@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-700 -650 12400 9000" role="img" aria-labelledby="title desc">
+<title id="title">Plan mieszkania — regal-salon, ustawienie potwierdzone</title>
+<desc id="desc">Pełny plan mieszkania z regałem regal-salon zaznaczonym w salonie przy ścianie SALON-W1. Pozycja została potwierdzona przez użytkownika: SALON-W1, wycentrowanie 128/128 mm, front do wnętrza salonu, mebel na podłodze.</desc>
+<defs>
+ <marker id="arrowFront" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 Z" fill="#b62934"/></marker>
+ <marker id="dimArrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse"><path d="M0,5 L10,0 L10,10 Z" fill="#4b5563"/></marker>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-opacity=".18"/></filter>
+</defs>
+<rect x="-700" y="-650" width="12400" height="9000" fill="#f7f6f0"/>
+<polygon points="0,0 10060,0 10060,5140 5040,5140 5040,7560 0,7560" fill="#888a81"/>
+<style>
+ text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;fill:#263238}
+ .room-name{font-size:130px;font-weight:700}.room-id{font-size:86px;fill:#5d655e}.wall{font-size:74px;fill:#59615b;font-weight:700}
+ .openwin{fill:#3e92b6}.opendoor{fill:#c68c47}.shaft{fill:#777970}
+ .dim{stroke:#4b5563;stroke-width:12;fill:none}.ext{stroke:#9ca3af;stroke-width:8}.dimtext{font-size:76px;font-weight:700;fill:#374151}
+ .assumption{font-size:72px;fill:#a2342f;font-weight:700}.note{font-size:72px;fill:#4b5563}
+</style>
+<polygon points="240,150 3940,150 3940,2390 240,2390" fill="#e4edde" stroke="#454b42" stroke-width="14"/>
+<text x="2090.0" y="1225.0" text-anchor="middle" class="room-name">Kuchnia</text><text x="2090.0" y="1355.0" text-anchor="middle" class="room-id">KUCHNIA</text>
+<polygon points="4060,150 4840,150 4840,1600 4060,1600" fill="#f0e8dd" stroke="#454b42" stroke-width="14"/>
+<text x="4450.0" y="830.0" text-anchor="middle" class="room-name">WC</text><text x="4450.0" y="960.0" text-anchor="middle" class="room-id">WC</text>
+<polygon points="4920,150 6370,150 6370,2390 4920,2390" fill="#dde9ed" stroke="#454b42" stroke-width="14"/>
+<text x="5645.0" y="1225.0" text-anchor="middle" class="room-name">Łazienka</text><text x="5645.0" y="1355.0" text-anchor="middle" class="room-id">LAZIENKA</text>
+<polygon points="6490,150 9820,150 9820,4990 6490,4990" fill="#ede8d7" stroke="#454b42" stroke-width="14"/>
+<text x="8155.0" y="2525.0" text-anchor="middle" class="room-name">Salon</text><text x="8155.0" y="2655.0" text-anchor="middle" class="room-id">SALON</text>
+<polygon points="240,2540 3940,2540 3940,4990 240,4990" fill="#e5e0ec" stroke="#454b42" stroke-width="14"/>
+<text x="2090.0" y="3720.0" text-anchor="middle" class="room-name">Pokój</text><text x="2090.0" y="3850.0" text-anchor="middle" class="room-id">POKOJ-9</text>
+<polygon points="4060,1600 4840,1600 4840,2540 6370,2540 6370,4990 4060,4990" fill="#e7e6df" stroke="#454b42" stroke-width="14"/>
+<text x="5215" y="3205" text-anchor="middle" class="room-name">Przedpokój</text><text x="5215" y="3335" text-anchor="middle" class="room-id">PRZEDPOKOJ</text>
+<polygon points="240,5140 4890,5140 4890,7410 240,7410" fill="#e6eada" stroke="#454b42" stroke-width="14"/>
+<text x="2565.0" y="6230.0" text-anchor="middle" class="room-name">Pokój z łóżkiem</text><text x="2565.0" y="6360.0" text-anchor="middle" class="room-id">POKOJ-LOZKO</text>
+<text x="8155" y="275" text-anchor="middle" dominant-baseline="middle" class="wall">SALON-W1</text><text x="9695" y="2570" text-anchor="middle" dominant-baseline="middle" class="wall">SALON-W2</text><text x="8155" y="4865" text-anchor="middle" dominant-baseline="middle" class="wall">SALON-W3</text><text x="6615" y="2570" text-anchor="middle" dominant-baseline="middle" class="wall">SALON-W4</text>
+<text x="5645" y="275" text-anchor="middle" dominant-baseline="middle" class="wall">LAZIENKA-W1</text><text x="6245" y="1270" text-anchor="middle" dominant-baseline="middle" class="wall">LAZIENKA-W2</text><text x="5645" y="2265" text-anchor="middle" dominant-baseline="middle" class="wall">LAZIENKA-W3</text><text x="5045" y="1270" text-anchor="middle" dominant-baseline="middle" class="wall">LAZIENKA-W4</text>
+<rect x="0" y="1000" width="240" height="1360" class="openwin"><title>Okno — kuchnia</title></rect><rect x="0" y="2570" width="240" height="1650" class="openwin"><title>Okno — pokój 9,07 m²</title></rect><rect x="0" y="5510" width="240" height="1380" class="openwin"><title>Okno — pokój 10,56 m²</title></rect><rect x="9820" y="1000" width="240" height="1400" class="openwin"><title>Okno — salon, część północna</title></rect><rect x="9820" y="3220" width="240" height="980" class="openwin"><title>Okno — salon, część południowa</title></rect><rect x="9820" y="2400" width="240" height="820" class="opendoor"><title>Drzwi balkonowe</title></rect>
+<rect x="4030" y="4990" width="780" height="150" class="opendoor"><title>Drzwi — pokój 10,56 m²</title></rect><rect x="5100" y="4990" width="820" height="150" class="opendoor"><title>Drzwi wejściowe</title></rect><rect x="3940" y="1580" width="120" height="800" class="opendoor"><title>Drzwi — kuchnia</title></rect><rect x="3940" y="3430" width="120" height="790" class="opendoor"><title>Drzwi — pokój 9,07 m²</title></rect><rect x="4840" y="1600" width="80" height="790" class="opendoor"><title>Drzwi — łazienka</title></rect><rect x="4060" y="1500" width="780" height="200" class="opendoor"><title>Otwór drzwiowy — WC</title></rect><rect x="6370" y="3410" width="120" height="790" class="opendoor"><title>Drzwi — salon</title></rect>
+<rect x="3390" y="970" width="550" height="600" class="shaft"/><text x="3665" y="1270" text-anchor="middle" font-size="80">SZACHT</text>
+<g id="regal-salon" filter="url(#shadow)"><rect x="6618.0" y="150" width="3074" height="423" rx="22" fill="#d43845" fill-opacity=".88" stroke="#861e28" stroke-width="18"/><line x1="6618.0" y1="573" x2="9692.0" y2="573" stroke="#fff" stroke-width="18" stroke-dasharray="42 28"/><text x="8155.0" y="315" text-anchor="middle" font-size="88" font-weight="800" fill="#fff">Regał w salonie · regal-salon</text><text x="8155.0" y="425" text-anchor="middle" font-size="68" font-weight="650" fill="#fff">3074 × 423 mm · front ↓</text></g>
+<line x1="8155.0" y1="361.5" x2="8155.0" y2="1093" stroke="#b62934" stroke-width="24" marker-end="url(#arrowFront)"/><text x="8225.0" y="1023" class="assumption">FRONT → wnętrze salonu</text>
+<line x1="6490" y1="-80" x2="6618.0" y2="-80" class="dim" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/><line x1="6490" y1="-60" x2="6490" y2="150" class="ext"/><line x1="6618.0" y1="-60" x2="6618.0" y2="150" class="ext"/><text x="6554.0" y="-125" text-anchor="middle" class="dimtext">128 mm</text>
+<line x1="9692.0" y1="-80" x2="9820" y2="-80" class="dim" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/><line x1="9692.0" y1="-60" x2="9692.0" y2="150" class="ext"/><line x1="9820" y1="-60" x2="9820" y2="150" class="ext"/><text x="9756.0" y="-125" text-anchor="middle" class="dimtext">128 mm</text>
+<line x1="6618.0" y1="740" x2="9692.0" y2="740" class="dim" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/><text x="8155.0" y="695" text-anchor="middle" class="dimtext">3074 mm</text><line x1="9910" y1="150" x2="9910" y2="573" class="dim" marker-start="url(#dimArrow)" marker-end="url(#dimArrow)"/><text x="10020" y="361.5" class="dimtext" transform="rotate(90 10020 361.5)">423 mm</text>
+<line x1="6918.0" y1="150" x2="6918.0" y2="-90" stroke="#a2342f" stroke-width="12"/><text x="6958.0" y="-95" class="assumption">POTWIERDZONE: plecy na SALON-W1, bez szczeliny</text><text x="8155.0" y="925" text-anchor="middle" class="assumption">POTWIERDZONE: wycentrowanie 128 / 128 mm, front do wnętrza salonu, mebel stoi na podłodze</text>
+<text x="-300" y="-430" font-size="165" font-weight="800">regal-salon · lokalizacja potwierdzona</text><text x="-300" y="7850" class="note">Niebieski: okna · pomarańczowy: drzwi · czerwony: regal-salon. Geometria mieszkania z plan/mieszkanie.svg.</text><text x="-300" y="7990" class="note">Lokalizacja potwierdzona przez użytkownika. Renderer manifest pozostaje niezmieniony do czasu obsługi pełnego modelu.</text>
+</svg>
