@@ -2,7 +2,31 @@
   "schemaVersion": 1,
   "assetId": "regal-salon",
   "name": "Regał w salonie",
-  "placement": null,
-  "currentVersion": null,
-  "versions": []
+  "placement": {
+    "confirmed": true,
+    "roomId": "SALON",
+    "wallId": "SALON-W1",
+    "positionMm": [8155.0, 0.0, 361.5],
+    "rotationDeg": 0.0,
+    "confirmationSvg": "meble/regal-salon/plany/v0001.svg",
+    "description": "Regał stoi na podłodze tyłem przy SALON-W1, frontem do środka salonu. Szerokość ściany 3330 mm, szerokość regału 3074 mm; wycentrowany: 128 mm od lewego i 128 mm od prawego narożnika ściany."
+  },
+  "currentVersion": "v0001",
+  "versions": [
+    {
+      "id": "v0001",
+      "file": "meble/regal-salon/wersje/v0001.json",
+      "summary": "Pierwsza publikacja uzgodnionego regału 3074×2430×423 mm: układ 8×6, wspólne przegrody 18 mm, plecy 3 mm, 20 wpuszczanych frontów cofniętych 10 mm, centralny otwór 746×786 mm i półka 200×200×18 mm. Ustawienie przy SALON-W1 wycentrowane po 128 mm.",
+      "createdAt": "2026-09-08T16:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "SALON",
+        "wallId": "SALON-W1",
+        "positionMm": [8155.0, 0.0, 361.5],
+        "rotationDeg": 0.0,
+        "confirmationSvg": "meble/regal-salon/plany/v0001.svg",
+        "description": "Regał stoi na podłodze tyłem przy SALON-W1, frontem do środka salonu. Szerokość ściany 3330 mm, szerokość regału 3074 mm; wycentrowany: 128 mm od lewego i 128 mm od prawego narożnika ściany."
+      }
+    }
+  ]
 }
