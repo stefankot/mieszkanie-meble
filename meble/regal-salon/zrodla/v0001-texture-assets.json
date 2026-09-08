@@ -1,0 +1,20 @@
+{
+  "model": "regal-salon",
+  "separateTextureFilesRequiredForRegal": false,
+  "reason": "Materiał regału wykorzystuje proceduralne mapy CanvasTexture generowane bezpośrednio w kompletnym źródle HTML. Nie ma osobnych bitmap wymaganych do zachowania wyglądu klonu w tym modelu.",
+  "rendererExternalPBRReferences": {
+    "defaultResolution": "4k",
+    "note": "Poniższe zasoby są referencjami globalnego renderera. Aktualny materiał korpusu regal-salon nie jest oznaczony jako surface='wood', więc te mapy nie są podstawową zależnością materiału regału.",
+    "oak_veneer_03": [
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/oak_veneer_03/oak_veneer_03_diff_4k.jpg",
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/oak_veneer_03/oak_veneer_03_nor_gl_4k.jpg",
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/oak_veneer_03/oak_veneer_03_rough_4k.jpg"
+    ],
+    "poly_wool_herringbone": [
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/poly_wool_herringbone/poly_wool_herringbone_diff_4k.jpg",
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/poly_wool_herringbone/poly_wool_herringbone_nor_gl_4k.jpg",
+      "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/poly_wool_herringbone/poly_wool_herringbone_rough_4k.jpg"
+    ]
+  },
+  "downloadStatus": "Nie dołączono binarnych map zewnętrznych: proceduralne tekstury regału są zapisane w źródle modelu; dokładne URL-e globalnych map PBR zachowano powyżej."
+}
