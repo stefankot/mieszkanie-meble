@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "assetId": "lozko",
+  "name": "Łóżko pod oknem",
+  "placement": {
+    "confirmed": false,
+    "roomId": "POKOJ-LOZKO",
+    "wallId": "POKOJ-LOZKO-W4",
+    "positionMm": [
+      1258,
+      0,
+      6275
+    ],
+    "rotationDeg": 90,
+    "confirmationSvg": "plan/lozko-istniejace.svg",
+    "description": "Istniejące ustawienie odziedziczone z pliku użytkownika; nie jest nową akceptacją SVG."
+  },
+  "currentVersion": "bazowa",
+  "versions": [
+    {
+      "id": "bazowa",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "summary": "Oryginalne łóżko — geometria i mechanizmy bez zmian",
+      "placement": {
+        "confirmed": false,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [
+          1258,
+          0,
+          6275
+        ],
+        "rotationDeg": 90,
+        "confirmationSvg": "plan/lozko-istniejace.svg",
+        "description": "Istniejące ustawienie odziedziczone z pliku użytkownika; nie jest nową akceptacją SVG."
+      }
+    }
+  ]
+}

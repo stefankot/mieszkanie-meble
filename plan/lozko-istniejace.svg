@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-600 -500 12200 8800" role="img" aria-labelledby="title desc">
+<title id="title">Plan mieszkania — pomieszczenia i ściany</title>
+<desc id="desc">Plan pochodzi z dostarczonego renderera. Jednostki współrzędnych: milimetry. Niebieskie otwory to okna, pomarańczowe to drzwi.</desc>
+<rect x="-600" y="-500" width="12200" height="8800" fill="#f7f6f0"/>
+<polygon points="0,0 10060,0 10060,5140 5040,5140 5040,7560 0,7560" fill="#888a81"/>
+<polygon points="240.0,150.0 3940.0,150.0 3940.0,2390.0 240.0,2390.0" fill="#e4edde" stroke="#454b42" stroke-width="14"/>
+<text x="2090.0" y="1225.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Kuchnia</text>
+<text x="2090.0" y="1385.0" text-anchor="middle" font-family="sans-serif" font-size="90">KUCHNIA</text>
+<text x="2090.0" y="275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="3815.0" y="1270.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="2090.0" y="2265.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="365.0" y="1270.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<polygon points="4060.0,150.0 4840.0,150.0 4840.0,1600.0 4060.0,1600.0" fill="#f0e8dd" stroke="#454b42" stroke-width="14"/>
+<text x="4450.0" y="830.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">WC</text>
+<text x="4450.0" y="990.0" text-anchor="middle" font-family="sans-serif" font-size="90">WC</text>
+<text x="4450.0" y="275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="4715.0" y="875.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="4450.0" y="1475.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="4185.0" y="875.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<polygon points="4920.0,150.0 6370.0,150.0 6370.0,2390.0 4920.0,2390.0" fill="#dde9ed" stroke="#454b42" stroke-width="14"/>
+<text x="5645.0" y="1225.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Łazienka</text>
+<text x="5645.0" y="1385.0" text-anchor="middle" font-family="sans-serif" font-size="90">LAZIENKA</text>
+<text x="5645.0" y="275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="6245.0" y="1270.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="5645.0" y="2265.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="5045.0" y="1270.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<polygon points="6490.0,150.0 9820.0,150.0 9820.0,4990.0 6490.0,4990.0" fill="#ede8d7" stroke="#454b42" stroke-width="14"/>
+<text x="8155.0" y="2525.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Salon</text>
+<text x="8155.0" y="2685.0" text-anchor="middle" font-family="sans-serif" font-size="90">SALON</text>
+<text x="8155.0" y="275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="9695.0" y="2570.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="8155.0" y="4865.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="6615.0" y="2570.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<polygon points="240.0,2540.0 3940.0,2540.0 3940.0,4990.0 240.0,4990.0" fill="#e5e0ec" stroke="#454b42" stroke-width="14"/>
+<text x="2090.0" y="3720.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Pokój</text>
+<text x="2090.0" y="3880.0" text-anchor="middle" font-family="sans-serif" font-size="90">POKOJ-9</text>
+<text x="2090.0" y="2665.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="3815.0" y="3765.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="2090.0" y="4865.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="365.0" y="3765.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<polygon points="4060.0,1600.0 4840.0,1600.0 4840.0,2540.0 6370.0,2540.0 6370.0,4990.0 4060.0,4990.0" fill="#e7e6df" stroke="#454b42" stroke-width="14"/>
+<text x="5215.0" y="3250.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Przedpokój</text>
+<text x="5215.0" y="3410.0" text-anchor="middle" font-family="sans-serif" font-size="90">PRZEDPOKOJ</text>
+<text x="4450.0" y="1725.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="4715.0" y="2070.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="5605.0" y="2665.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="6245.0" y="3765.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<text x="5215.0" y="4865.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W5</text>
+<text x="4185.0" y="3295.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W6</text>
+<polygon points="240.0,5140.0 4890.0,5140.0 4890.0,7410.0 240.0,7410.0" fill="#e6eada" stroke="#454b42" stroke-width="14"/>
+<text x="2565.0" y="6230.0" text-anchor="middle" font-family="sans-serif" font-size="130" font-weight="bold">Pokój z łóżkiem</text>
+<text x="2565.0" y="6390.0" text-anchor="middle" font-family="sans-serif" font-size="90">POKOJ-LOZKO</text>
+<text x="2565.0" y="5265.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W1</text>
+<text x="4765.0" y="6275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W2</text>
+<text x="2565.0" y="7285.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W3</text>
+<text x="365.0" y="6275.0" text-anchor="middle" dominant-baseline="middle" fill="#4d5548" font-family="sans-serif" font-size="88">W4</text>
+<rect x="0.0" y="1000.0" width="240.0" height="1360.0" fill="#3e92b6"><title>Okno — kuchnia</title></rect>
+<rect x="0.0" y="2570.0" width="240.0" height="1650.0" fill="#3e92b6"><title>Okno — pokój 9,07 m²</title></rect>
+<rect x="0.0" y="5510.0" width="240.0" height="1380.0" fill="#3e92b6"><title>Okno — pokój 10,56 m²</title></rect>
+<rect x="9820.0" y="1000.0" width="240.0" height="1400.0" fill="#3e92b6"><title>Okno — salon, część północna</title></rect>
+<rect x="9820.0" y="3220.0" width="240.0" height="980.0" fill="#3e92b6"><title>Okno — salon, część południowa</title></rect>
+<rect x="9820.0" y="2400.0" width="240.0" height="820.0" fill="#c68c47"><title>Drzwi balkonowe</title></rect>
+<rect x="4030.0" y="4990.0" width="780.0" height="150.0" fill="#c68c47"><title>Drzwi — pokój 10,56 m²</title></rect>
+<rect x="5100.0" y="4990.0" width="820.0" height="150.0" fill="#c68c47"><title>Drzwi wejściowe do mieszkania</title></rect>
+<rect x="3940.0" y="1580.0" width="120.0" height="800.0" fill="#c68c47"><title>Drzwi — kuchnia</title></rect>
+<rect x="3940.0" y="3430.0" width="120.0" height="790.0" fill="#c68c47"><title>Drzwi — pokój 9,07 m²</title></rect>
+<rect x="4840.0" y="1600.0" width="80.0" height="790.0" fill="#c68c47"><title>Drzwi — łazienka</title></rect>
+<rect x="4060.0" y="1500.0" width="780.0" height="200.0" fill="#c68c47"><title>Otwór drzwiowy — WC</title></rect>
+<rect x="6370.0" y="3410.0" width="120.0" height="790.0" fill="#c68c47"><title>Drzwi — salon</title></rect>
+<rect x="3390" y="970" width="550" height="600" fill="#888a81"/><text x="3665.0" y="1270.0" text-anchor="middle" font-family="sans-serif" font-size="80">SZACHT</text>
+<g font-family="sans-serif" font-size="105" fill="#354235"><text x="-300" y="-220" font-size="165" font-weight="bold">Plan odniesienia do ustawiania mebli</text><text x="5400" y="5600">SALON-W4: długa ściana od strony</text><text x="5400" y="5780">łazienki i przedpokoju.</text><text x="5400" y="6180">Niebieski: okna · Pomarańczowy: drzwi</text><text x="5400" y="6460">SVG: X w prawo, Z w dół; Y = wysokość.</text><text x="5400" y="6740">Współrzędne w mm. Skala zgodna z rendererem.</text><text x="5400" y="7020">Nie zastępuje pomiaru mieszkania.</text></g>
+<!-- FURNITURE_OVERLAY: wstaw tu grupę mebla, strzałkę frontu i wymiary przed potwierdzeniem. -->
+<g transform="translate(1258 6275) rotate(-90)"><rect x="-1135" y="-818" width="2270" height="1636" rx="25" fill="#ce6c3e" fill-opacity=".65" stroke="#803e25" stroke-width="25"/><path d="M0 0 V650 m-100 -150 l100 150 100 -150" fill="none" stroke="#552d20" stroke-width="35"/></g><text x="2200" y="6500" font-family="sans-serif" font-size="130" fill="#7d3b21">Łóżko — istniejące ustawienie</text></svg>

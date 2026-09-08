@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "currentVersion": "2026-09-08-v1",
+  "versions": [
+    {
+      "id": "2026-09-08-v1",
+      "label": "2026-09-08-v1",
+      "file": "renderery/2026-09-08-v1.html",
+      "sha256": "158ec811bfe1339abb58e81fc55e1ad994d2715283be798ba18b13fa5074ffb9",
+      "source": "renderery/zrodla/2026-09-08-v1.html",
+      "sourceSha256": "e82d58fa53f4ce535797f17fc2253a16a4d1384c29767e9d9d1718ba987eecb1",
+      "engineSha256": "37e688f4358b4284062e4af4f0bd76b74e8faa9af63f80510d3c8aadad62c91f",
+      "integration": "mebel-sync/1"
+    }
+  ]
+}
