@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-600 -500 11200 8300">
+<defs>
+  <marker id="af" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#7b2f34"/></marker>
+  <marker id="ak" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#2f6578"/></marker>
+  <marker id="ad" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto-start-reverse"><path d="M10 5L0 0L0 10Z" fill="#655b55"/></marker>
+  <style>text{font-family:Arial,sans-serif}.room{stroke:#454b42;stroke-width:14}.wall{fill:#4d5548;font-size:88px}.rn{font-size:130px;font-weight:700}.rid{font-size:90px}.note{font-size:90px}.dim{fill:#5a514c;font-size:76px;font-weight:700}</style>
+</defs>
+<rect x="-600" y="-500" width="11200" height="8300" fill="#f7f6f0"/>
+<polygon points="0,0 10060,0 10060,5140 5040,5140 5040,7560 0,7560" fill="#888a81"/>
+<polygon class="room" points="240,150 3940,150 3940,2390 240,2390" fill="#e4edde"/>
+<text x="2090" y="1225" text-anchor="middle" class="rn">Kuchnia</text><text x="2090" y="1385" text-anchor="middle" class="rid">KUCHNIA</text>
+<text x="2090" y="275" text-anchor="middle" class="wall">W1</text><text x="3815" y="1270" text-anchor="middle" class="wall">W2</text><text x="2090" y="2265" text-anchor="middle" class="wall">W3</text><text x="365" y="1270" text-anchor="middle" class="wall">W4</text>
+<polygon class="room" points="4060,150 4840,150 4840,1600 4060,1600" fill="#f0e8dd"/><text x="4450" y="830" text-anchor="middle" class="rn">WC</text>
+<polygon class="room" points="4920,150 6370,150 6370,2390 4920,2390" fill="#dde9ed"/><text x="5645" y="1225" text-anchor="middle" class="rn">Łazienka</text><text x="5645" y="1385" text-anchor="middle" class="rid">LAZIENKA</text>
+<polygon class="room" points="6490,150 9820,150 9820,4990 6490,4990" fill="#ede8d7"/><text x="8155" y="2525" text-anchor="middle" class="rn">Salon</text><text x="8155" y="2685" text-anchor="middle" class="rid">SALON</text>
+<polygon class="room" points="240,2540 3940,2540 3940,4990 240,4990" fill="#e5e0ec"/><text x="2090" y="3720" text-anchor="middle" class="rn">Pokój</text><text x="2090" y="3880" text-anchor="middle" class="rid">POKOJ-9</text>
+<polygon class="room" points="4060,1600 4840,1600 4840,2540 6370,2540 6370,4990 4060,4990" fill="#e7e6df"/><text x="5215" y="3250" text-anchor="middle" class="rn">Przedpokój</text><text x="5215" y="3410" text-anchor="middle" class="rid">PRZEDPOKOJ</text>
+<polygon class="room" points="240,5140 4890,5140 4890,7410 240,7410" fill="#e6eada"/><text x="2565" y="6230" text-anchor="middle" class="rn">Pokój z łóżkiem</text><text x="2565" y="6390" text-anchor="middle" class="rid">POKOJ-LOZKO</text>
+<rect x="0" y="1000" width="240" height="1360" fill="#3e92b6"/><rect x="0" y="2570" width="240" height="1650" fill="#3e92b6"/><rect x="0" y="5510" width="240" height="1380" fill="#3e92b6"/>
+<rect x="9820" y="1000" width="240" height="1400" fill="#3e92b6"/><rect x="9820" y="3220" width="240" height="980" fill="#3e92b6"/><rect x="9820" y="2400" width="240" height="820" fill="#c68c47"/>
+<rect x="4030" y="4990" width="780" height="150" fill="#c68c47"/><rect x="5100" y="4990" width="820" height="150" fill="#c68c47"/><rect x="3940" y="1580" width="120" height="800" fill="#c68c47"/><rect x="3940" y="3430" width="120" height="790" fill="#c68c47"/><rect x="4840" y="1600" width="80" height="790" fill="#c68c47"/><rect x="4060" y="1500" width="780" height="200" fill="#c68c47"/><rect x="6370" y="3410" width="120" height="790" fill="#c68c47"/>
+<rect x="3390" y="970" width="550" height="600" fill="#888a81"/><text x="3665" y="1270" text-anchor="middle" font-size="80">SZACHT</text>
+<g id="kuchnia-v0001">
+  <rect x="240" y="150" width="2900" height="600" rx="14" fill="#5d8fa1" fill-opacity=".82" stroke="#244d5d" stroke-width="18"/>
+  <line x1="840" y1="150" x2="840" y2="750" stroke="#d9edf3" stroke-width="12"/><line x1="2840" y1="150" x2="2840" y2="750" stroke="#d9edf3" stroke-width="12"/>
+  <text x="540" y="430" text-anchor="middle" fill="#fff" font-size="76" font-weight="700">LODÓWKA</text>
+  <text x="1840" y="390" text-anchor="middle" fill="#fff" font-size="94" font-weight="700">NOWA KUCHNIA</text><text x="1840" y="500" text-anchor="middle" fill="#fff" font-size="72">2000 mm ciąg</text>
+  <text x="2990" y="390" text-anchor="middle" fill="#fff" font-size="64" font-weight="700">300</text><text x="2990" y="475" text-anchor="middle" fill="#fff" font-size="56">słup</text>
+  <line x1="1690" y1="760" x2="1690" y2="1060" stroke="#2f6578" stroke-width="24" marker-end="url(#ak)"/><text x="1760" y="975" fill="#2f6578" font-size="74" font-weight="700">FRONT → środek kuchni</text>
+  <line x1="240" y1="850" x2="3140" y2="850" stroke="#655b55" stroke-width="10" marker-start="url(#ad)" marker-end="url(#ad)"/><text x="1690" y="820" text-anchor="middle" class="dim">2900 mm</text><text x="260" y="945" class="dim">dosunięta do lewego narożnika W1</text>
+</g>
+<g id="regal-context">
+  <rect x="1490" y="2080" width="1200" height="310" rx="12" fill="#7b2f34" fill-opacity=".9" stroke="#4d171b" stroke-width="18"/>
+  <text x="2090" y="2190" text-anchor="middle" fill="#fff" font-size="92" font-weight="700">Regał w kuchni</text><text x="2090" y="2290" text-anchor="middle" fill="#fff" font-size="70">regal-kuchnia · 1200 × 310 mm</text>
+  <line x1="2090" y1="2070" x2="2090" y2="1700" stroke="#7b2f34" stroke-width="24" marker-end="url(#af)"/><text x="2180" y="1785" fill="#7b2f34" font-size="74" font-weight="700">FRONT → KUCHNIA-W1</text>
+  <line x1="240" y1="1980" x2="1490" y2="1980" stroke="#655b55" stroke-width="10" marker-start="url(#ad)" marker-end="url(#ad)"/><text x="865" y="1920" text-anchor="middle" class="dim">1250 mm</text>
+  <line x1="2690" y1="1980" x2="3940" y2="1980" stroke="#655b55" stroke-width="10" marker-start="url(#ad)" marker-end="url(#ad)"/><text x="3315" y="1920" text-anchor="middle" class="dim">1250 mm</text>
+</g>
+<line x1="3440" y1="750" x2="3440" y2="2080" stroke="#655b55" stroke-width="10" marker-start="url(#ad)" marker-end="url(#ad)"/><text x="3530" y="1440" class="dim" transform="rotate(90 3530 1440)">1330 mm między obrysami</text>
+<text x="-300" y="-220" font-size="165" font-weight="700" fill="#354235">Potwierdzone ustawienie: kuchnia + regal-kuchnia</text>
+<text x="5400" y="5600" class="note" fill="#354235">Kuchnia: 2900 × 600 mm przy KUCHNIA-W1</text><text x="5400" y="5780" class="note" fill="#354235">Start w lewym narożniku: X=240 mm</text><text x="5400" y="5960" class="note" fill="#354235">Regał: 1200 × 310 mm, środek KUCHNIA-W3</text><text x="5400" y="6140" class="note" fill="#354235">Fronty zwrócone ku sobie</text>
+</svg>
