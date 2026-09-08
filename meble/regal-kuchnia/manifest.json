@@ -2,7 +2,31 @@
   "schemaVersion": 1,
   "assetId": "regal-kuchnia",
   "name": "Regał w kuchni",
-  "placement": null,
-  "currentVersion": null,
-  "versions": []
+  "placement": {
+    "confirmed": true,
+    "roomId": "KUCHNIA",
+    "wallId": "KUCHNIA-W3",
+    "positionMm": [2090, 0, 2235],
+    "rotationDeg": 180,
+    "confirmationSvg": "meble/regal-kuchnia/plany/v0001.svg",
+    "description": "Kuchnia. Regał 1200 × 310 × 2400 mm wyśrodkowany przy KUCHNIA-W3: po 1250 mm od obu narożników tej ściany. Tylna krawędź przylega do W3; lokalny +Z/front jest skierowany do KUCHNIA-W1. Na rysunku potwierdzającym pokazano także kontekst zabudowy kuchennej 2900 × 600 mm przy W1, dosuniętej do lewego narożnika. Ustawienie zaakceptowane 2026-09-08."
+  },
+  "currentVersion": "v0001",
+  "versions": [
+    {
+      "id": "v0001",
+      "file": "meble/regal-kuchnia/wersje/v0001.json",
+      "summary": "Regał kuchenny 1200 × 310 × 2400 mm z płyty 18 mm, bez pleców: regularna siatka 3 × 6, wpuszczane drewnopodobne drzwiczki w rzędach 1 i 6 oraz bordowy front 1160 × 772 mm opuszczany do funkcji biurka, obejmujący rzędy 3 i 4. Położenie przy KUCHNIA-W3 zaakceptowane.",
+      "createdAt": "2026-09-08T16:10:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "KUCHNIA",
+        "wallId": "KUCHNIA-W3",
+        "positionMm": [2090, 0, 2235],
+        "rotationDeg": 180,
+        "confirmationSvg": "meble/regal-kuchnia/plany/v0001.svg",
+        "description": "Kuchnia. Regał 1200 × 310 × 2400 mm wyśrodkowany przy KUCHNIA-W3: po 1250 mm od obu narożników tej ściany. Tylna krawędź przylega do W3; lokalny +Z/front jest skierowany do KUCHNIA-W1. Na rysunku potwierdzającym pokazano także kontekst zabudowy kuchennej 2900 × 600 mm przy W1, dosuniętej do lewego narożnika. Ustawienie zaakceptowane 2026-09-08."
+      }
+    }
+  ]
 }
