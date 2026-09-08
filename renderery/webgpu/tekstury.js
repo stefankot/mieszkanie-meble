@@ -25,10 +25,7 @@ const API = ['boxGeo','board','boardMaterial','pegMaterial','fabricMaterial','se
              'drawSky','drawBoardHeight','drawFabricAlbedo','FABRIC_PROFILES',
              'attachSurfaceFinish','cloneMaterial'];
 
-let fabryka = null;
-
 async function pobierzFabryke(){
-  if(fabryka) return fabryka;
   const odp = await fetch(ZRODLO);
   if(!odp.ok) throw Error('Nie można pobrać źródła tekstur: HTTP ' + odp.status);
   const html = await odp.text();
@@ -55,13 +52,15 @@ function boxGeo(w,h,d,r,seg){
 }
 `;
   const cialo = preambula + blok + '\nreturn {' + API.join(',') + '};';
-  fabryka = new Function('THREE', cialo);
-  return fabryka;
+  return new Function('THREE', cialo);
 }
 
-export async function utworzTekstury(THREE){
-  const f = await pobierzFabryke();
-  const T = f(THREE);
+/* Pobranie odbywa się raz, na poziomie modułu (top-level await), dzięki czemu
+   eksportowana funkcja jest synchroniczna i silnik nie musi jej awaitować. */
+const fabryka = await pobierzFabryke();
+
+export function utworzTekstury(THREE){
+  const T = fabryka(THREE);
   // materiały egzemplarzowe tworzone tu, bo w oryginale leżą tuż za wycinkiem
   T.mattressMat = T.fabricMaterial('#c9c04f');
   T.cushionMat  = T.fabricMaterial('#d1c858');
