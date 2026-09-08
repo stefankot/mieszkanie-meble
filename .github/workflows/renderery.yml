@@ -1,0 +1,48 @@
+name: Zbuduj wersje rendererów
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'renderery/zrodla/**'
+      - 'narzedzia/**'
+      - '.github/workflows/renderery.yml'
+      - 'biblioteka-start.zip'
+permissions:
+  contents: write
+concurrency:
+  group: renderer-build
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Zbuduj bez zmiany silnika
+        run: |
+          if [ -f biblioteka-start.zip ] && [ ! -f FORMAT-MEBLA.md ]; then
+            python3 - <<'PY'
+          import zipfile
+          from pathlib import PurePosixPath
+          with zipfile.ZipFile('biblioteka-start.zip') as archive:
+              for name in archive.namelist():
+                  p = PurePosixPath(name)
+                  assert not p.is_absolute() and '..' not in p.parts and p.parts[0] not in ('.git', '.github')
+              archive.extractall('.')
+          PY
+          fi
+          if [ -f narzedzia/buduj.py ]; then python3 narzedzia/buduj.py; fi
+      - name: Zapisz wygenerowane wersje
+        run: |
+          if [ ! -f FORMAT-MEBLA.md ]; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md FORMAT-MEBLA.md index.html .nojekyll renderery plan meble prompty narzedzia
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Zbuduj katalog rendererów z zachowaniem silnika'
+          git pull --rebase origin main
+          git push origin HEAD:main
