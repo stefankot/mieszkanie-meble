@@ -1,0 +1,82 @@
+{
+  "schema": "regal-salon-procedural-textures-v1",
+  "version": "v0002",
+  "sourceCompleteHtmlSha256": "0bd6a268057b9ffdcfdd4c1f8f2ee22cfd7849b45ad13cf0217fb729ea787691",
+  "purpose": "Deklaratywny, deterministyczny opis proceduralnych map użytych przez materiały regału. Nie zawiera JavaScriptu ani shaderów.",
+  "numericModel": {
+    "rng": {
+      "type": "lcg32",
+      "stateUnsigned32": true,
+      "multiplier": 1664525,
+      "increment": 1013904223,
+      "modulus": 4294967296,
+      "output": "state / 4294967296"
+    },
+    "noiseSampling": {
+      "wrap": "periodic",
+      "interpolation": "bilinear-after-smoothstep",
+      "smoothstep": "t*t*(3-2*t)"
+    },
+    "fbm": {
+      "gridSizePerOctave": "base * 2^octave",
+      "seedPerOctave": "seed + octave*7919",
+      "initialAmplitude": 1.0,
+      "amplitudeMultiplier": 0.5,
+      "normalization": "divide by sum of amplitudes"
+    }
+  },
+  "maps": {
+    "board-albedo": {
+      "sizePx": [512,512],
+      "channels": "RGBA8",
+      "colorSpace": "sRGB",
+      "baseColor": "#ffffff",
+      "fbm": {"seed":4242,"octaves":4,"base":4},
+      "formula": {"noise":"fbm(u,v)-0.5","redDelta":10.0,"greenDelta":10.0,"blueDelta":9.0,"alpha":255,"clamp":[0,255],"quantization":"Uint8ClampedArray semantics"}
+    },
+    "board-height": {
+      "sizePx": [512,512],
+      "channels": "R8",
+      "colorSpace": "linear/data",
+      "formula": {"constant":0.5,"terms":[{"fbm":{"seed":777,"octaves":3,"base":5},"subtract":0.5,"multiply":0.55},{"fbm":{"seed":991,"octaves":2,"base":64},"subtract":0.5,"multiply":0.45}],"clamp":[0,1],"scaleTo":255,"quantization":"Uint8ClampedArray semantics"}
+    },
+    "board-normal": {
+      "sizePx": [512,512],
+      "channels": "RGB8",
+      "colorSpace": "linear/data",
+      "derivedFrom": "board-height",
+      "method": "Sobel-3x3-periodic",
+      "strength": 0.65,
+      "encoding": "XYZ normalized to [0,255]"
+    },
+    "board-roughness": {
+      "sizePx": [512,512],
+      "channels": "R8",
+      "colorSpace": "linear/data",
+      "formula": {"constant":0.86,"terms":[{"fbm":{"seed":313,"octaves":4,"base":6},"subtract":0.5,"multiply":0.2},{"fbm":{"seed":515,"octaves":2,"base":48},"subtract":0.5,"multiply":0.07}],"clamp":[0,1],"scaleTo":255,"quantization":"Uint8ClampedArray semantics"}
+    },
+    "detail-micro": {
+      "sizePx": [512,512],
+      "channels": "R8",
+      "colorSpace": "linear/data",
+      "formula": {"constant":0.5,"terms":[{"fbm":{"seed":9901,"octaves":3,"base":80},"subtract":0.5,"multiply":0.7},{"fbm":{"seed":9907,"octaves":2,"base":32},"subtract":0.5,"multiply":0.3}],"clamp":[0,1],"scaleTo":255,"quantization":"Uint8ClampedArray semantics"}
+    },
+    "macro-noise": {
+      "sizePx": [512,512],
+      "channels": "R8",
+      "colorSpace": "linear/data",
+      "formula": {"constant":0.5,"terms":[{"fbm":{"seed":20260908,"octaves":4,"base":3},"subtract":0.5,"multiply":0.86},{"fbm":{"seed":20260909,"octaves":3,"base":11},"subtract":0.5,"multiply":0.28}],"clamp":[0,1],"scaleTo":255,"quantization":"Uint8ClampedArray semantics"}
+    }
+  },
+  "materialTextureTransforms": {
+    "maple-body": {"tileCm":3,"factorySurfaceSizeCm":[243,42],"baseRepeat":[81,14]},
+    "maple-front": {"tileCm":5,"factorySurfaceSizeCm":[78.2,36],"baseRepeat":[15.64,7.2]},
+    "maple-back": {"tileCm":8,"factorySurfaceSizeCm":[243,115.5],"baseRepeat":[30.375,14.4375]}
+  },
+  "externalRendererPbrReferences": {
+    "appliesToRegal": false,
+    "reason": "Materiały regal-salon nie mają userData.surface='wood', więc rejestracja PBR nie podmienia ich map.",
+    "oak_veneer_03": "referencja globalnego renderera, nie zależność modelu",
+    "poly_wool_herringbone": "referencja globalnego renderera, nie zależność modelu"
+  }
+}
