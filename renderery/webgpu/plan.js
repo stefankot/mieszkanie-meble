@@ -45,5 +45,28 @@ for(let j=0;j<NY;j++)for(let k=0;k<NZ;k++)for(let i=0;i<NX;i++)if(cellAt(i,j,k))
 }
 const wallGeometry=new THREE.BufferGeometry();wallGeometry.setAttribute('position',new THREE.Float32BufferAttribute(wallPositions,3));wallGeometry.computeVertexNormals();wallGeometry.computeBoundingBox();
 
-  return {APARTMENT, wallGeometry, wallPositions, insidePolygon, roomAt, roomCenter};
+
+/* ---------- ZAPYTANIA KOLIZYJNE ----------
+   Wyłącznie nowe funkcje odczytu. Dane planu, siatka ścian i kolejność
+   wierzchołków nie są tu ruszane — udostępniamy to, co i tak zostało
+   policzone wyżej, żeby nawigacja nie musiała powtarzać tej logiki. */
+function przedzial(tab, v){
+  if(v < tab[0] || v >= tab[tab.length-1]) return -1;
+  let lo = 0, hi = tab.length - 2;
+  while(lo < hi){ const m = (lo + hi + 1) >> 1; if(tab[m] <= v) lo = m; else hi = m - 1; }
+  return lo;
+}
+/* Czy punkt leży w bryle ściany (z uwzględnieniem otworów okiennych i drzwiowych). */
+function czySciana(x, y, z){
+  const i = przedzial(xs, x), j = przedzial(ys, y), k = przedzial(zs, z);
+  if(i < 0 || j < 0 || k < 0) return false;
+  return cells[cellIndex(i, j, k)] === 1;
+}
+/* Czy nad punktem jest podłoga, po której wolno chodzić (mieszkanie albo balkon). */
+function czyPodloga(x, z){
+  return insidePolygon(x, z, APARTMENT.outer) || inRect(x, z, APARTMENT.balcony);
+}
+
+  return {APARTMENT, wallGeometry, wallPositions, insidePolygon, roomAt, roomCenter,
+          czySciana, czyPodloga, wallBoxes};
 }
