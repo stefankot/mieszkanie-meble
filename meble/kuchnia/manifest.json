@@ -2,7 +2,31 @@
   "schemaVersion": 1,
   "assetId": "kuchnia",
   "name": "Nowa kuchnia",
-  "placement": null,
-  "currentVersion": null,
-  "versions": []
+  "placement": {
+    "confirmed": true,
+    "roomId": "KUCHNIA",
+    "wallId": "KUCHNIA-W1",
+    "positionMm": [1690, 0, 450],
+    "rotationDeg": 0,
+    "confirmationSvg": "meble/kuchnia/plany/v0001.svg",
+    "description": "Kuchnia. Zabudowa 2900 × 600 mm dosunięta do lewego narożnika KUCHNIA-W1: 600 mm kolumna lodówki + 2000 mm ciąg główny + 300 mm prawy słup. Tylna krawędź przylega do W1; lokalny +Z/front jest skierowany do wnętrza kuchni i w stronę regału przy KUCHNIA-W3. Ustawienie obu elementów zostało zaakceptowane na wspólnym rysunku 2026-09-08."
+  },
+  "currentVersion": "v0001",
+  "versions": [
+    {
+      "id": "v0001",
+      "file": "meble/kuchnia/wersje/v0001.json",
+      "summary": "Nowa kuchnia 2900 × 600 × 2500 mm: 600 mm kolumna lodówki, główny ciąg 2000 mm w rytmie 60+60+40+40, górne szafki do sufitu, bordowa wnęka z półkami, stalowy blat, zlew, zmywarka i prawy słup 300 mm z wentylowanym frontem przed grzejnikiem. Położenie przy KUCHNIA-W1 zaakceptowane.",
+      "createdAt": "2026-09-08T16:30:18+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "KUCHNIA",
+        "wallId": "KUCHNIA-W1",
+        "positionMm": [1690, 0, 450],
+        "rotationDeg": 0,
+        "confirmationSvg": "meble/kuchnia/plany/v0001.svg",
+        "description": "Kuchnia. Zabudowa 2900 × 600 mm dosunięta do lewego narożnika KUCHNIA-W1: 600 mm kolumna lodówki + 2000 mm ciąg główny + 300 mm prawy słup. Tylna krawędź przylega do W1; lokalny +Z/front jest skierowany do wnętrza kuchni i w stronę regału przy KUCHNIA-W3. Ustawienie obu elementów zostało zaakceptowane na wspólnym rysunku 2026-09-08."
+      }
+    }
+  ]
 }
