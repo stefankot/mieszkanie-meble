@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0001.svg",
     "description": "Pokój z łóżkiem. Obrys 2270 × 1636 mm jest rozpięty między POKOJ-LOZKO-W1 i W3; tylna krawędź jest 200 mm od POKOJ-LOZKO-W4 (ściana z oknem). Lokalny +Z/front jest skierowany do wnętrza pokoju. Ustawienie zaakceptowane 2026-09-08."
   },
-  "currentVersion": "v0001",
+  "currentVersion": "bazowa",
   "versions": [
     {
       "id": "bazowa",
@@ -31,7 +31,7 @@
     {
       "id": "v0001",
       "file": "meble/lozko/wersje/v0001.json",
-      "summary": "Aktualny projekt łóżka: korpus 2270 × 1636 mm, materac 2000 × 1600 mm wpuszczony 50 mm, bursztynowy materac i cztery klinowe poduchy 80 cm w układzie L, SPF, TV, półki, kołki oraz boczny schowek 234 × 1600 mm. Położenie zaakceptowane na planie.",
+      "summary": "NIEPEŁNA — utracone mechanizmy i perforacje — Aktualny projekt łóżka: korpus 2270 × 1636 mm, materac 2000 × 1600 mm wpuszczony 50 mm, bursztynowy materac i cztery klinowe poduchy 80 cm w układzie L, SPF, TV, półki, kołki oraz boczny schowek 234 × 1600 mm. Położenie zaakceptowane na planie.",
       "createdAt": "2026-09-08T15:18:06+02:00",
       "placement": {
         "confirmed": true,
