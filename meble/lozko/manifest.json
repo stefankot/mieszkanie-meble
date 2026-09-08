@@ -3,19 +3,15 @@
   "assetId": "lozko",
   "name": "Łóżko pod oknem",
   "placement": {
-    "confirmed": false,
+    "confirmed": true,
     "roomId": "POKOJ-LOZKO",
     "wallId": "POKOJ-LOZKO-W4",
-    "positionMm": [
-      1258,
-      0,
-      6275
-    ],
+    "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "plan/lozko-istniejace.svg",
-    "description": "Istniejące ustawienie odziedziczone z pliku użytkownika; nie jest nową akceptacją SVG."
+    "confirmationSvg": "meble/lozko/plany/v0001.svg",
+    "description": "Pokój z łóżkiem. Obrys 2270 × 1636 mm jest rozpięty między POKOJ-LOZKO-W1 i W3; tylna krawędź jest 200 mm od POKOJ-LOZKO-W4 (ściana z oknem). Lokalny +Z/front jest skierowany do wnętrza pokoju. Ustawienie zaakceptowane 2026-09-08."
   },
-  "currentVersion": "bazowa",
+  "currentVersion": "v0001",
   "versions": [
     {
       "id": "bazowa",
@@ -26,14 +22,25 @@
         "confirmed": false,
         "roomId": "POKOJ-LOZKO",
         "wallId": "POKOJ-LOZKO-W4",
-        "positionMm": [
-          1258,
-          0,
-          6275
-        ],
+        "positionMm": [1258, 0, 6275],
         "rotationDeg": 90,
         "confirmationSvg": "plan/lozko-istniejace.svg",
         "description": "Istniejące ustawienie odziedziczone z pliku użytkownika; nie jest nową akceptacją SVG."
+      }
+    },
+    {
+      "id": "v0001",
+      "file": "meble/lozko/wersje/v0001.json",
+      "summary": "Aktualny projekt łóżka: korpus 2270 × 1636 mm, materac 2000 × 1600 mm wpuszczony 50 mm, bursztynowy materac i cztery klinowe poduchy 80 cm w układzie L, SPF, TV, półki, kołki oraz boczny schowek 234 × 1600 mm. Położenie zaakceptowane na planie.",
+      "createdAt": "2026-09-08T15:18:06+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0001.svg",
+        "description": "Pokój z łóżkiem. Obrys 2270 × 1636 mm jest rozpięty między POKOJ-LOZKO-W1 i W3; tylna krawędź jest 200 mm od POKOJ-LOZKO-W4 (ściana z oknem). Lokalny +Z/front jest skierowany do wnętrza pokoju. Ustawienie zaakceptowane 2026-09-08."
       }
     }
   ]
