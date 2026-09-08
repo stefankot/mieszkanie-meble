@@ -1,8 +1,1 @@
-{
-  "schemaVersion": 1,
-  "assetId": "regal-przy-lozku",
-  "name": "Regał w pokoju z łóżkiem",
-  "placement": null,
-  "currentVersion": null,
-  "versions": []
-}
+{"schemaVersion":1,"assetId":"regal-przy-lozku","name":"Regał w pokoju z łóżkiem","placement":{"confirmed":true,"roomId":"POKOJ-LOZKO","wallId":"POKOJ-LOZKO-W2","positionMm":[3616,0,6718],"rotationDeg":180,"confirmationSvg":"meble/regal-przy-lozku/plany/v0001.svg","description":"Prawy dolny narożnik pokoju z łóżkiem. Krótsze skrzydło K stoi przy ścianie przeciwległej do okna (POKOJ-LOZKO-W2), dłuższe D przy dolnej ścianie (POKOJ-LOZKO-W3). Koniec K jest 886 mm od ściany z drzwiami; ok. 106 mm od końca skrzydła całkowicie otwartych drzwi. Lewy koniec D jest 2102 mm od ściany z oknem. Ustawienie zaakceptowane przez użytkownika."},"currentVersion":"v0001","versions":[{"id":"v0001","file":"meble/regal-przy-lozku/wersje/v0001.json","summary":"Pierwsza wersja: pełny regał L z układem D/K/N, biurkami w R3, skorygowanymi przegrodami R4/R5 i niszą 300×300×300 mm w K-R6-C2; zatwierdzone ustawienie w pokoju z łóżkiem.","createdAt":"2026-09-08T14:59:00+02:00","placement":{"confirmed":true,"roomId":"POKOJ-LOZKO","wallId":"POKOJ-LOZKO-W2","positionMm":[3616,0,6718],"rotationDeg":180,"confirmationSvg":"meble/regal-przy-lozku/plany/v0001.svg","description":"Prawy dolny narożnik pokoju z łóżkiem. Krótsze skrzydło K stoi przy ścianie przeciwległej do okna (POKOJ-LOZKO-W2), dłuższe D przy dolnej ścianie (POKOJ-LOZKO-W3). Koniec K jest 886 mm od ściany z drzwiami; ok. 106 mm od końca skrzydła całkowicie otwartych drzwi. Lewy koniec D jest 2102 mm od ściany z oknem. Ustawienie zaakceptowane przez użytkownika."}}]}
