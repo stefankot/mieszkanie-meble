@@ -1,0 +1,19 @@
+{
+  "schema": "regal-salon-instance-finish-v1",
+  "version": "v0002",
+  "source": "meble/regal-salon/zrodla/v0001-model.js + complete viewer finish pipeline",
+  "description": "Deterministyczne parametry wariancji powierzchni dla 88 panelowych siatek modelu.",
+  "profile": "panel",
+  "algorithm": {
+    "rng": "lcg32 from procedural texture spec",
+    "seedExpression": "seed*2654435761 modulo 2^32",
+    "uvOffsetRange": [-0.5,0.5],
+    "uvRotationFormulaRad": "(r-0.5)*0.03",
+    "roughnessDeltaFormula": "(r-0.5)*0.06",
+    "hueShiftTurnsFormula": "(r-0.5)*0.002",
+    "saturationScaleFormula": "1+(r-0.5)*0.02",
+    "lightnessScaleFormula": "1+(r-0.5)*0.01",
+    "randomDrawOrder": ["uvOffsetX","uvOffsetY","uvRotation","roughness","hue","saturation","lightness"]
+  },
+  "seedOrder": ["plecy_B1","plecy_B2","plecy_B3","pion_0","pion_1","pion_2","pion_3","pion_C4C5_dol","pion_C4C5_gora","pion_5","pion_6","pion_7","pion_8","poziom_L0_C1","poziom_L0_C2","poziom_L0_C3","poziom_L0_C4","poziom_L0_C5","poziom_L0_C6","poziom_L0_C7","poziom_L0_C8","poziom_L1_C1","poziom_L1_C2","poziom_L1_C3","poziom_L1_C4","poziom_L1_C5","poziom_L1_C6","poziom_L1_C7","poziom_L1_C8","poziom_L2_C1","poziom_L2_C2","poziom_L2_C3","poziom_L2_C4","poziom_L2_C5","poziom_L2_C6","poziom_L2_C7","poziom_L2_C8","poziom_L3_C1","poziom_L3_C2","poziom_L3_C3","poziom_L3_C6","poziom_L3_C7","poziom_L3_C8","poziom_L4_C1","poziom_L4_C2","poziom_L4_C3","poziom_L4_C4","poziom_L4_C5","poziom_L4_C6","poziom_L4_C7","poziom_L4_C8","poziom_L5_C1","poziom_L5_C2","poziom_L5_C3","poziom_L5_C4","poziom_L5_C5","poziom_L5_C6","poziom_L5_C7","poziom_L5_C8","poziom_L6_C1","poziom_L6_C2","poziom_L6_C3","poziom_L6_C4","poziom_L6_C5","poziom_L6_C6","poziom_L6_C7","poziom_L6_C8","polka_centralna_200x200","F_C1_B","F_C1_T","F_C2_B","F_C2_T","F_C3_B","F_C3_T","F_C4_B","F_C4_T","F_C5_B","F_C5_T","F_C6_B","F_C6_T","F_C7_B","F_C7_T","F_C8_B","F_C8_T","F_C1_M","F_C2_M","F_C7_M","F_C8_M"]
+}
