@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "assetId": "regal-salon",
+  "name": "Regał w salonie",
+  "sourceVersion": "v0001",
+  "publicationMode": "source-only",
+  "rendererDefault": false,
+  "placement": {
+    "confirmed": true,
+    "roomId": "SALON",
+    "wallId": "SALON-W1",
+    "positionMm": [8155, 0, 361.5],
+    "rotationDeg": 0,
+    "confirmationSvg": "meble/regal-salon/plany/v0001.svg",
+    "description": "Wycentrowany na SALON-W1: 128 mm od obu narożników; plecy przy ścianie bez szczeliny; front do wnętrza salonu; mebel stoi na podłodze."
+  },
+  "files": {
+    "modelSource": "meble/regal-salon/zrodla/v0001-model.js",
+    "limitations": "meble/regal-salon/zrodla/v0001-FORMAT-MEBLA-braki.md",
+    "textureInventory": "meble/regal-salon/zrodla/v0001-texture-assets.json"
+  },
+  "checksums": {
+    "completeHtmlSha256": "0bd6a268057b9ffdcfdd4c1f8f2ee22cfd7849b45ad13cf0217fb729ea787691",
+    "modelSourceSha256": "ee0075a31effac344ea0b23f7087a9d5173380e22f506f1ee726102ec39175da"
+  },
+  "note": "Nie ustawiono meble/regal-salon/manifest.json jako currentVersion, ponieważ FORMAT-MEBLA.md v1 nie odtwarza pełnego oświetlenia, materiałów i logiki tego modelu."
+}
