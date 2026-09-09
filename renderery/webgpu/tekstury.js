@@ -15,6 +15,8 @@
    jako graf TSL w kolejnej iteracji silnika.
    ============================================================ */
 
+import { pobierz, postep } from './siec.js';
+
 const ZRODLO = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/renderery/zrodla/2026-09-08-v1.html';
 const OD = 'function referenceWood(size){';
 const DO = 'var mattressMat = fabricMaterial(';
@@ -25,9 +27,34 @@ const API = ['boxGeo','board','boardMaterial','pegMaterial','fabricMaterial','se
              'drawSky','drawBoardHeight','drawFabricAlbedo','FABRIC_PROFILES',
              'attachSurfaceFinish','cloneMaterial'];
 
+/* Zweryfikowany blok trzymamy w localStorage pod kluczem zawierającym sumę
+   kontrolną. Przy kolejnym wejściu nie ma ani pobrania, ani liczenia SHA —
+   a to był najdłuższy etap startu (4,5 s wraz z inicjalizacją WebGPU).
+   Klucz zawiera sumę, więc zmiana zatwierdzonego źródła unieważnia zapis sama
+   z siebie: stary wpis po prostu przestaje pasować i lecimy po nowe. */
+const KLUCZ_PAMIECI = 'mieszkanie-webgpu:tekstury:' + SUMA;
+
+function zPamieci(){
+  try{
+    const t = localStorage.getItem(KLUCZ_PAMIECI);
+    return t && t.length > 500 ? t : null;
+  }catch(e){ return null; }
+}
+function doPamieci(blok){
+  try{ localStorage.setItem(KLUCZ_PAMIECI, blok); }
+  catch(e){ /* brak miejsca nie może psuć uruchomienia */ }
+}
+
 async function pobierzFabryke(){
-  const odp = await fetch(ZRODLO);
-  if(!odp.ok) throw Error('Nie można pobrać źródła tekstur: HTTP ' + odp.status);
+  const zapamietany = zPamieci();
+  if(zapamietany){
+    postep('Kod tekstur z pamięci podręcznej…', .10);
+    return new Function('THREE', preambula() + zapamietany + '\nreturn {' + API.join(',') + '};');
+  }
+  postep('Pobieranie kodu tekstur…', .08);
+  /* To jest top-level await całego modułu: bez limitu czasu jedno zawieszone
+     połączenie zatrzymywało graf modułów i strona stała pusta, bez błędu. */
+  const odp = await pobierz(ZRODLO, {}, {opis: 'źródło tekstur'});
   const html = await odp.text();
   const i = html.indexOf(OD), j = html.indexOf(DO);
   if(i < 0 || j < 0 || j <= i) throw Error('Nie znaleziono bloku tekstur w źródle.');
@@ -37,10 +64,7 @@ async function pobierzFabryke(){
     .map(x => x.toString(16).padStart(2,'0')).join('');
   if(suma !== SUMA) throw Error('Blok tekstur nie zgadza się z zatwierdzoną wersją (' + suma.slice(0,12) + ').');
 
-  /* Preambuła: to, czego wycinek potrzebuje, a co w źródle leży poza nim.
-     MAXANISO — WebGPURenderer nie ma capabilities.getMaxAnisotropy().
-     CHAMFER i boxGeo — w źródle stoją niżej, przy budowie mebla. */
-  const preambula = `
+  const cialoPreambuly = `
 const MAXANISO = 16;
 const CHAMFER = .28;
 function boxGeo(w,h,d,r,seg){
@@ -51,8 +75,25 @@ function boxGeo(w,h,d,r,seg){
   return new THREE.RoundedBoxGeometry(w,h,d, seg||1, r);
 }
 `;
-  const cialo = preambula + blok + '\nreturn {' + API.join(',') + '};';
-  return new Function('THREE', cialo);
+  doPamieci(blok);
+  return new Function('THREE', cialoPreambuly + blok + '\nreturn {' + API.join(',') + '};');
+}
+
+/* Preambuła: to, czego wycinek potrzebuje, a co w źródle leży poza nim.
+   MAXANISO — WebGPURenderer nie ma capabilities.getMaxAnisotropy().
+   CHAMFER i boxGeo — w źródle stoją niżej, przy budowie mebla. */
+function preambula(){
+  return `
+const MAXANISO = 16;
+const CHAMFER = .28;
+function boxGeo(w,h,d,r,seg){
+  r = (r===undefined) ? CHAMFER : r;
+  var lim = Math.min(w,h,d)*0.49;
+  r = Math.min(r, lim);
+  if(r <= 0.005) return new THREE.BoxGeometry(w,h,d);
+  return new THREE.RoundedBoxGeometry(w,h,d, seg||1, r);
+}
+`;
 }
 
 /* Pobranie odbywa się raz, na poziomie modułu (top-level await), dzięki czemu
