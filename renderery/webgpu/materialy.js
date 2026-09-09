@@ -22,6 +22,7 @@
 import { texture, vec3 } from 'three/tsl';
 import { dodajNiedoskonalosci } from './niedoskonalosci.js';
 import { zTerminem, ponow, postep } from './siec.js';
+import { semantyczneUV } from './uv-drewna.js';
 
 const CDN = 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg';
 const HDRI = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr';
@@ -214,6 +215,7 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
      wyznaczają, ile razy próbka ma się powtórzyć. Wykonywane raz na geometrię. */
   function skalujUV(mesh, cmProbki = 100){
     const g = mesh.geometry;
+    if(mesh.userData.woodUV && semantyczneUV(g, mesh.userData.woodUV)) return;
     if(!g || !g.attributes.uv || g.userData.uvSkala) return;
     if(!g.boundingBox) g.computeBoundingBox();
     const r = g.boundingBox.getSize(new THREE.Vector3());

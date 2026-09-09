@@ -1256,3 +1256,16 @@ Box z jawnym edgeRadiusMm omija globalne minimum2,2mm. 0mm pozostaje ostrym BoxG
 Dodano uniform i ustawWariacjeKoloru(boolean), opcjonalnie `?imperfections=color-off`. Wyłączenie usuwa wyłącznie proceduralną zmianę albedo (przebarwienia/brud/wytarcia koloru); roughnessNode, geometria, gradacja forniru, światła i ekspozycja pozostają te same. Domyślnie wariacja koloru jest nadal włączona.
 
 [RUNTIME] Ten sam kadr regału salonu, kamera[820,145,220]cm, cel[820,140,40]cm, wysoka jakość, pixel ratio1, bufor1657×924, ekspozycja0,55, 5s warm-up +10s pomiaru. Bez wariacji koloru zmiana jest subtelna; fornir pozostaje czytelny. Nie stwierdzono wystarczającego zysku obrazu, aby automatycznie zmieniać domyślny wygląd. rAF on:p50/p95/p99=100,0/117,7/133,8ms, n96; off:116,6/133,3/134,3ms,n91. To krótkie obserwacje, nie dowód kosztu samej zmiany koloru. **NO GPU TIMING.** Uniform nie usuwa obliczeń warstwy i nie jest optymalizacją shaderów. 0 zarejestrowanych błędów GPU/rejection. Składnia/diff: PASS. Rollback: true w przełączniku/usunięcie parametru albo revert P4. Słabsza gradacja oak odłożona, aby nie mieszać dwóch zmian.
+
+
+## P5 — semantyczne UV forniru (2026-09-09)
+
+[CURRENT CODE] Dodano lokalne UV w milimetrach: grainDirection, textureGrainAxis, textureScaleMm, grainOffset, veneerSheetId, veneerContinuityGroup i orientację ścian. Istniejące modele bez pól zachowują dotychczasowe UV. Brak globalnego triplanar.
+
+POC dotyczy tylko F16/F17 regału salon v0004. Fixture nie jest zatwierdzonym modelem ani wpisem manifestu. Podgląd zamienia jedynie geometrię UV i przywraca oryginały. Przesunięcie arkusza wynosi 382 mm, wliczając odstęp między frontami.
+
+[RUNTIME] Chrome, widoczna karta; A/B kamera [820,145,400], target [820,140,40], viewport 1657×924, buffer 1242×693, DPR urządzenia 2, ratio renderera 0.75, profil minimalna, exposure 0.55. Identyczne parametry obu wariantów, events=[]; pionowy słój pozostaje pionowy, drugi front otrzymuje inną część arkusza. Pierwszy próbny wariant odrzucono: błędnie zakładał oś U skanu; oak_veneer_01 ma słój w osi V. Powtórzono po korekcie i zablokowaniu kamery tylko w lokalnym narzędziu testowym.
+
+[REPO] 11/11 testów geometrii P3 i UV P5 przechodzi na three 0.185.0. [NO DATA] NO GPU TIMING; brak benchmarku wydajności i brak deklarowanego przyspieszenia. Początkowe błędy połączeń lokalnego serwera ustąpiły po przeładowaniu; nie klasyfikowano ich jako błędów GPU.
+
+Rollback: usunąć pola UV z nowego modelu albo cofnąć ten commit. Nie zmieniono aktywnych wersji, materiałów, światła ani domyślnego obrazu. Publikacja obejmuje adapter i nieaktywny POC.

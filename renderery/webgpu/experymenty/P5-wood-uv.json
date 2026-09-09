@@ -1,0 +1,44 @@
+{
+  "assetId": "regal-salon",
+  "sourceVersion": "v0004",
+  "confirmed": false,
+  "description": "Wyłącznie POC UV dwóch frontów. Nie jest snapshotem do aktywacji.",
+  "parts": {
+    "F16": {
+      "grainDirection": "y",
+      "textureScaleMm": [
+        1000,
+        1000
+      ],
+      "grainOffset": [
+        0,
+        0
+      ],
+      "veneerSheetId": "poc-sheet-01",
+      "veneerContinuityGroup": "poc-top-fronts",
+      "faceOrientation": {
+        "pz": 0,
+        "px": 0
+      },
+      "textureGrainAxis": "v"
+    },
+    "F17": {
+      "grainDirection": "y",
+      "textureScaleMm": [
+        1000,
+        1000
+      ],
+      "grainOffset": [
+        382,
+        0
+      ],
+      "veneerSheetId": "poc-sheet-01",
+      "veneerContinuityGroup": "poc-top-fronts",
+      "faceOrientation": {
+        "pz": 0,
+        "px": 0
+      },
+      "textureGrainAxis": "v"
+    }
+  }
+}

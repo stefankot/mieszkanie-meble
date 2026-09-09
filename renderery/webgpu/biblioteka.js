@@ -24,6 +24,7 @@
    ============================================================ */
 
 import { pobierz, postep } from './siec.js';
+import { semantyczneUV } from './uv-drewna.js';
 
 const BAZA = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
 const MEBLE = [
@@ -131,6 +132,11 @@ const TYPY_CZESCI = {
 };
 
 function siatka(geometria, p, {THREE, materialBazowy, model}){
+  const woodUV = Object.hasOwn(p, 'grainDirection') ? Object.fromEntries(
+    ['grainDirection', 'textureGrainAxis', 'textureScaleMm', 'grainOffset', 'veneerSheetId',
+     'veneerContinuityGroup', 'faceOrientation']
+      .filter(k => Object.hasOwn(p, k)).map(k => [k, structuredClone(p[k])])) : null;
+  if(woodUV) semantyczneUV(geometria, woodUV);
   const d = model.materials[p.material];
   if(!d) throw Error('brak materiału ' + p.material);
   const rozmiar = p.sizeMm || [500, 500, 500];
@@ -147,6 +153,7 @@ function siatka(geometria, p, {THREE, materialBazowy, model}){
   o.userData.design = Object.fromEntries(
     ['edgeRadiusMm', 'gapMm', 'recessMm', 'panelThicknessMm']
       .filter(k => Object.hasOwn(p, k)).map(k => [k, p[k]]));
+  if(woodUV) o.userData.woodUV = woodUV;
   o.castShadow = o.receiveShadow = true;
   return o;
 }
