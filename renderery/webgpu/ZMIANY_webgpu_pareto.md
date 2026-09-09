@@ -1230,3 +1230,11 @@ Wysoka jakość: pixelRatio 1,25 → 1,0, z zachowaniem limitu devicePixelRatio.
 
 ### Zamknięcie iteracji i zgoda na publikację
 Użytkownik zatwierdził wszystkie zmiany i polecił zapis oraz synchronizację GitHuba. Pozostawiono: GI 50%, SSR 50%, skala wysokiej jakości 1,0 i poprawiony detektor ruchu. Ostatni pomiar użytkownika (skala 1,25 → 1,0): 10,2 → 16,5 FPS, klatki >50 ms: 97,1% → 93,3%. Wcześniej SSR 90% → 50%: 14,0 → 14,8 FPS. Wydajność nadal nie zapewnia płynnego spaceru; dalsze strojenie zakończono na polecenie użytkownika.
+
+## P1 — jawne jednostki i kontrolowany SSR A/B — 2026-09-09
+
+Scena pozostaje w cm, dane mebli w mm. Dodano helpery cm/m w konfiguracji długości SSGI, SSR i SSS; wszystkie wartości liczbowe zachowane. Standardowy SSR r185 ogranicza odległość punkt–płaszczyzna, nie stałą długość promienia. Składnia Node i git diff --check: PASS.
+
+[RUNTIME] Chrome152/M2, wysoka jakość, stały kadr metalowego blatu, bufor1657×924, pixel ratio1, ACES0,55, GI28/6. Przeprowadzono off (intensity0, koszt SSR pozostaje),1cm,50cm,100cm,200cm oraz powrót do1cm. 5s rozgrzewki +10s rAF na próbę; 0 zarejestrowanych błędów GPU/rejection. **NO GPU TIMING.** rAF p50/p95/p99 w ms:1cm66,7/83,4/83,8;50cm83,3/84,2/100;100cm83,2/84,1/84,3;200cm67,5/83,4/83,9. Wyniki krótkie i niemonotoniczne; nie stanowią pomiaru GPU ani dowodu skalowania kosztu.
+
+Większy próg przywraca odbicie baterii i ściany, ale wprowadza poszarpaną granicę trafień. Zmianę domyślnego zasięgu odrzucono na tym etapie; pozostaje1cm. P14 wymaga osobnego testu odszumiania/rekonstrukcji. Rollback: revert tej zmiany jednostek. Żaden model/manifest nie został zmieniony ani aktywowany. Publikacja zatwierdzona zbiorczą instrukcją użytkownika.

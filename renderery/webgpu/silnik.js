@@ -34,6 +34,11 @@ import { postep, koniecPomiaru } from './siec.js';
 import { utworzInterakcje } from './interakcje.js';
 import { utworzZaslony } from './zaslony.js';
 
+/* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
+   Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
+const cm = wartosc => wartosc;
+const m = wartosc => cm(wartosc * 100);
+
 /* Kompilacja WGSL blokuje główny wątek, więc pasek postępu zamarza dokładnie
    wtedy, gdy jest najbardziej potrzebny. Przed każdym długim etapem oddajemy
    przeglądarce dwie klatki, żeby zdążyła narysować nowy komunikat. */
@@ -912,8 +917,8 @@ const gi = ssgi(kKolor, kGlebia, normalnaSceny, camera);
 gi.useTemporalFiltering = false;
 gi.sliceCount.value = 2;                 // [WebGI] rayCount 2
 gi.stepCount.value = 8;
-gi.radius.value = 200;                   // [WebGI] objectRadius 2 m → 200 cm
-gi.thickness.value = 60;                 // [WebGI] tolerance
+gi.radius.value = m(2);
+gi.thickness.value = cm(60);
 /* aoIntensity 1 zwierało kąt za szafą do czerni i kasowało gradację cienia.
    Przy .68 okluzja nadal rysuje styki, ale zostawia rysunek w półcieniu. */
 gi.aoIntensity.value = .68;
@@ -940,15 +945,17 @@ window.__silnik.ustawSkaleSSGI = ustawSkaleSSGI;
 const wezelAO = gi.getAONode();
 const wezelGI = gi.getGINode();
 
-/* --- SSR: parametry Lumena 1:1 --- */
+/* --- SSR: standardowy r185; długości w jednostkach sceny (cm). --- */
 const odbicia = ssr(kKolor, kGlebia, normalnaSceny, {
   metalnessNode: kMetRou.r,
   roughnessNode: kMetRou.g
 });
 odbicia.quality.value = .35;              // [Lumen] ssr.quality
 odbicia.intensity.value = 1.2;            // [Lumen] ssr.intensity
-odbicia.maxDistance.value = 1;            // [Lumen] ssr.maxDistance
-odbicia.thickness.value = .1;             // [Lumen] ssr.thickness
+/* Standardowy SSR ogranicza odległość punkt–płaszczyzna, nie stałą długość
+   promienia. 1 cm pozostaje bazą do A/B z m(.5), m(1), ewentualnie m(2). */
+odbicia.maxDistance.value = cm(1);
+odbicia.thickness.value = cm(.1);
 odbicia.mirrorBias.value = .5;            // [Lumen] ssr.mirrorBias
 odbicia.maxLuminance.value = 35;          // [Lumen] ssr.maxLuminance
 odbicia.screenEdgeFade.value = .2;        // [Lumen] ssr.screenEdgeFade
@@ -986,8 +993,8 @@ if(giCzyste){
    centymetry, stąd maxDistance i thickness są większe niż domyślne. */
 const cienKontaktowy = UZYJ_SSGI ? sss(kGlebia, camera, slonce) : null;
 if(cienKontaktowy){
-  cienKontaktowy.maxDistance.value = 9;      // cm — dalej robi się z tego obwódka
-  cienKontaktowy.thickness.value = 2.5;      // cm
+  cienKontaktowy.maxDistance.value = cm(9); // dalej robi się z tego obwódka
+  cienKontaktowy.thickness.value = cm(2.5);
   cienKontaktowy.shadowIntensity.value = .22;
   cienKontaktowy.quality.value = .6;
 }
