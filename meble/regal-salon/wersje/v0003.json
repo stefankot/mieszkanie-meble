@@ -1,0 +1,1923 @@
+{
+  "schemaVersion": 1,
+  "assetId": "regal-salon",
+  "version": "v0003",
+  "summary": "Przesunięcie regału o 128 mm w lewo: lewy bok przy SALON-W4, 256 mm od SALON-W2 na zasłony. Model bez zmian.",
+  "placement": {
+    "confirmed": true,
+    "roomId": "SALON",
+    "wallId": "SALON-W1",
+    "positionMm": [
+      8027,
+      0,
+      361.5
+    ],
+    "rotationDeg": 0.0,
+    "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
+    "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
+  },
+  "model": {
+    "name": "Regał w salonie",
+    "units": "mm",
+    "materials": {
+      "maple-0375": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.58,
+        "metalness": 0.0
+      },
+      "maple-0375-front": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.54,
+        "metalness": 0.0
+      },
+      "maple-0375-back": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.62,
+        "metalness": 0.0
+      }
+    },
+    "parts": [
+      {
+        "id": "V01",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          -1528.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 1"
+      },
+      {
+        "id": "V02",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          -1146.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 2"
+      },
+      {
+        "id": "V03",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          -764.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 3"
+      },
+      {
+        "id": "V04",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          -382.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 4"
+      },
+      {
+        "id": "V05",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          382.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 5"
+      },
+      {
+        "id": "V06",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          764.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 6"
+      },
+      {
+        "id": "V07",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          1146.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 7"
+      },
+      {
+        "id": "V08",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          2430.0,
+          420.0
+        ],
+        "positionMm": [
+          1528.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion pełny 8"
+      },
+      {
+        "id": "VC-DOL",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          822.0,
+          420.0
+        ],
+        "positionMm": [
+          0.0,
+          411.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion centralny dolny"
+      },
+      {
+        "id": "VC-GORA",
+        "type": "box",
+        "sizeMm": [
+          18.0,
+          822.0,
+          420.0
+        ],
+        "positionMm": [
+          0.0,
+          2019.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Pion centralny górny"
+      },
+      {
+        "id": "H01",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -1337.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C1"
+      },
+      {
+        "id": "H02",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -955.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C2"
+      },
+      {
+        "id": "H03",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -573.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C3"
+      },
+      {
+        "id": "H04",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -191.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C4"
+      },
+      {
+        "id": "H05",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          191.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C5"
+      },
+      {
+        "id": "H06",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          573.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C6"
+      },
+      {
+        "id": "H07",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          955.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C7"
+      },
+      {
+        "id": "H08",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          1337.0,
+          9.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny dolny C8"
+      },
+      {
+        "id": "H09",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -1337.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C1"
+      },
+      {
+        "id": "H10",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -955.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C2"
+      },
+      {
+        "id": "H11",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -573.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C3"
+      },
+      {
+        "id": "H12",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -191.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C4"
+      },
+      {
+        "id": "H13",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          191.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C5"
+      },
+      {
+        "id": "H14",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          573.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C6"
+      },
+      {
+        "id": "H15",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          955.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C7"
+      },
+      {
+        "id": "H16",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          1337.0,
+          813.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R2-R3 C8"
+      },
+      {
+        "id": "H17",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -1337.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C1"
+      },
+      {
+        "id": "H18",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -955.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C2"
+      },
+      {
+        "id": "H19",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -573.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C3"
+      },
+      {
+        "id": "H20",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -191.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C4"
+      },
+      {
+        "id": "H21",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          191.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C5"
+      },
+      {
+        "id": "H22",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          573.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C6"
+      },
+      {
+        "id": "H23",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          955.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C7"
+      },
+      {
+        "id": "H24",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          1337.0,
+          1617.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny R4-R5 C8"
+      },
+      {
+        "id": "H25",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -1337.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C1"
+      },
+      {
+        "id": "H26",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -955.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C2"
+      },
+      {
+        "id": "H27",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -573.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C3"
+      },
+      {
+        "id": "H28",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -191.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C4"
+      },
+      {
+        "id": "H29",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          191.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C5"
+      },
+      {
+        "id": "H30",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          573.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C6"
+      },
+      {
+        "id": "H31",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          955.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C7"
+      },
+      {
+        "id": "H32",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          1337.0,
+          2421.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Poziom pełny górny C8"
+      },
+      {
+        "id": "H33",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          -573.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka otwarta C3 R3-R4"
+      },
+      {
+        "id": "H34",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          420.0
+        ],
+        "positionMm": [
+          573.0,
+          1215.0,
+          1.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka otwarta C6 R3-R4"
+      },
+      {
+        "id": "HR01",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -1337.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C1"
+      },
+      {
+        "id": "HR02",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -955.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C2"
+      },
+      {
+        "id": "HR03",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -573.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C3"
+      },
+      {
+        "id": "HR04",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -191.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C4"
+      },
+      {
+        "id": "HR05",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          191.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C5"
+      },
+      {
+        "id": "HR06",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          573.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C6"
+      },
+      {
+        "id": "HR07",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          955.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C7"
+      },
+      {
+        "id": "HR08",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          1337.0,
+          411.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R1-R2 C8"
+      },
+      {
+        "id": "HR09",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -1337.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C1"
+      },
+      {
+        "id": "HR10",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -955.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C2"
+      },
+      {
+        "id": "HR11",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -573.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C3"
+      },
+      {
+        "id": "HR12",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -191.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C4"
+      },
+      {
+        "id": "HR13",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          191.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C5"
+      },
+      {
+        "id": "HR14",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          573.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C6"
+      },
+      {
+        "id": "HR15",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          955.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C7"
+      },
+      {
+        "id": "HR16",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          1337.0,
+          2019.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R5-R6 C8"
+      },
+      {
+        "id": "HR17",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -1337.0,
+          1215.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R3-R4 C1"
+      },
+      {
+        "id": "HR18",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          -955.0,
+          1215.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R3-R4 C2"
+      },
+      {
+        "id": "HR19",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          955.0,
+          1215.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R3-R4 C7"
+      },
+      {
+        "id": "HR20",
+        "type": "box",
+        "sizeMm": [
+          364.0,
+          18.0,
+          379.0
+        ],
+        "positionMm": [
+          1337.0,
+          1215.0,
+          -19.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka cofnięta R3-R4 C8"
+      },
+      {
+        "id": "F01",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -1337.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C1 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F02",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -955.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C2 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F03",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -573.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C3 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F04",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -191.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C4 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F05",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          191.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C5 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F06",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          573.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C6 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F07",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          955.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C7 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F08",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          1337.0,
+          411.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C8 R1-R2",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F09",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -1337.0,
+          1215.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C1 R3-R4",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F10",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -955.0,
+          1215.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C2 R3-R4",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F11",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          955.0,
+          1215.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C7 R3-R4",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F12",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          1337.0,
+          1215.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C8 R3-R4",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F13",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -1337.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C1 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F14",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -955.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C2 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F15",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -573.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C3 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F16",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          -191.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C4 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F17",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          191.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C5 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F18",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          573.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C6 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F19",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          955.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C7 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "F20",
+        "type": "box",
+        "sizeMm": [
+          360.0,
+          782.0,
+          18.0
+        ],
+        "positionMm": [
+          1337.0,
+          2019.0,
+          192.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-front",
+        "label": "Front C8 R5-R6",
+        "bevelMm": 1.0
+      },
+      {
+        "id": "S-CENTRUM",
+        "type": "box",
+        "sizeMm": [
+          200.0,
+          18.0,
+          200.0
+        ],
+        "positionMm": [
+          0.0,
+          1215.0,
+          -108.5
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375",
+        "label": "Półka centralna 200×200×18"
+      },
+      {
+        "id": "B1",
+        "type": "box",
+        "sizeMm": [
+          1155.0,
+          2430.0,
+          3.0
+        ],
+        "positionMm": [
+          -959.5,
+          1215.0,
+          -210.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-back",
+        "label": "Plecy B1"
+      },
+      {
+        "id": "B2",
+        "type": "box",
+        "sizeMm": [
+          1146.0,
+          2430.0,
+          3.0
+        ],
+        "positionMm": [
+          191.0,
+          1215.0,
+          -210.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-back",
+        "label": "Plecy B2"
+      },
+      {
+        "id": "B3",
+        "type": "box",
+        "sizeMm": [
+          773.0,
+          2430.0,
+          3.0
+        ],
+        "positionMm": [
+          1150.5,
+          1215.0,
+          -210.0
+        ],
+        "rotationDeg": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "material": "maple-0375-back",
+        "label": "Plecy B3"
+      }
+    ],
+    "joints": [],
+    "notes": [
+      "Geometria publikacji odpowiada ustaleniom z rozmowy: 3074×2430×423 mm, korpus 420 mm + plecy 3 mm, płyta 18 mm.",
+      "Standardowe światło modułu: 364×384 mm. Centralne C4+C5 / R3+R4: jeden otwór 746×786 mm bez środkowego pionu i bez środkowej półki.",
+      "20 frontów ma 360×782×18 mm, po 2 mm luzu z każdej strony i cofnięcie płaszczyzny frontu dokładnie 10 mm od przedniej krawędzi korpusu.",
+      "20 półek za wysokimi frontami ma głębokość 379 mm, aby nie kolidować z frontami wpuszczanymi.",
+      "Półka centralna ma 200×200×18 mm i jest wycentrowana w otworze; w rzeczywistej konstrukcji jest mocowana do ściany na niewidocznych wspornikach.",
+      "Dokładne strony zawiasowania poszczególnych 20 frontów nie zostały ustalone w rozmowie. Nie zapisano mechanizmów hinge, aby nie zgadywać ich osi/pivotów; wszystkie fronty są zachowane w dokładnej pozycji zamkniętej.",
+      "Dokładna matryca wierceń ALTARLIDEN/LASTARE nie jest częścią deklaratywnego modelu; ma zostać przeniesiona 1:1 z papierowego szablonu wykonanego na oryginalnym boku LASTARE."
+    ]
+  }
+}
