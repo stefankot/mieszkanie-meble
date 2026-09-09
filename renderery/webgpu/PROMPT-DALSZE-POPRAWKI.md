@@ -150,6 +150,22 @@ i `renderer.shadowMap.needsUpdate` **nie mają żadnego znaczenia w ścieżce We
 Dopóki `light.shadow.autoUpdate` zostaje domyślnym `true`, mapa cienia VSM jest
 przerysowywana w każdej klatce.
 
+### Z0. NAJPIERW: cofnij regresję z 9 września (jedna linijka)
+
+Zabudowa meblowa wygląda **gorzej niż przed 9 września**. Przyczyna jest znana
+i punktowa. W `silnik.js` drabinka dopracowania podnosiła po zatrzymaniu kamery
+`SSGINode.stepCount` z 6 do 28. Przy `useScreenSpaceSampling = true` liczba
+kroków wyznacza **dystans marszu promienia**, więc 28 kroków dawało prawie
+pięciokrotnie większy zasięg okluzji: głębsze cienie w narożach, ciemniejsze
+i bardziej kontrastowe wnętrza wnęk. **To był wygląd zatwierdzony.**
+
+Ta drabinka została zamieniona na stałe `KROKI_SSGI = 8`, żeby usunąć mruganie.
+Mruganie **nie zniknęło**, a obraz spłaszczył się i rozjaśnił.
+
+**Zrób najpierw:** w `silnik.js` przywróć `KROKI_SSGI = 28` (stała, bez drabinki)
+i sprawdź, czy wygląd wraca. Dopiero potem szukaj prawdziwej przyczyny mrugania —
+najpewniej są nią błędy walidacji z punktu B3, a nie drabinka jakości.
+
 ### Z7. Tekstura drewna
 Wzór drewna nadal nie wygląda jak na renderach. Obecnie `oak_veneer_01` (Poly
 Haven, 1K, `slojPionowy: true`), gradacja w TSL: `GAMMA .66`, `GAIN [1.04,1.04,1.05]`,

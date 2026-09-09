@@ -23,6 +23,8 @@
    żadnych atrap.
    ============================================================ */
 
+import { pobierz, postep } from './siec.js';
+
 const BAZA = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
 const MEBLE = [
   ['lozko', 'Łóżko pod oknem'],
@@ -80,20 +82,43 @@ const TYPY_CZESCI = {
     if(p.uv) g.setAttribute('uv', new ctx.THREE.Float32BufferAttribute(p.uv, 2));
     g.computeVertexNormals();
     return siatka(g, p, ctx);
+  },
+
+  /* ŚWIATŁA W MEBLU (LED w niszach, oprawy).
+     Punkt rozszerzenia z komentarza zamieniony na działającą implementację —
+     bez tego nie da się odtworzyć podświetlonych wnęk z referencji.
+
+     Kształt danych trzyma konwencje formatu: milimetry, lokalne osie części,
+     +Z jako front. Typ świecenia wybiera `shape`:
+       "strip" (domyślnie) → RectAreaLight, czyli listwa LED o wymiarach sizeMm
+       "point"             → PointLight o zasięgu distanceMm
+       "spot"              → SpotLight o kącie angleDeg
+
+     Nieznany `shape` nie wywala mebla — część zostaje pominięta i wypisana,
+     tak samo jak każdy inny nieobsługiwany typ. */
+  light: (p, {THREE}) => {
+    const kolor = p.color || 0xffd9a6;
+    const moc = liczba(p.intensity, 0, 1000) ? p.intensity : 3;
+    const ksztalt = p.shape || 'strip';
+    if(ksztalt === 'point'){
+      const l = new THREE.PointLight(kolor, moc, mm(p.distanceMm || 0), p.decay ?? 2);
+      l.castShadow = !!p.castShadow;
+      return l;
+    }
+    if(ksztalt === 'spot'){
+      const l = new THREE.SpotLight(kolor, moc, mm(p.distanceMm || 0),
+                                    THREE.MathUtils.degToRad(p.angleDeg ?? 40),
+                                    p.penumbra ?? .6, p.decay ?? 2);
+      l.castShadow = !!p.castShadow;
+      return l;
+    }
+    if(ksztalt !== 'strip') throw Error('nieznany kształt światła "' + ksztalt + '"');
+    /* Listwa świeci wzdłuż lokalnego −Z, czyli w głąb wnęki. RectAreaLight nie
+       rzuca cieni w Three.js — to jest wypełnienie, nie źródło kierunkowe. */
+    const [sx, sy] = (p.sizeMm || [600, 20]).map(mm);
+    const l = new THREE.RectAreaLight(kolor, moc, Math.max(1, sx), Math.max(1, sy));
+    return l;
   }
-
-  /* PUNKT ROZSZERZENIA — światła.
-     Gdy FORMAT-MEBLA.md zdefiniuje typy świateł, wpis wygląda tak:
-
-       light: (p, {THREE}) => {
-         const l = new THREE.PointLight(p.color || 0xffffff, p.intensity ?? 1, mm(p.distanceMm || 0));
-         l.castShadow = !!p.castShadow;
-         return l;
-       },
-
-     Celowo nie zgaduję schematu z góry: własny, wymyślony kształt danych
-     rozjechałby się z tym, co faktycznie zostanie opublikowane. Do tego czasu
-     części o nieznanym typie są pomijane i wypisywane w diagnostyce. */
 };
 
 function siatka(geometria, p, {THREE, materialBazowy, model}){
@@ -162,8 +187,7 @@ export function zastosujRuch(ruch, t){
 }
 
 async function pobierzJSON(sciezka){
-  const odp = await fetch(BAZA + sciezka, {cache: 'no-cache'});
-  if(!odp.ok) throw Error('HTTP ' + odp.status + ' dla ' + sciezka);
+  const odp = await pobierz(BAZA + sciezka, {cache: 'no-cache'}, {opis: sciezka});
   return odp.json();
 }
 
@@ -180,6 +204,7 @@ function zbudujModel(dane, ctx){
   const THREE = ctx.THREE;
   const korzen = new THREE.Group();
   korzen.name = 'biblioteka:' + dane.assetId;
+  korzen.userData.lighting = m.lighting; // jawne opisy LED w lokalnych mm, bez tworzenia świateł
   const czesci = new Map();
   const pelnyCtx = {...ctx, model: m};
 
@@ -251,8 +276,7 @@ export async function uruchomBiblioteke(api){
      Format JSON nie odtwarza jego sprzężonych siłowników, więc dopóki nie
      zostanie opublikowana pełnoprawna wersja deklaratywna, ten moduł zostaje. */
   async function zbudujLegacy(wpisWersji, umiejscowienie){
-    const odp = await fetch(BAZA + wpisWersji.file);
-    if(!odp.ok) throw Error('Nie można pobrać modułu łóżka: HTTP ' + odp.status);
+    const odp = await pobierz(BAZA + wpisWersji.file, {}, {opis: 'moduł łóżka'});
     const bajty = await odp.arrayBuffer();
     const suma = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bajty))]
       .map(x => x.toString(16).padStart(2,'0')).join('');
@@ -360,7 +384,12 @@ export async function uruchomBiblioteke(api){
   wynik.przypnij = przypnij;
 
   async function odswiez(){
-    const wyniki = await Promise.all(MEBLE.map(([id, nazwa]) => zaladujMebel(id, nazwa)));
+    let gotowych = 0;
+    const wyniki = await Promise.all(MEBLE.map(async ([id, nazwa]) => {
+      const r = await zaladujMebel(id, nazwa);
+      postep(`Meble z biblioteki — ${++gotowych} z ${MEBLE.length}…`, .80 + .13*(gotowych/MEBLE.length));
+      return r;
+    }));
     wynik.ruchy = [...stan.values()].flatMap(w => w.ruchy || []);
     const zmiana = wyniki.some(Boolean);
     if(zmiana) przyZmianie?.(wynik);
