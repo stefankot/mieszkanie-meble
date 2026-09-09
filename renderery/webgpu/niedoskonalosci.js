@@ -23,7 +23,15 @@
    ============================================================ */
 
 import { positionWorld, normalWorld, mx_fractal_noise_float, mx_worley_noise_float,
-         float, vec3, texture, mix, smoothstep, clamp } from 'three/tsl';
+         float, vec3, texture, mix, smoothstep, clamp, uniform } from 'three/tsl';
+
+/* P4: jedna zmienna A/B. Chropowatość i geometria nie zależą od przełącznika. */
+const wariacjaKoloru = uniform(new URLSearchParams(globalThis.location?.search || '')
+  .get('imperfections') === 'color-off' ? 0 : 1);
+export function ustawWariacjeKoloru(wlacz){
+  wariacjaKoloru.value = wlacz ? 1 : 0;
+  return wariacjaKoloru.value;
+}
 
 /* Domyślne natężenia. Wszystkie celowo małe — niedoskonałość ma być widoczna
    dopiero wtedy, gdy się jej szuka. Przesada wygląda jak brud, nie jak realizm. */
@@ -73,7 +81,7 @@ export function dodajNiedoskonalosci(material, rodzaj = 'drewno', przesuniecie =
 
   /* Brud jest lekko chłodny i szary — ściąga barwę w stronę neutralnej. */
   const poBrudzie = mix(bazaKoloru, vec3(0.38, 0.37, 0.35), zabrudzenie.mul(p.brud * 1.4));
-  material.colorNode = poBrudzie.mul(jasnosc).clamp(0, 1);
+  material.colorNode = mix(bazaKoloru, poBrudzie.mul(jasnosc).clamp(0, 1), wariacjaKoloru);
 
   /* --- CHROPOWATOŚĆ --- */
   const bazaChrop = material.roughnessMap
