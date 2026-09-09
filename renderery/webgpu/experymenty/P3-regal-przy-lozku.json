@@ -1,0 +1,2233 @@
+{
+  "schemaVersion": 1,
+  "assetId": "regal-przy-lozku",
+  "version": "poc-edge-1",
+  "summary": "Pierwsza wersja: pełny regał L z układem D/K/N, biurkami w R3, skorygowanymi przegrodami R4/R5 i niszą 300×300×300 mm w K-R6-C2; zatwierdzone ustawienie w pokoju z łóżkiem.",
+  "placement": {
+    "confirmed": false,
+    "roomId": "POKOJ-LOZKO",
+    "wallId": "POKOJ-LOZKO-W2",
+    "positionMm": [
+      3616,
+      0,
+      6718
+    ],
+    "rotationDeg": 180,
+    "confirmationSvg": "meble/regal-przy-lozku/plany/v0001.svg",
+    "description": "Prawy dolny narożnik pokoju z łóżkiem. Krótsze skrzydło K stoi przy ścianie przeciwległej do okna (POKOJ-LOZKO-W2), dłuższe D przy dolnej ścianie (POKOJ-LOZKO-W3). Koniec K jest 886 mm od ściany z drzwiami; ok. 106 mm od końca skrzydła całkowicie otwartych drzwi. Lewy koniec D jest 2102 mm od ściany z oknem. Ustawienie zaakceptowane przez użytkownika."
+  },
+  "model": {
+    "name": "Regał w pokoju z łóżkiem",
+    "units": "mm",
+    "materials": {
+      "grey": {
+        "type": "white",
+        "color": "#D8DCDE",
+        "roughness": 0.74,
+        "metalness": 0
+      },
+      "backGrey": {
+        "type": "white",
+        "color": "#CFD3D5",
+        "roughness": 0.82,
+        "metalness": 0
+      },
+      "amber": {
+        "type": "white",
+        "color": "#E3A23A",
+        "roughness": 0.58,
+        "metalness": 0
+      },
+      "nicheWarm": {
+        "type": "white",
+        "color": "#ECE7DF",
+        "roughness": 0.8,
+        "metalness": 0
+      }
+    },
+    "parts": [
+      {
+        "id": "h-D-0",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          9.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 0",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-0",
+        "type": "box",
+        "positionMm": [
+          -964,
+          9.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 0",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-1",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          575.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-1",
+        "type": "box",
+        "positionMm": [
+          -964,
+          575.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-2",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          719.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-2",
+        "type": "box",
+        "positionMm": [
+          -964,
+          719.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-3",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          1319.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 3",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-3",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1319.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 3",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-4",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          1619.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-4",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1619.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-5",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          1819.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-5",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1819.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-D-6",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          2435.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          18.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta D 6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "h-K-6",
+        "type": "box",
+        "positionMm": [
+          -964,
+          2435.0,
+          210.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          18.0,
+          964.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Pozioma płyta K 6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "outer-D",
+        "type": "box",
+        "positionMm": [
+          1265.0,
+          1222.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          2444.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Zewnętrzny bok D",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "outer-K",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1222.0,
+          683.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          2444.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Zewnętrzny bok K",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-N-C1-R1",
+        "type": "box",
+        "positionMm": [
+          -663.0,
+          292.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          548.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D N-C1 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C1-C2-R1",
+        "type": "box",
+        "positionMm": [
+          -81.0,
+          292.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          548.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C1-C2 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R1",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          292.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          548.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R1",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          292.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          548.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-N-C1-R1",
+        "type": "box",
+        "positionMm": [
+          -964,
+          292.0,
+          -281.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          548.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K N-C1 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-C1-C2-R1",
+        "type": "box",
+        "positionMm": [
+          -964,
+          292.0,
+          301.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          548.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K C1-C2 R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-N-C1-R2",
+        "type": "box",
+        "positionMm": [
+          -663.0,
+          647.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          126.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D N-C1 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C1-C2-R2",
+        "type": "box",
+        "positionMm": [
+          -81.0,
+          647.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          126.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C1-C2 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R2",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          647.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          126.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R2",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          647.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          126.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-N-C1-R2",
+        "type": "box",
+        "positionMm": [
+          -964,
+          647.0,
+          -281.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          126.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K N-C1 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-C1-C2-R2",
+        "type": "box",
+        "positionMm": [
+          -964,
+          647.0,
+          301.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          126.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K C1-C2 R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-N-C1-R6",
+        "type": "box",
+        "positionMm": [
+          -663.0,
+          2127.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          598.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D N-C1 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C1-C2-R6",
+        "type": "box",
+        "positionMm": [
+          -81.0,
+          2127.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          598.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C1-C2 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R6",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          2127.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          598.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R6",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          2127.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          598.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-N-C1-R6",
+        "type": "box",
+        "positionMm": [
+          -964,
+          2127.0,
+          -281.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          598.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K N-C1 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-C1-C2-R6",
+        "type": "box",
+        "positionMm": [
+          -964,
+          2127.0,
+          301.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          598.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K C1-C2 R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R3",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          1019.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          582.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R3",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R3",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          1019.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          582.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R3",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C1-C2-R4",
+        "type": "box",
+        "positionMm": [
+          -81.0,
+          1469.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          282.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C1-C2 R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R4",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          1469.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          282.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R4",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          1469.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          282.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-N-C1-R4",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1469.0,
+          -281.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          282.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K N-C1 R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-C1-C2-R4",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1469.0,
+          301.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          282.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K C1-C2 R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C1-C2-R5",
+        "type": "box",
+        "positionMm": [
+          -81.0,
+          1719.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          182.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C1-C2 R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C2-C3-R5",
+        "type": "box",
+        "positionMm": [
+          301.0,
+          1719.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          182.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C2-C3 R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vD-C3-C4-R5",
+        "type": "box",
+        "positionMm": [
+          683.0,
+          1719.0,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          182.0,
+          420
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda D C3-C4 R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-N-C1-R5",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1719.0,
+          -281.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          182.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K N-C1 R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "vK-C1-C2-R5",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1719.0,
+          301.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          182.0,
+          18.0
+        ],
+        "bevelMm": 2,
+        "material": "grey",
+        "label": "Przegroda K C1-C2 R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "back-D-R1",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          292.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          548.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R1",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          292.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          548.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy K R1",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R2",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          647.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          126.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R2",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          647.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          126.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy K R2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R3-amber",
+        "type": "box",
+        "positionMm": [
+          -491.0,
+          1019.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          1566.0,
+          582.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Plecy D R3 amber",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R3-grey",
+        "type": "box",
+        "positionMm": [
+          783.0,
+          1019.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          982.0,
+          582.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R3 szare",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R3",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          1019.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          582.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Plecy K R3 amber",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R4",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          1469.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          282.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R4",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          1469.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          282.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy K R4",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R5",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          1719.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          182.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R5",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          1719.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          182.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy K R5",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-D-R6",
+        "type": "box",
+        "positionMm": [
+          0.0,
+          2127.0,
+          -690.5
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          2548.0,
+          598.0,
+          3.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy D R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "back-K-R6",
+        "type": "box",
+        "positionMm": [
+          -1272.5,
+          2127.0,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          3.0,
+          598.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "backGrey",
+        "label": "Plecy K R6",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "liner-D-bottom",
+        "type": "box",
+        "positionMm": [
+          -181.0,
+          730.5,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          946.0,
+          3.0,
+          420
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Amber wnęka D R3 dół",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "liner-D-top",
+        "type": "box",
+        "positionMm": [
+          -181.0,
+          1308.5,
+          -482
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          946.0,
+          3.0,
+          420
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Amber wnęka D R3 góra",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "liner-K-bottom",
+        "type": "box",
+        "positionMm": [
+          -964,
+          730.5,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          3.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Amber wnęka K/N R3 dół",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "liner-K-top",
+        "type": "box",
+        "positionMm": [
+          -964,
+          1308.5,
+          0.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          620,
+          3.0,
+          1384.0
+        ],
+        "bevelMm": 0,
+        "material": "amber",
+        "label": "Amber wnęka K/N R3 góra",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 3.0
+      },
+      {
+        "id": "D-R1-C1",
+        "type": "box",
+        "positionMm": [
+          -372.0,
+          292.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          544.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R1 C1 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R2-C1",
+        "type": "box",
+        "positionMm": [
+          -372.0,
+          647.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          122.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R2 C1 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R6-C1",
+        "type": "box",
+        "positionMm": [
+          -372.0,
+          2127.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          594.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R6 C1 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R1-C2",
+        "type": "box",
+        "positionMm": [
+          110.0,
+          292.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          544.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R1 C2 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R2-C2",
+        "type": "box",
+        "positionMm": [
+          110.0,
+          647.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          122.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R2 C2 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R6-C2",
+        "type": "box",
+        "positionMm": [
+          110.0,
+          2127.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          594.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R6 C2 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R1-C3",
+        "type": "box",
+        "positionMm": [
+          492.0,
+          292.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          544.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R1 C3 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R2-C3",
+        "type": "box",
+        "positionMm": [
+          492.0,
+          647.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          122.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R2 C3 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R6-C3",
+        "type": "box",
+        "positionMm": [
+          492.0,
+          2127.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          360.0,
+          594.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R6 C3 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R1-C4",
+        "type": "box",
+        "positionMm": [
+          974.0,
+          292.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          544.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R1 C4 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R2-C4",
+        "type": "box",
+        "positionMm": [
+          974.0,
+          647.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          122.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R2 C4 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "D-R6-C4",
+        "type": "box",
+        "positionMm": [
+          974.0,
+          2127.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          560.0,
+          594.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "D R6 C4 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "K-R1-C1",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          292.0,
+          10.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          544.0,
+          560.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "K R1 C1 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "K-R2-C1",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          647.0,
+          10.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          122.0,
+          560.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "K R2 C1 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "K-R6-C1",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          2127.0,
+          10.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          594.0,
+          560.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "K R6 C1 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "K-R1-C2",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          292.0,
+          492.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          544.0,
+          360.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "K R1 C2 front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "K-R2-C2",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          647.0,
+          492.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          122.0,
+          360.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "K R2 C2 drawer front",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-back",
+        "type": "box",
+        "positionMm": [
+          -954,
+          2127.0,
+          524.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          6.0,
+          300,
+          300
+        ],
+        "bevelMm": 0,
+        "material": "nicheWarm",
+        "label": "Plecy niszy 300×300×300",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 6.0
+      },
+      {
+        "id": "niche-bottom",
+        "type": "box",
+        "positionMm": [
+          -809.0,
+          1968.0,
+          524.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          290,
+          18.0,
+          300
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Dół niszy",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-top",
+        "type": "box",
+        "positionMm": [
+          -809.0,
+          2286.0,
+          524.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          290,
+          18.0,
+          300
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Góra niszy",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-side",
+        "type": "box",
+        "positionMm": [
+          -809.0,
+          2127.0,
+          365.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          290,
+          300,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Bok niszy",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-mask-side",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          2127.0,
+          342.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          594.0,
+          60.0
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Maskownica boczna niszy",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-mask-low",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          1900.0,
+          524.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          140.0,
+          300
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Maskownica pod niszą",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "niche-mask-high",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          2352.0,
+          524.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          144.0,
+          300
+        ],
+        "bevelMm": 1.5,
+        "material": "grey",
+        "label": "Maskownica nad niszą",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "desk-D",
+        "type": "box",
+        "positionMm": [
+          -181.0,
+          1019.0,
+          -291.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          942.0,
+          578.0,
+          18.0
+        ],
+        "bevelMm": 1.5,
+        "material": "amber",
+        "label": "Biurko D R3 C1+2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      },
+      {
+        "id": "desk-K",
+        "type": "box",
+        "positionMm": [
+          -673.0,
+          1019.0,
+          492.0
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "sizeMm": [
+          18.0,
+          578.0,
+          354.0
+        ],
+        "bevelMm": 1.5,
+        "material": "amber",
+        "label": "Biurko K R3 C2",
+        "edgeRadiusMm": 0,
+        "panelThicknessMm": 18.0
+      }
+    ],
+    "joints": [
+      {
+        "part": "desk-D",
+        "type": "hinge",
+        "pivotMm": [
+          -181.0,
+          730,
+          -291.0
+        ],
+        "axis": [
+          1,
+          0,
+          0
+        ],
+        "angleDeg": 90,
+        "label": "Biurko D — opuszczanie z pionowego frontu do poziomu roboczego"
+      },
+      {
+        "part": "desk-K",
+        "type": "hinge",
+        "pivotMm": [
+          -673.0,
+          730,
+          492.0
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "angleDeg": -90,
+        "label": "Biurko K — opuszczanie z pionowego frontu do poziomu roboczego"
+      }
+    ],
+    "notes": [
+      "Geometria 1:1: płyta konstrukcyjna 18 mm, wysokość 2444 mm, obrys 2548×1384 mm; D głębokość 420 mm, K głębokość 620 mm.",
+      "R3: brak ścianek D/N, N/K, D-C1/C2 i K-C1/C2; pozostają przegrody D-C2/C3 i D-C3/C4. D-R3-C1+2 i K-R3-C2 są opuszczanymi biurkami.",
+      "R4/R5: D-C1 pozostaje połączone z N; między N i K-C1 jest pionowa przegroda 18 mm; pozostałe przegrody modułowe wracają.",
+      "K-R6-C2 zawiera niszę 300×300×300 mm przy zewnętrznym skraju K, wycentrowaną pionowo. Model nie zawiera rzeźby.",
+      "Fronty są wpuszczone: ich lico jest 10 mm za przednią płaszczyzną korpusu.",
+      "Plecy przy ścianach mają 3 mm. W R3 strefa D-C1+2/N/K jest amber; D-C3/C4 pozostają szare.",
+      "Format nie odwzorowuje rastra nawiertów LASTARE/ALTARLIDEN; dokładne wiercenia pozostają DO POMIARU Z ORYGINALNEGO LASTARE.",
+      "Drzwi i fronty szuflad są zapisane geometrycznie, ale bez animacji okuć, ponieważ kierunki zawiasów i pełna geometria prowadnic nie zostały jednoznacznie ustalone. Animowane są dwa biurka, których ruch był określony w projekcie.",
+      "L-kształtny mebel ma dwa kierunki frontu: główny front D odpowiada lokalnej osi +Z; front K odpowiada lokalnej osi +X.",
+      "POC diagnostyczny: ostre krawędzie; nie zatwierdzono do aktywacji. Rozmiary, pozycje i semantic IDs są identyczne z v0001."
+    ]
+  }
+}

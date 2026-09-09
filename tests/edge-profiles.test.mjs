@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {pathToFileURL} from 'node:url';
+import {zbudujModel} from '../renderery/webgpu/biblioteka.js';
+import {frontParametryczny} from '../renderery/webgpu/experymenty/front-parametryczny.js';
+const root=process.env.THREE_TEST_ROOT;
+const THREE=await import(root?pathToFileURL(root+'/build/three.webgpu.js').href:'three/webgpu');
+const {RoundedBoxGeometry}=await import(root?pathToFileURL(root+'/examples/jsm/geometries/RoundedBoxGeometry.js').href:'three/addons/geometries/RoundedBoxGeometry.js');
+let fallback=0;
+const ctx={THREE:{...THREE,RoundedBoxGeometry},materialBazowy:{white:()=>new THREE.MeshPhysicalMaterial()},boxGeo:(...size)=>{fallback++;return new THREE.BoxGeometry(...size.slice(0,3));}};
+const model=p=>({assetId:'hero',model:{units:'mm',materials:{a:{type:'white'}},parts:[{id:'front',type:'box',sizeMm:[600,720,18],material:'a',...p}]}});
+test('explicit zero bypasses renderer minimum without changing dimensions or semantic ID',()=>{fallback=0;const x=zbudujModel(model({edgeRadiusMm:0}),ctx);const o=x.korzen.children[0];assert.equal(fallback,0);assert.equal(o.name,'hero:front');assert.equal(o.geometry.attributes.position.count,24);o.geometry.computeBoundingBox();assert.deepEqual(o.geometry.boundingBox.getSize(new THREE.Vector3()).toArray().map(x=>Math.round(x*10)),[600,720,18]);});
+test('missing edge field preserves legacy fallback',()=>{fallback=0;zbudujModel(model({}),ctx);assert.equal(fallback,1);});
+test('positive radius uses rounded geometry',()=>{const x=zbudujModel(model({edgeRadiusMm:2}),ctx);assert.ok(x.korzen.children[0].geometry.attributes.position.count>24);});
+test('invalid explicit radius cannot silently fall back',()=>{for(const r of [-1,NaN,Infinity,9,10])assert.throws(()=>zbudujModel(model({edgeRadiusMm:r}),ctx));});
+test('authored gaps and recess determine front geometry exactly once',()=>{const p=frontParametryczny({id:'front',widthMm:600,heightMm:720,gapMm:3,recessMm:2,panelThicknessMm:18,edgeRadiusMm:0,material:'a'});assert.deepEqual(p.sizeMm,[594,714,18]);assert.deepEqual(p.positionMm,[0,0,-11]);const x=zbudujModel(model(p),ctx).korzen.children[0];assert.deepEqual(x.userData.design,{edgeRadiusMm:0,gapMm:3,recessMm:2,panelThicknessMm:18});});

@@ -54,6 +54,15 @@ const TYPY_CZESCI = {
 
   box: (p, ctx) => {
     if(!wektor(p.sizeMm, 3, 0.001, 30000)) throw Error('błędne sizeMm');
+    if(Object.hasOwn(p, 'edgeRadiusMm')){
+      const r = p.edgeRadiusMm;
+      if(!liczba(r, 0, Math.min(...p.sizeMm)/2) || r === Math.min(...p.sizeMm)/2)
+        throw Error('edgeRadiusMm musi być nieujemne i mniejsze od połowy grubości');
+      const g = r === 0
+        ? new ctx.THREE.BoxGeometry(...p.sizeMm.map(mm))
+        : new ctx.THREE.RoundedBoxGeometry(...p.sizeMm.map(mm), 3, mm(r));
+      return siatka(g, p, ctx);
+    }
     return siatka(ctx.boxGeo(...p.sizeMm.map(mm), mm(p.bevelMm || 0)), p, ctx);
   },
 
@@ -135,6 +144,9 @@ function siatka(geometria, p, {THREE, materialBazowy, model}){
   if(d.roughness !== undefined) mat.roughness = d.roughness;
   if(d.metalness !== undefined) mat.metalness = d.metalness;
   const o = new THREE.Mesh(geometria, mat);
+  o.userData.design = Object.fromEntries(
+    ['edgeRadiusMm', 'gapMm', 'recessMm', 'panelThicknessMm']
+      .filter(k => Object.hasOwn(p, k)).map(k => [k, p[k]]));
   o.castShadow = o.receiveShadow = true;
   return o;
 }
@@ -193,7 +205,7 @@ async function pobierzJSON(sciezka){
 
 /* Model deklaratywny → grupa Three.js. Zwraca też listę pominiętych elementów,
    żeby renderer mógł uczciwie powiedzieć, czego nie odtworzył. */
-function zbudujModel(dane, ctx){
+export function zbudujModel(dane, ctx){
   const m = dane.model;
   const pominiete = [];
   if(!m || m.units !== 'mm' || !Array.isArray(m.parts) || !m.parts.length)
