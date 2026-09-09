@@ -6,16 +6,12 @@
     "confirmed": true,
     "roomId": "SALON",
     "wallId": "SALON-W1",
-    "positionMm": [
-      8027,
-      0,
-      361.5
-    ],
+    "positionMm": [8027, 0, 361.5],
     "rotationDeg": 0.0,
     "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
     "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
   },
-  "currentVersion": "v0003",
+  "currentVersion": "v0004",
   "versions": [
     {
       "id": "v0001",
@@ -26,11 +22,7 @@
         "confirmed": true,
         "roomId": "SALON",
         "wallId": "SALON-W1",
-        "positionMm": [
-          8155.0,
-          0.0,
-          361.5
-        ],
+        "positionMm": [8155.0, 0.0, 361.5],
         "rotationDeg": 0.0,
         "confirmationSvg": "meble/regal-salon/plany/v0001.svg",
         "description": "Regał stoi na podłodze tyłem przy SALON-W1, frontem do środka salonu. Szerokość ściany 3330 mm, szerokość regału 3074 mm; wycentrowany: 128 mm od lewego i 128 mm od prawego narożnika ściany."
@@ -45,11 +37,22 @@
         "confirmed": true,
         "roomId": "SALON",
         "wallId": "SALON-W1",
-        "positionMm": [
-          8027,
-          0,
-          361.5
-        ],
+        "positionMm": [8027, 0, 361.5],
+        "rotationDeg": 0.0,
+        "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
+        "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
+      }
+    },
+    {
+      "id": "v0004",
+      "file": "meble/regal-salon/wersje/v0004.json",
+      "summary": "Dodano jawne metadane model.lighting.recesses dla 5 otwartych wnęk i 6 listew LED: granice wolnej przestrzeni, pozycje, cele i wymiary w lokalnym układzie mm. Geometria, materiały, identyfikatory części, wymiary i zatwierdzone ustawienie pozostają bez zmian względem aktywnego v0003.",
+      "createdAt": "2026-09-09T13:23:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "SALON",
+        "wallId": "SALON-W1",
+        "positionMm": [8027, 0, 361.5],
         "rotationDeg": 0.0,
         "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
         "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
