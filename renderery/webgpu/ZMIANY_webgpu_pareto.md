@@ -1269,3 +1269,8 @@ POC dotyczy tylko F16/F17 regału salon v0004. Fixture nie jest zatwierdzonym mo
 [REPO] 11/11 testów geometrii P3 i UV P5 przechodzi na three 0.185.0. [NO DATA] NO GPU TIMING; brak benchmarku wydajności i brak deklarowanego przyspieszenia. Początkowe błędy połączeń lokalnego serwera ustąpiły po przeładowaniu; nie klasyfikowano ich jako błędów GPU.
 
 Rollback: usunąć pola UV z nowego modelu albo cofnąć ten commit. Nie zmieniono aktywnych wersji, materiałów, światła ani domyślnego obrazu. Publikacja obejmuje adapter i nieaktywny POC.
+
+
+## P6 — szczotkowana stal (2026-09-09)
+
+Nieaktywny POC jednego blatu kuchni v0001: MeshPhysicalNodeMaterial r185, 1764 skończone tangenty, anizotropia 0.65 w danych JSON, kierunki 0°/90°. [RUNTIME] Widoczne poszerzenie i zmiana kierunku refleksu. A/B wysoka, buffer 1657×924, ratio1, ACES0.55; 5s rozgrzewki +10s rAF. A p50/p95/p99 66.7/83.4/84.3ms; B 66.7/83.3/84.2ms; events=[]. NO GPU TIMING. Brak deklarowanego przyspieszenia. Domyślny materiał zachowany, model i manifest bez zmian. Szczegóły, warunki oraz rollback w experymenty/P6-stal.md.
