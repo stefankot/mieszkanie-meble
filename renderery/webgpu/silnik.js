@@ -683,8 +683,10 @@ let srodowisko = null;
    pusty ekran. */
 async function wczytajSrodowiskoPozniej(){
   try{
+    const tloHdri = new URLSearchParams(location.search).get('environment') === 'hdri';
     srodowisko = await wczytajSrodowisko(THREE, renderer, scene,
-                                         {nazwa: 'urban_courtyard_02', jakosc: '1k', moc: .34});
+                                         {nazwa: 'urban_courtyard_02', jakosc: '1k', moc: .34, tloHdri});
+    if(tloHdri) niebo.visible = false;
   }catch(e){
     usterki.push('HDRI: ' + e.message + ' — zapasowe środowisko proceduralne');
     try{

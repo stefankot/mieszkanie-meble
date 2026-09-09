@@ -269,7 +269,7 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
    referencjach.
    ============================================================ */
 export async function wczytajSrodowisko(THREE, renderer, scene, {
-  nazwa = 'urban_courtyard_02', jakosc = '2k', moc = 1.0
+  nazwa = 'urban_courtyard_02', jakosc = '2k', moc = 1.0, tloHdri = false
 } = {}){
   postep('Środowisko HDRI…', .60);
   const {RGBELoader} = await import('three/addons/loaders/RGBELoader.js');
@@ -282,6 +282,10 @@ export async function wczytajSrodowisko(THREE, renderer, scene, {
   scene.environment = cel.texture;
   scene.environmentIntensity = moc;
   pmrem.dispose();
-  hdr.dispose();
-  return {tekstura: cel.texture, nazwa};
+  if(tloHdri){
+    scene.background = hdr;
+    scene.backgroundIntensity = moc;
+    scene.backgroundRotation.copy(scene.environmentRotation);
+  }else hdr.dispose();
+  return {tekstura: cel.texture, nazwa, tlo: tloHdri ? hdr : null};
 }
