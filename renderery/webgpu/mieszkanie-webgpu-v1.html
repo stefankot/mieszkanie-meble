@@ -12,11 +12,40 @@
  #hud b{display:block;margin-bottom:4px}
  #stan{margin:0;font-size:12px;color:#4a4a42;white-space:pre-wrap}
  #blad{color:#963a2d;font-weight:700}
+
+ /* --- EKRAN ŁADOWANIA ---
+    Leży w HTML, nie w module, więc pojawia się natychmiast — także wtedy,
+    gdy któryś moduł w ogóle się nie wczyta. */
+ #ladowanie{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+   background:#e3e5e6;transition:opacity .45s;font:13px/1.5 system-ui,sans-serif;color:#25241f}
+ #ladowanie.znika{opacity:0;pointer-events:none}
+ #ladowanie .karta{width:min(420px,calc(100vw - 40px))}
+ #ladowanie h1{margin:0 0 3px;font-size:15px;font-weight:600}
+ #ladowanie .etap{color:#6f6d5f;min-height:1.5em}
+ #tor{height:5px;background:#cfcdbf;border-radius:3px;overflow:hidden;margin:11px 0 7px}
+ #wypelnienie{height:100%;width:0;background:#25241f;border-radius:3px;
+   transition:width .35s cubic-bezier(.4,0,.2,1)}
+ #ladowanie .stopka{display:flex;justify-content:space-between;color:#8a8879;font-size:12px}
+ #ladowanie.zablad .karta{color:#963a2d}
+ #ladowanie.zablad #wypelnienie{background:#963a2d}
+ #ponow{margin-top:12px;font:inherit;padding:6px 12px;border:1px solid #bdbbac;border-radius:7px;
+   background:#fffdf6;color:#25241f;cursor:pointer;display:none}
+ #ladowanie.zablad #ponow{display:inline-block}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <div id="hud"><b>Mieszkanie · silnik WebGPU</b><p id="stan">uruchamianie…</p></div>
+
+<div id="ladowanie" role="status" aria-live="polite">
+ <div class="karta">
+  <h1>Mieszkanie · silnik WebGPU</h1>
+  <div class="etap" id="etap">Wczytywanie bibliotek (three.js, WebGPU)…</div>
+  <div id="tor"><div id="wypelnienie"></div></div>
+  <div class="stopka"><span id="procent">0%</span><span id="czas">0,0 s</span></div>
+  <button id="ponow" type="button">Spróbuj ponownie</button>
+ </div>
+</div>
 
 <script type="importmap">
 {"imports":{
@@ -28,13 +57,82 @@
 }}
 </script>
 <script>
+ /* Postęp ładowania. Celowo w zwykłym skrypcie, a nie w module: ma działać
+    natychmiast i przetrwać sytuację, w której moduł w ogóle się nie wczyta. */
+ (function(){
+   const start = performance.now();
+   const el = id => document.getElementById(id);
+   let ostatniUlamek = 0, zakonczone = false, bylRaport = false;
+
+   /* Zanim pierwszy moduł zdąży cokolwiek zgłosić, przeglądarka pobiera
+      i parsuje three.js (0,8 MB) oraz inicjalizuje WebGPU. Ten odcinek nie miał
+      żadnego raportu i pasek stał na zerze — wyglądało to na zawieszenie.
+      Do czasu pierwszego prawdziwego etapu pasek pełznie sam, żeby było widać,
+      że strona żyje. Pełznięcie nigdy nie przekracza 10 %, więc nie kłamie
+      o faktycznym postępie. */
+   const pelzanie = setInterval(() => {
+     if(zakonczone || bylRaport) return clearInterval(pelzanie);
+     const t = (performance.now() - start) / 1000;
+     const u = Math.min(.10, t / 90);
+     ostatniUlamek = Math.max(ostatniUlamek, u);
+     el('wypelnienie').style.width = (ostatniUlamek*100).toFixed(1) + '%';
+     el('procent').textContent = Math.round(ostatniUlamek*100) + '%';
+   }, 120);
+
+   const zegar = setInterval(() => {
+     if(zakonczone) return;
+     const s = (performance.now() - start) / 1000;
+     el('czas').textContent = s.toFixed(1).replace('.', ',') + ' s';
+     /* Po 25 s bez końca mówimy wprost, że to już za długo — zamiast kazać
+        użytkownikowi zgadywać, czy strona żyje. */
+     if(s > 25 && !el('ladowanie').classList.contains('zablad'))
+       el('etap').textContent = 'To trwa dłużej niż zwykle — pobieranie z sieci może być zablokowane.';
+   }, 100);
+
+   window.__postep = {
+     etap(nazwa, ulamek){
+       if(zakonczone) return;
+       bylRaport = true;
+       el('etap').textContent = nazwa;
+       if(typeof ulamek === 'number'){
+         ostatniUlamek = Math.max(ostatniUlamek, Math.min(1, ulamek));
+         el('wypelnienie').style.width = (ostatniUlamek*100).toFixed(0) + '%';
+         el('procent').textContent = Math.round(ostatniUlamek*100) + '%';
+       }
+     },
+     blad(tekst){
+       zakonczone = true; clearInterval(zegar);
+       const l = el('ladowanie');
+       l.classList.add('zablad');
+       el('etap').textContent = tekst;
+       el('wypelnienie').style.width = '100%';
+     },
+     koniec(){
+       if(zakonczone) return;
+       zakonczone = true; clearInterval(zegar);
+       el('wypelnienie').style.width = '100%';
+       el('procent').textContent = '100%';
+       const l = el('ladowanie');
+       l.classList.add('znika');
+       setTimeout(() => l.remove(), 500);
+     }
+   };
+   el('ponow').addEventListener('click', () => location.reload());
+   /* Ostatni etap — kompilacja shaderów — potrafi trwać kilkanaście sekund
+      i nie da się go podzielić na kroki, więc uprzedzamy o tym wprost. */
+   window.__postep.dlugi = (nazwa) => window.__postep.etap(nazwa);
+ })();
+
  window.addEventListener('error', e => {
    const n = document.getElementById('stan');
    if(n) n.innerHTML = '<span id="blad">BŁĄD: ' + e.message + '</span>';
+   window.__postep?.blad('Nie udało się uruchomić sceny: ' + e.message);
  });
  window.addEventListener('unhandledrejection', e => {
+   const t = (e.reason && e.reason.message) || e.reason;
    const n = document.getElementById('stan');
-   if(n) n.innerHTML = '<span id="blad">BŁĄD: ' + (e.reason && e.reason.message || e.reason) + '</span>';
+   if(n) n.innerHTML = '<span id="blad">BŁĄD: ' + t + '</span>';
+   window.__postep?.blad('Nie udało się uruchomić sceny: ' + t);
  });
 </script>
 <script type="module" src="./silnik.js"></script>
