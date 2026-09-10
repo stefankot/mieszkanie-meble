@@ -189,7 +189,12 @@ export function utworzSterowanie(api){
       <h3>P7–P18 / P8 — presety</h3>
       <select id="devPreset" aria-label="Preset testowy funkcji">
         <option value="baseline">Baseline — wyłącz warianty</option>
-        <option value="all-compatible">Wszystkie zgodne funkcje</option>
+        <option value="candidate-a">Kandydat A — TRAA + ACES</option>
+        <option value="candidate-b">Kandydat B — TRAA + AgX</option>
+        <option value="candidate-c">Kandydat C — SMAA + Neutral</option>
+        <option value="all-compatible">Wszystkie eksperymenty — stress test</option>
+        <option value="p19-current">P19–P37 — wszystkie włączone</option>
+        <option value="p19-off">P19–P37 — wszystkie wyłączone</option>
         <option value="taau">TAAU r185</option>
         <option value="ktx-etc1s">KTX2 — ETC1S albedo</option>
         <option value="ktx-uastc">KTX2 — UASTC albedo</option>
@@ -487,13 +492,18 @@ export function utworzSterowanie(api){
   });
 
   /* ---------- DEV: jawne, odwracalne presety query ---------- */
-  const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest',
+  const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest','bez',
     'furnitureV2','furnitureSource'];
   const DEV_PRESETS = {
     baseline: {quality:'srednia', aa:'smaa', tone:'aces', camera:'interactive'},
+    'candidate-a': {quality:'wysoka', aa:'taau', tone:'aces', camera:'interactive'},
+    'candidate-b': {quality:'wysoka', aa:'taau', tone:'agx', camera:'interactive'},
+    'candidate-c': {quality:'wysoka', aa:'smaa', tone:'neutral', camera:'interactive'},
     'all-compatible': {quality:'wysoka', aa:'taau', tone:'agx', gi:'speedball',
       ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0005-poc-v2',
       furnitureSource:'local'},
+    'p19-current': {quality:'wysoka', aa:'taau', tone:'aces'},
+    'p19-off': {quality:'wysoka', aa:'smaa', tone:'aces', bez:'wszystko'},
     taau: {quality:'wysoka', aa:'taau', tone:'aces'},
     'ktx-etc1s': {quality:'wysoka', aa:'smaa', tone:'aces', ktx2:'etc1s'},
     'ktx-uastc': {quality:'wysoka', aa:'smaa', tone:'aces', ktx2:'uastc'},
@@ -510,7 +520,10 @@ export function utworzSterowanie(api){
   };
   const DEV_OPIS = {
     baseline: 'Bez eksperymentalnych parametrów; current SSGI/SSR, SMAA i ACES.',
-    'all-compatible': 'Test integracyjny wariantów zgodnych w jednym kadrze; nie służy do izolowanych pomiarów A/B.',
+    'candidate-a': '30–31 FPS w pomiarze lokalnym; najrówniejsze krawędzie i naturalna kompresja świateł.',
+    'candidate-b': '30–31 FPS; ta sama geometria i AA, łagodniejszy kontrast AgX.',
+    'candidate-c': '29–31 FPS; najostrzejszy detal statyczny, możliwe migotanie cienkich krawędzi w ruchu.',
+    'all-compatible': 'Stress test, nie kandydat realtime: Speedball i modern SSR nie osiągnęły 25 FPS osobno.',
     'photo-path': 'Eksperymentalna bramka integracji; r185 nie dostarcza produkcyjnego WebGPU path tracera.'
   };
   function devAdres(){
