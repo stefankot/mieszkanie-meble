@@ -191,7 +191,7 @@ export function utworzSterowanie(api){
         <option value="baseline">Baseline — wyłącz warianty</option>
         <option value="candidate-a">Kandydat A — TRAA + ACES</option>
         <option value="candidate-b">Kandydat B — TRAA + AgX</option>
-        <option value="candidate-c">Kandydat C — SMAA + Neutral</option>
+        <option value="candidate-c">Kandydat C — TRAA + modern SSR</option>
         <option value="all-compatible">Wszystkie eksperymenty — stress test</option>
         <option value="p19-current">P19–P37 — wszystkie włączone</option>
         <option value="p19-off">P19–P37 — wszystkie wyłączone</option>
@@ -498,7 +498,7 @@ export function utworzSterowanie(api){
     baseline: {quality:'srednia', aa:'smaa', tone:'aces', camera:'interactive'},
     'candidate-a': {quality:'wysoka', aa:'taau', tone:'aces', camera:'interactive'},
     'candidate-b': {quality:'wysoka', aa:'taau', tone:'agx', camera:'interactive'},
-    'candidate-c': {quality:'wysoka', aa:'smaa', tone:'neutral', camera:'interactive'},
+    'candidate-c': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'modern', camera:'interactive'},
     'all-compatible': {quality:'wysoka', aa:'taau', tone:'agx', gi:'speedball',
       ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0005-poc-v2',
       furnitureSource:'local'},
@@ -522,7 +522,7 @@ export function utworzSterowanie(api){
     baseline: 'Bez eksperymentalnych parametrów; current SSGI/SSR, SMAA i ACES.',
     'candidate-a': '30–31 FPS w pomiarze lokalnym; najrówniejsze krawędzie i naturalna kompresja świateł.',
     'candidate-b': '30–31 FPS; ta sama geometria i AA, łagodniejszy kontrast AgX.',
-    'candidate-c': '29–31 FPS; najostrzejszy detal statyczny, możliwe migotanie cienkich krawędzi w ruchu.',
+    'candidate-c': '28,1 FPS; temporalnie stabilne krawędzie i stochastic SSR, lecz najmniejszy zapas wydajności.',
     'all-compatible': 'Stress test, nie kandydat realtime: Speedball i modern SSR nie osiągnęły 25 FPS osobno.',
     'photo-path': 'Eksperymentalna bramka integracji; r185 nie dostarcza produkcyjnego WebGPU path tracera.'
   };
