@@ -21,6 +21,7 @@ import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 import { taau } from 'three/addons/tsl/display/TAAUNode.js';
 import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
+import { traa } from 'three/addons/tsl/display/TRAANode.js';
 import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 import { sss } from 'three/addons/tsl/display/SSSNode.js';
@@ -1197,7 +1198,16 @@ function wyjscieDla(poziom){
   /* P35: TAAU stabilne — próg 0,00045 przy near = 2 cm odrzucał historię już od samego jittera
      (skakanie obrazu); 0,002 i waga 0,04 akumulują stabilnie. ?bez=taaustabilne wraca do P25. */
   const stabilne = wlaczone('taaustabilne');
-  if(temporal){
+  /* P36: przy wejściu 100% TAAU niczego nie powiększa, a jego filtr gaussowski 3×3 zmiękcza obraz.
+     TRAA bierze bieżący piksel wprost — to samo wygładzanie czasowe, ostre jak SMAA. ?bez=traa wraca do TAAU. */
+  const uzyjTRAA = !photo && wlaczone('traa') && wlaczone('taaupelne');
+  if(temporal && uzyjTRAA){
+    aa=traa(kompozyt,kGlebia,kPredkosc,camera);
+    aa.depthThreshold=stabilne ? .002 : .0005;
+    aa.edgeDepthDiff=.001;
+    aa.maxVelocityLength=96;
+    wezlyTAAU.add(aa);
+  }else if(temporal){
     aa=taau(kompozyt,kGlebia,kPredkosc,camera);
     aa.currentFrameWeight=photo ? 1/64 : (stabilne ? .04 : .06);
     aa.depthThreshold=stabilne ? .002 : .00045;
@@ -1206,8 +1216,9 @@ function wyjscieDla(poziom){
     wezlyTAAU.add(aa);
   }else aa=smaa(kompozyt);
   /* P35: RCAS po TAAU oddaje ostrość zjedzoną przez filtr gaussowski rekonstrukcji.
-     sharpness: 0 = najmocniej, 2 = brak; ?ostrosc=<liczba>, ?bez=wyostrz wyłącza. */
-  const ostrosc = +(new URLSearchParams(location.search).get('ostrosc') ?? .35);
+     sharpness: 0 = najmocniej, 2 = brak; ?ostrosc=<liczba>, ?bez=wyostrz wyłącza.
+     P36: jitter TRAA uśrednia słój w obrębie piksela — RCAS 0,4 przywraca jego kontrast (zrzut vs SMAA). */
+  const ostrosc = +(new URLSearchParams(location.search).get('ostrosc') ?? (uzyjTRAA ? .4 : .35));
   const wynik = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, ostrosc) : aa);
   zbudowane.set(klucz, wynik);
   return wynik;
