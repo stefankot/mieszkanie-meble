@@ -44,6 +44,7 @@ import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } fro
 import { createPhotoPathIntegration } from './photo-path.js';
 import { runNavigationRegression } from './navigation-regression.js?p18b';
 import { wlaczone } from './flagi.js';
+import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
@@ -804,6 +805,8 @@ function skalujUVMebli(zrodlo){
        formatce słój biegł pionowo. */
     /* Formatki lekko poza pionem — tolerancja stolarska, nie błąd. */
     if(wpis.korzen) skrzywFormatki(wpis.korzen, THREE);
+    /* P26: materac i poduchy jako miękkie bryły — tylko geometria renderera, model bez zmian. */
+    if(wpis.korzen && wlaczone('miekkie')) zmiekczTkaniny(wpis.korzen, THREE);
 
     /* ---------- SCALANIE MATERIAŁÓW ----------
        siatka() w bibliotece klonuje materiał na KAŻDĄ część, więc regał dawał
