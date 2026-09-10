@@ -20,6 +20,7 @@ import { ssr }  from 'three/addons/tsl/display/SSRNode.js';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 import { taau } from 'three/addons/tsl/display/TAAUNode.js';
+import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 import { sss } from 'three/addons/tsl/display/SSSNode.js';
@@ -1193,15 +1194,21 @@ function wyjscieDla(poziom){
     kompozyt = vec4(kKolor.rgb.add(poswiata.rgb), kKolor.a);
   }
   let aa;
+  /* P35: TAAU stabilne — próg 0,00045 przy near = 2 cm odrzucał historię już od samego jittera
+     (skakanie obrazu); 0,002 i waga 0,04 akumulują stabilnie. ?bez=taaustabilne wraca do P25. */
+  const stabilne = wlaczone('taaustabilne');
   if(temporal){
     aa=taau(kompozyt,kGlebia,kPredkosc,camera);
-    aa.currentFrameWeight=photo ? 1/64 : .06;
-    aa.depthThreshold=.00045;
+    aa.currentFrameWeight=photo ? 1/64 : (stabilne ? .04 : .06);
+    aa.depthThreshold=stabilne ? .002 : .00045;
     aa.edgeDepthDiff=.001;
     aa.maxVelocityLength=96;
     wezlyTAAU.add(aa);
   }else aa=smaa(kompozyt);
-  const wynik = gradacja(aa);
+  /* P35: RCAS po TAAU oddaje ostrość zjedzoną przez filtr gaussowski rekonstrukcji.
+     sharpness: 0 = najmocniej, 2 = brak; ?ostrosc=<liczba>, ?bez=wyostrz wyłącza. */
+  const ostrosc = +(new URLSearchParams(location.search).get('ostrosc') ?? .35);
+  const wynik = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, ostrosc) : aa);
   zbudowane.set(klucz, wynik);
   return wynik;
 }
@@ -1393,7 +1400,8 @@ function ustawPoziomJakosci(nazwa){
   worldGI.ustawProfil(nazwa);
 
   const temporal=trybAA==='taau' && nazwa==='wysoka';
-  przebieg.setResolutionScale(temporal ? .75 : 1);
+  /* P35: wejście TAAU 100% (było 75% — rozmycie przy skalowaniu w górę); ?bez=taaupelne wraca do 75%. */
+  przebieg.setResolutionScale(temporal && !wlaczone('taaupelne') ? .75 : 1);
   resetujHistorieTAAU('profile-switch');
   stanPhotoRaster.active=['photo_raster','photo_path'].includes(nazwa);
   stanPhotoRaster.samples=0; stanPhotoRaster.moving=false; stanPhotoRaster.heavy=false;

@@ -157,7 +157,7 @@ export function utworzSterowanie(api){
         <option value="photo_path">PHOTO_PATH — integration TEST</option>
       </select>
       <select id="antyaliasing" title="Porównanie wygładzania">
-        <option value="taau" selected>TAAU — domyślne (wysoka, +43% FPS)</option>
+        <option value="taau" selected>TAAU — domyślne (wysoka, wyostrzone)</option>
         <option value="smaa">SMAA (P18)</option>
       </select>
       <select id="toneMapping" title="Porównanie tone mappingu">
@@ -438,7 +438,7 @@ export function utworzSterowanie(api){
         ? p.opis + (['photo_raster','photo_path'].includes(jakoscSel.value)
         ? ' · TAAU 64 próbek, pełna rozdzielczość'
         : aaSel.value==='taau' && jakoscSel.value==='wysoka'
-        ? ' · TAAU: wejście 75%, wynik 100%' : ' · SMAA')
+        ? ' · TAAU: wejście 100% + wyostrzanie RCAS' : ' · SMAA')
         + (giSel.value==='speedball' ? ' · Speedball GI TEST' : ' · current SSGI')
         + (ssrSel.value==='modern' ? ' · stochastic SSR TEST' : ' · current SSR')
         + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'

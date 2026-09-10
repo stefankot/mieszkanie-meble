@@ -32,6 +32,7 @@ Podgląd: http://localhost:8123/webgpu/mieszkanie-webgpu-v1.html — katalog `we
 | P31 tańsze niedoskonałości | 9de0d07 | `szumtani`, `niedoskonalosci` | `niedoskonalosci.js` → `dodajNiedoskonalosci()` | pełny 44,3 FPS / GPU 16,2 ms → tani 49,2 FPS / GPU 14,2 ms (+11%); bez warstwy 53,5 FPS |
 | P32 BundleGroup | — | — | bez zmian w kodzie | ODRZUCONE: CPU 4,1 ms przy GPU 14,2 ms, 161 draw calls po cullingu |
 | P33 three.js r186 | (ten commit) | `?three=186` | `mieszkanie-webgpu-v1.html` → importmap wstawiany skryptem | r186 bez błędów, obraz identyczny; r185 48,5 FPS / CPU 4,0 ms vs r186 49,6 FPS / CPU 3,5 ms (+2%, szum) — domyślnie r185 |
+| P35 TAAU ostre i stabilne | (ten commit) | `taaupelne`, `wyostrz` (+ `?ostrosc=`, domyślnie 0,35), `taaustabilne` | `silnik.js` → `wyjscieDla()` (SharpenNode RCAS po TAAU, `depthThreshold` .00045→.002, `currentFrameWeight` .06→.04), `ustawPoziomJakosci()` (wejście 75%→100%); `sterowanie.js` → opisy | zgłoszenie: rozmycie i skakanie. 1036×987, regał: P25 48,2 FPS, zmienność historii 0,060% → P35 35,4 FPS, 0,066%; ostrość słoja i szczelin frontów wyraźnie lepsza na zrzucie. Koszt −27% FPS (nadal ~SMAA na piksel) |
 | P34 KTX2 dla skanów | — | — | bez zmian w kodzie | POMINIĘTE: etapy „Skany PBR” 1–37 ms; start ogranicza kompilacja shaderów |
 
 ## Uwagi dla kolejnego modelu
