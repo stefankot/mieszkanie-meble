@@ -40,6 +40,7 @@ import { audytMrt } from './mrt-audit.js';
 import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
 import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
 import { utworzArchPhoto } from './arch-photo.js';
+import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -1122,11 +1123,12 @@ function gradacja(zrodlo){
 }
 
 function wyjscieDla(poziom){
-  const temporal=trybAA==='taau' && poziom==='pelny';
-  const klucz=poziom+':'+(temporal?'taau':'smaa');
+  const photo=poziom==='photo';
+  const temporal=photo || (trybAA==='taau' && poziom==='pelny');
+  const klucz=poziom+':'+(photo?'photo-raster':temporal?'taau':'smaa');
   if(zbudowane.has(klucz)) return zbudowane.get(klucz);
   let kompozyt;
-  if(poziom === 'pelny'){
+  if(poziom === 'pelny' || photo){
     /* Okluzja, światło pośrednie, cień kontaktowy i odbicia ekranowe. */
     kompozyt = vec4(zSSR.rgb.add(poswiata.rgb), zSSR.a);
   }else if(poziom === 'sredni'){
@@ -1143,7 +1145,7 @@ function wyjscieDla(poziom){
   let aa;
   if(temporal){
     aa=taau(kompozyt,kGlebia,kPredkosc,camera);
-    aa.currentFrameWeight=.06;
+    aa.currentFrameWeight=photo ? 1/64 : .06;
     aa.depthThreshold=.00045;
     aa.edgeDepthDiff=.001;
     aa.maxVelocityLength=96;
@@ -1215,6 +1217,13 @@ const ostatniaKam = new THREE.Vector3(NaN, NaN, NaN);
 const ostatniObrot = new THREE.Quaternion();
 let poprawkaRuchu = true, czasOdDrgniecia = Infinity;
 const PROG_OBROTU = Math.cos(THREE.MathUtils.degToRad(.02)/2);
+const stanPhotoRaster = createPhotoRasterState();
+const SSR_INTERACTIVE = {quality:SSR_MODERN_SETTINGS.quality, resolutionScale:SSR_MODERN_SETTINGS.resolutionScale};
+function ustawCiezkiPhotoRaster(wlaczony){
+  odbicia.quality.value = wlaczony ? .7 : SSR_INTERACTIVE.quality;
+  odbicia.resolutionScale = wlaczony ? 1 : SSR_INTERACTIVE.resolutionScale;
+  for(const n of wezlyHistoriiSSR) n.setSize(1,1);
+}
 function wykryjRuch(dt){
   const inicjalizacja = !Number.isFinite(ostatniaKam.x);
   const drgniecie = !inicjalizacja && (
@@ -1238,6 +1247,20 @@ function dopracuj(dt){
      z rzędu zbija jakość — inaczej pojedyncze mikroprzesunięcie gładzika
      kasuje dopracowanie i obraz mruga. */
   klatekRuchu = drgniecie ? klatekRuchu + 1 : 0;
+  const photoZmiana=updatePhotoRasterState(stanPhotoRaster, {
+    active:poziomJakosci==='photo_raster', moving:drgniecie && klatekRuchu>=3
+  });
+  if(photoZmiana.resetHistory) resetujHistorieTAAU('photo-camera-move');
+  if(photoZmiana.heavyChanged) ustawCiezkiPhotoRaster(stanPhotoRaster.heavy);
+  if(stanPhotoRaster.active){
+    ustawJakosc(photoRasterSlices(stanPhotoRaster.samples));
+    if(photoZmiana.samplesChanged && (stanPhotoRaster.samples<2 || stanPhotoRaster.samples%8===0)){
+      const n=$('photoRasterInfo');
+      if(n) n.textContent=stanPhotoRaster.moving ? 'PHOTO_RASTER: ruch — historia wyzerowana'
+        : `PHOTO_RASTER: akumulacja ${stanPhotoRaster.samples}/${stanPhotoRaster.target}`
+          + (stanPhotoRaster.heavy ? ' · pełne GI/SSR' : '');
+    }
+  }
   if(drgniecie){
     /* Pule świateł przestawiamy przy KAŻDYM drgnięciu — mają własny próg
        pół metra, więc to i tak kosztuje tylko porównanie kwadratu odległości. */
@@ -1252,6 +1275,7 @@ function dopracuj(dt){
     }
     return;
   }
+  if(stanPhotoRaster.active){ bezRuchu += dt; return; }
   bezRuchu += dt;
   /* Kolejny szczebel co ~0,4 s bezruchu — i tylko o jeden w górę naraz. */
   const docelowy = Math.min(PLASTRY_STOP.length - 1, Math.floor(bezRuchu / .4) - 1);
@@ -1261,7 +1285,8 @@ function dopracuj(dt){
   }
 }
 window.__silnik.dopracuj = () => ({stopien, bezRuchu: +bezRuchu.toFixed(2), klatekRuchu,
-                                   plastry: gi.sliceCount.value, kroki: gi.stepCount.value});
+  plastry: gi.sliceCount.value, kroki: gi.stepCount.value,
+  photoRaster:{...stanPhotoRaster}});
 
 /* ============================================================
    POZIOMY JAKOŚCI
@@ -1289,6 +1314,11 @@ const POZIOMY = {
     potok: 'pelny', ssgiSkala: .5, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
     ledPodPolka: true, cienZieleni: true, dopracowanie: true,
     opis: 'pełny potok: odbicia, cienie kontaktowe i refrakcja szkła'
+  },
+  photo_raster: {
+    potok: 'photo', ssgiSkala: 1, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
+    ledPodPolka: true, cienZieleni: true, dopracowanie: true,
+    opis: 'PHOTO_RASTER: 64-klatkowa akumulacja; pełne GI i odbicia po zatrzymaniu'
   }
 };
 let poziomJakosci = 'srednia';
@@ -1303,6 +1333,12 @@ function ustawPoziomJakosci(nazwa){
   const temporal=trybAA==='taau' && nazwa==='wysoka';
   przebieg.setResolutionScale(temporal ? .75 : 1);
   resetujHistorieTAAU('profile-switch');
+  stanPhotoRaster.active=nazwa==='photo_raster';
+  stanPhotoRaster.samples=0; stanPhotoRaster.moving=false; stanPhotoRaster.heavy=false;
+  ustawCiezkiPhotoRaster(false);
+  const photoInfo=$('photoRasterInfo');
+  if(photoInfo) photoInfo.textContent=stanPhotoRaster.active
+    ? `PHOTO_RASTER: akumulacja 0/${stanPhotoRaster.target}` : '';
 
   potok.outputNode = wyjscieDla(j.potok);
   potok.needsUpdate = true;
@@ -1342,7 +1378,7 @@ function ustawAA(nazwa){
   return trybAA;
 }
 window.__silnik.aa={ustaw:ustawAA,get tryb(){return trybAA;},resets:0,lastReset:null,
-  opis:'TAAU r185 działa tylko w profilu wysoka; scene pass 0.75, wynik w rozdzielczości ekranu'};
+  opis:'TAAU r185: wysoka używa wejścia 75%; PHOTO_RASTER akumuluje 64 pełne klatki'};
 /* Zapisana jakość jest już odtworzona w panelu. Odczytujemy ją na końcu
    rozruchu, aby opóźnione ładowanie HDRI/LED nie nadpisało wyboru użytkownika. */
 function wybranaJakoscStartowa(){
