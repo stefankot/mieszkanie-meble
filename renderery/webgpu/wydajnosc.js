@@ -8,7 +8,7 @@ export const PERF = new URLSearchParams(globalThis.location?.search || '').get('
 export function utworzPomiar(renderer){
   const okno = {klatki: 0, cpu: 0, gpu: 0, gpuN: 0, t0: performance.now()};
   const stan = {fps: 0, cpuMs: 0, gpuMs: NaN, drawCalls: 0, trojkaty: 0};
-  let czekaGPU = false, zbior = null, el = null;
+  let czekaGPU = false, zbior = null, el = null, odRozwiazania = 0;
   if(PERF){
     el = document.createElement('div');
     el.style.cssText = 'position:fixed;right:8px;top:8px;z-index:30;background:#25241fd9;color:#f8f7f1;'
@@ -17,13 +17,15 @@ export function utworzPomiar(renderer){
   }
 
   function poKlatce(cpuMs){
-    okno.klatki++; okno.cpu += cpuMs;
+    okno.klatki++; okno.cpu += cpuMs; odRozwiazania++;
     stan.drawCalls = renderer.info.render.drawCalls;
     stan.trojkaty = renderer.info.render.triangles;
     if(PERF && !czekaGPU){
+      /* Pula zapytań sumuje wszystkie klatki od poprzedniego odczytu — dzielimy przez ich liczbę. */
       czekaGPU = true;
+      const klatek = odRozwiazania; odRozwiazania = 0;
       renderer.resolveTimestampsAsync('render')
-        .then(ms => { if(Number.isFinite(ms) && ms > 0){ okno.gpu += ms; okno.gpuN++; } })
+        .then(ms => { if(Number.isFinite(ms) && ms > 0){ okno.gpu += ms / klatek; okno.gpuN++; } })
         .catch(() => {}).finally(() => { czekaGPU = false; });
     }
     const teraz = performance.now(), dt = teraz - okno.t0;
