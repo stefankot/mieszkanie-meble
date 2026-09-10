@@ -831,6 +831,13 @@ function skalujUVMebli(zrodlo){
     });
     wpis.korzen?.traverse(o => {
       if(!o.isMesh) return;
+      /* P23: części o promieniu < 5 cm (kołki, uchwyty, siłowniki) nie dają widocznego
+         cienia przy tekselu ~0,7 cm i rozmyciu VSM, a dokładają wywołań do każdej aktualizacji mapy. */
+      if(wlaczone('cienstatyczny') && o.castShadow){
+        if(!o.geometry.boundingSphere) o.geometry.computeBoundingSphere();
+        const sk = o.getWorldScale(new THREE.Vector3());
+        if(o.geometry.boundingSphere.radius * Math.max(sk.x, sk.y, sk.z) < 5) o.castShadow = false;
+      }
       MAT.skalujUV?.(o, 100);
       /* siatka() w bibliotece nadpisuje roughness wartością z modelu (0,58 dla
          regału), co robiło z matowego forniru politurę. Modele deklarowały to
@@ -1539,7 +1546,9 @@ async function klatka(){
        wiatr jest odpowiednio wolniejszy — przy rozmyciu VSM zmiana między
        kolejnymi pozami jest wtedy poniżej progu dostrzegalności.
        Bez cienia liści nic nie ogranicza płynności i korony chodzą co klatkę. */
-    if(!stanZieleni.cien){
+    if(!stanZieleni.cien || wlaczone('cienstatyczny')){
+      /* P23: cień koron zostaje w ostatniej pozie, więc korony chodzą co klatkę bez
+         przerysowania mapy cienia (445 obiektów + rozmycie VSM) co 8 klatek. */
       poruszZielen(performance.now()/1000);
     }else if((klatki & 7) === 0){
       poruszZielen(performance.now()/1000 * WOLNIEJSZY_WIATR);
