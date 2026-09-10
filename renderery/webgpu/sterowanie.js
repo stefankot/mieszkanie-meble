@@ -146,6 +146,11 @@ export function utworzSterowanie(api){
         <option value="smaa" selected>SMAA — baseline</option>
         <option value="taau">TAAU r185 — TEST (wysoka)</option>
       </select>
+      <select id="worldGI" title="Porównanie światła pośredniego">
+        <option value="ssgi" selected>SSGI — baseline</option>
+        <option value="speedball">SSGI + Speedball 0.7.0 — TEST (wysoka)</option>
+      </select>
+      <p class="uwaga" id="worldGIInfo"></p>
       <p class="uwaga" id="jakoscOpis"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
       <label class="pole"><input type="checkbox" id="szkloFiz" checked>Szkło fizyczne (refrakcja, IOR 1,52)</label>
@@ -346,17 +351,30 @@ export function utworzSterowanie(api){
   });
   const jakoscSel = $('#jakoscPoziom');
   const aaSel = $('#antyaliasing');
-  if(new URLSearchParams(location.search).get('aa')==='taau') aaSel.value='taau';
+  const giSel = $('#worldGI');
+  const parametry = new URLSearchParams(location.search);
+  if(parametry.get('aa')==='taau') aaSel.value='taau';
+  if(parametry.get('gi')==='speedball') giSel.value='speedball';
+  if(['minimalna','srednia','wysoka'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
   aaSel.addEventListener('change',()=>{
     window.__silnik.aa?.ustaw(aaSel.value);
     opiszJakosc();
+  });
+  giSel.addEventListener('change',()=>{
+    const q = new URLSearchParams(location.search);
+    if(giSel.value === 'speedball') {
+      q.set('gi','speedball');
+      q.set('quality','wysoka');
+    } else q.delete('gi');
+    location.search = q.toString();
   });
   function opiszJakosc(){
     const j = window.__silnik.jakosc;
     const p = j?.POZIOMY?.[jakoscSel.value];
     $('#jakoscOpis').textContent = p
-      ? p.opis + (aaSel.value==='taau' && jakoscSel.value==='wysoka'
+        ? p.opis + (aaSel.value==='taau' && jakoscSel.value==='wysoka'
         ? ' · TAAU: wejście 75%, wynik 100%' : ' · SMAA')
+        + (giSel.value==='speedball' ? ' · Speedball GI TEST' : ' · current SSGI')
         + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
       : '';
   }
@@ -401,7 +419,7 @@ export function utworzSterowanie(api){
       const dane = {profilSwiatla: PROFIL_SWIATLA, pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
                     otwarty: el.open};
       for(const k of kontrolki()){
-        if(!k.id) continue;
+        if(!k.id || k.id === 'worldGI') continue;
         dane.pola[k.id] = k.type === 'checkbox' ? k.checked : k.value;
       }
       localStorage.setItem(KLUCZ_UST, JSON.stringify(dane));
@@ -418,7 +436,7 @@ export function utworzSterowanie(api){
         rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'30'});
     }
     for(const k of kontrolki()){
-      if(!k.id || !(k.id in d.pola)) continue;
+      if(!k.id || k.id === 'worldGI' || !(k.id in d.pola)) continue;
       const v = d.pola[k.id];
       if(k.type === 'checkbox'){
         if(typeof v !== 'boolean') continue;
@@ -438,6 +456,9 @@ export function utworzSterowanie(api){
     if(typeof d.otwarty === 'boolean') el.open = d.otwarty;
     const aaZUrl=new URLSearchParams(location.search).get('aa');
     if(['smaa','taau'].includes(aaZUrl)) aaSel.value=aaZUrl;
+    const q=new URLSearchParams(location.search);
+    giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
+    if(['minimalna','srednia','wysoka'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
     /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
        więc po przywróceniu wołamy to wprost. */
     zastosujCzas();

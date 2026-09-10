@@ -35,6 +35,7 @@ import { postep, koniecPomiaru } from './siec.js';
 import { utworzInterakcje } from './interakcje.js';
 import { utworzZaslony } from './zaslony.js';
 import { audytMrt } from './mrt-audit.js';
+import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -879,6 +880,28 @@ window.__silnik.sterowanie = sterowanie;
 window.__silnik.biblioteka = biblioteka;
 window.__silnik.opisBiblioteki = () => opiszBiblioteke(biblioteka);
 
+/* Speedball instaluje fabrykę węzłów świateł, więc opt-in musi nastąpić przed
+   pierwszym renderer.renderAsync(). Wyłączenie dla niższych profili zachowuje
+   jednocześnie twardą granicę QUALITY_DESKTOP. */
+const worldGI = await utworzWorldGI({
+  renderer, scene, camera,
+  wariant: wybierzWorldGI(),
+  profil: document.getElementById('jakoscPoziom')?.value,
+  onError: e => usterki.push('Speedball GI: ' + (e?.message || e))
+});
+window.__silnik.worldGI = worldGI;
+function aktualizujDiagnostykeGI(){
+  const el = document.getElementById('worldGIInfo');
+  if(!el) return;
+  const s = worldGI.odczyt();
+  if(s.wariant !== 'speedball') { el.textContent = 'World GI: current SSGI'; return; }
+  el.textContent = 'Speedball 0.7.0 · install ' + s.installMs.toFixed(1) + ' ms'
+    + (s.firstDataMs === null ? ' · budowa probes…' : ' · pierwsze dane ' + s.firstDataMs.toFixed(1) + ' ms')
+    + (s.stats?.probes ? ' · probes ' + s.stats.probes : '')
+    + (s.blad ? ' · błąd: ' + s.blad : '');
+}
+aktualizujDiagnostykeGI();
+
 /* ============================================================
    POTOK RENDEROWANIA — graf węzłów TSL
    ------------------------------------------------------------
@@ -1233,6 +1256,7 @@ function ustawPoziomJakosci(nazwa){
   const j = POZIOMY[nazwa];
   if(!j) return poziomJakosci;
   poziomJakosci = nazwa;
+  worldGI.ustawProfil(nazwa);
 
   const temporal=trybAA==='taau' && nazwa==='wysoka';
   przebieg.setResolutionScale(temporal ? .75 : 1);
@@ -1374,6 +1398,7 @@ async function klatka(){
   interakcje.aktualizuj();
   if(zaslony.aktualizuj()) odswiezCien();
   dopracuj(dtKlatki);
+  worldGI.aktualizuj();
   if(stanZieleni.animuj){
     /* MIGOTANIE CO ~0,1 s — przyczyna i naprawa.
        Liście poruszały się w KAŻDEJ klatce, a ich cień odświeżał się co ósmą.
@@ -1403,6 +1428,7 @@ async function klatka(){
   }
   nawigacja.rysujZnacznik();
   klatki++; window.__silnik.klatki = klatki;
+  if((klatki & 31) === 0) aktualizujDiagnostykeGI();
   zmierzKlatke(performance.now());
 }
 window.__silnik.klatka = klatka;
@@ -1452,6 +1478,9 @@ zapisz('WebGPU · ' + (LEKKI ? 'tryb lekki (bez SSGI/SSR)' : 'SSGI + SSR + bloom
      + 'Meble: ' + (opis.wczytane.join(', ') || 'brak')
      + (opis.braki.length ? '\nCzeka na model: ' + opis.braki.join(', ') : '')
      + '\nZasłony: ' + zaslony.ile + ' par (' + zaslony.opis.join(', ') + ')'
+     + '\nWorld GI: ' + (worldGI.odczyt().wariant === 'speedball'
+       ? 'SSGI + Speedball 0.7.0 TEST (' + (worldGI.odczyt().aktywny ? 'aktywne' : 'tylko profil wysoka') + ')'
+       : 'current SSGI')
      + (opis.pominiete.length ? '\nPominięte: ' + opis.pominiete.join(' · ') : '')
      + (usterki.length ? '\nUsterki: ' + usterki.join(' · ') : ''));
 }
