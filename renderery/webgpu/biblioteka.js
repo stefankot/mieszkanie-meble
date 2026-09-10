@@ -28,8 +28,11 @@ import { semantyczneUV } from './uv-drewna.js';
 import { STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
          wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen,
          singleFlight, statusPoZbudowaniu, odrzuconyStan } from './furniture-sync.js';
+import { normalizeFurnitureDocument } from './furniture-schema-v2.js?p8b';
 
-const BAZA = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
+const BAZA = new URLSearchParams(location.search).get('furnitureSource')==='local'
+  ? new URL('../../',import.meta.url).href
+  : 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
 const MEBLE = [
   ['lozko', 'Łóżko pod oknem'],
   ['regal-salon', 'Regał w salonie'],
@@ -39,7 +42,8 @@ const MEBLE = [
 ];
 const SUMA_LOZKA = '95056a0097fc3c7e1203d5408e3bfad82a87e6d22f2d60f92d5bf0519a7cf0de';
 const OKRES_MS = 15000;         // ten sam odstęp, co w wersji WebGL
-const SCHEMA_ZNANA = 1;
+const SCHEMATY_ZNANE = new Set([1,2]);
+const ROZSZERZENIA_V2 = new Set(['pl.mieszkanie.webgpu']);
 
 const liczba = (v, min = -30000, max = 30000) =>
   typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max;
@@ -228,6 +232,7 @@ export function zbudujModel(dane, ctx){
   const korzen = new THREE.Group();
   korzen.name = 'biblioteka:' + dane.assetId;
   korzen.userData.lighting = m.lighting; // jawne opisy LED w lokalnych mm, bez tworzenia świateł
+  if(m.v2) korzen.userData.furnitureV2=structuredClone(m.v2);
   const czesci = new Map();
   const pelnyCtx = {...ctx, model: m};
 
@@ -385,13 +390,11 @@ export async function uruchomBiblioteke(api){
         if(dane.assetId !== id || dane.version !== wybrana.id)
           throw Error('Identyfikator albo wersja modelu nie pasuje do katalogu.');
         const uwagi = [];
-        if(dane.schemaVersion !== SCHEMA_ZNANA){
-          // nowszy format wczytujemy najlepszym staraniem i mówimy o tym wprost
-          uwagi.push(`model deklaruje schemaVersion ${dane.schemaVersion}, ten silnik zna ${SCHEMA_ZNANA}`);
-        }
-        uwagi.push(...sprawdzRozszerzenia(dane));
+        if(!SCHEMATY_ZNANE.has(dane.schemaVersion)) throw Error(`Nieobsługiwane schemaVersion ${dane.schemaVersion}.`);
+        const znormalizowane=normalizeFurnitureDocument(dane);
+        uwagi.push(...sprawdzRozszerzenia(dane,dane.schemaVersion===2?ROZSZERZENIA_V2:undefined));
         const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana, dane);
-        zbudowane = zbudujModel(dane, {THREE, materialBazowy, boxGeo});
+        zbudowane = zbudujModel(znormalizowane.document, {THREE, materialBazowy, boxGeo});
         zbudowane.pominiete = uwagi.concat(zbudowane.pominiete);
         ustaw(zbudowane.korzen, umiejscowienie, THREE);
       }
@@ -424,7 +427,9 @@ export async function uruchomBiblioteke(api){
     pokolenia.uniewaznij(id);
     const w = stan.get(id) || {};
     stan.set(id, {...w, przypieta: wersja || undefined, wersja: null});
-    return zaladujMebel(id, w.nazwa || id);
+    const zmiana=await zaladujMebel(id, w.nazwa || id);
+    if(zmiana){ wynik.ruchy=[...stan.values()].flatMap(x=>x.ruchy||[]); przyZmianie?.(wynik); }
+    return zmiana;
   }
   wynik.przypnij = przypnij;
 

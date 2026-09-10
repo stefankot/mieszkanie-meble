@@ -31,7 +31,7 @@ import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
-import { uruchomBiblioteke } from './biblioteka.js';
+import { uruchomBiblioteke } from './biblioteka.js?p8';
 import { utworzNawigacje } from './nawigacja.js?p18';
 import { utworzSterowanie } from './sterowanie.js';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
@@ -897,6 +897,12 @@ const biblioteka = await uruchomBiblioteke({
     sterowanie?.odswiezMeble();
   }
 });
+const v2Poc=new URLSearchParams(location.search).get('furnitureV2');
+if(v2Poc){
+  const [assetId,version]=v2Poc.split(':');
+  if(assetId && version) await biblioteka.przypnij(assetId,version);
+  else usterki.push('furnitureV2 wymaga formatu assetId:version');
+}
 
 /* Spacer, orbita i widok z lotu ptaka. Kolizje czyta z planu, pudełka mebli
    przelicza po każdej podmianie modelu z biblioteki. */
