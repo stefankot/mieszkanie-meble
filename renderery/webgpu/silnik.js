@@ -33,6 +33,7 @@ import { skrzywFormatki } from './niedoskonalosci.js';
 import { postep, koniecPomiaru } from './siec.js';
 import { utworzInterakcje } from './interakcje.js';
 import { utworzZaslony } from './zaslony.js';
+import { audytMrt } from './mrt-audit.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -73,6 +74,7 @@ window.__silnik = { usterki, gotowy: false };
    bierzemy z pierwszego niezerowego źródła i pilnujemy go przy każdej klatce. */
 const szerokosc = () => Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1280);
 const wysokosc = () => Math.max(1, window.innerHeight || document.documentElement.clientHeight || 720);
+window.__silnik.mrtAudit=audytMrt(szerokosc(),wysokosc(),1);
 
 /* MRT z sześcioma kanałami przekracza domyślny limit 32 B na próbkę.
    Adapter zwykle udostępnia znacznie więcej (tu 128), ale trzeba o to poprosić
