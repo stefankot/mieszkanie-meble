@@ -785,7 +785,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const p=punkt(d.poz), cel=punkt(d.cel);
     /* Migracja dawnej wartości zapisanej przez renderer. Bez niej localStorage
        utrzymywał 122 cm mimo zmiany nowej wartości domyślnej. */
-    if(Math.abs(d.celOczu - 122) < .5 && Math.abs(p.y - 122) < .5){
+    const dawnaDomyslna = [122,170].some(h => Math.abs(d.celOczu - h) < .5 && Math.abs(p.y - h) < .5);
+    if(dawnaDomyslna){
       p.y = OCZY; d.celOczu = OCZY;
     }
     const ptak=d.tryb===TRYBY.PTAK;

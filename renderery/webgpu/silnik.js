@@ -32,7 +32,7 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
-import { utworzNawigacje } from './nawigacja.js?p18c';
+import { utworzNawigacje } from './nawigacja.js?p18d';
 import { utworzSterowanie } from './sterowanie.js?dev2';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
