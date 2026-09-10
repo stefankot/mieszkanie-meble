@@ -46,16 +46,26 @@
  </div>
 </div>
 
-<script type="importmap">
-{"imports":{
- "three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.webgpu.js",
- "three/webgpu":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.webgpu.js",
- "three/tsl":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.tsl.js",
- "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/",
- "speedball-gi":"https://cdn.jsdelivr.net/npm/speedball-gi@0.7.0/js/index.js",
- "three-mesh-bvh":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.11/src/index.js",
- "suncalc":"https://cdn.jsdelivr.net/npm/suncalc@1.9.0/+esm"
-}}
+<script>
+ /* P33: wersja three.js wybierana parametrem ?three=185|186 — importmap wstawiany przed
+    pierwszym modułem, więc A/B nie wymaga dwóch kopii strony. */
+ (function(){
+   const w = new URLSearchParams(location.search).get('three') === '186' ? '0.186.0' : '0.185.0';
+   const cdn = 'https://cdn.jsdelivr.net/npm/';
+   const s = document.createElement('script');
+   s.type = 'importmap';
+   s.textContent = JSON.stringify({imports: {
+     'three': cdn + 'three@' + w + '/build/three.webgpu.js',
+     'three/webgpu': cdn + 'three@' + w + '/build/three.webgpu.js',
+     'three/tsl': cdn + 'three@' + w + '/build/three.tsl.js',
+     'three/addons/': cdn + 'three@' + w + '/examples/jsm/',
+     'speedball-gi': cdn + 'speedball-gi@0.7.0/js/index.js',
+     'three-mesh-bvh': cdn + 'three-mesh-bvh@0.9.11/src/index.js',
+     'suncalc': cdn + 'suncalc@1.9.0/+esm'
+   }});
+   document.currentScript.after(s);
+   window.__wersjaThree = w;
+ })();
 </script>
 <script>
  /* Postęp ładowania. Celowo w zwykłym skrypcie, a nie w module: ma działać
