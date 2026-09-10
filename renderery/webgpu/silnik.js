@@ -45,6 +45,7 @@ import { createPhotoPathIntegration } from './photo-path.js';
 import { runNavigationRegression } from './navigation-regression.js?p18b';
 import { wlaczone } from './flagi.js';
 import { zmiekczTkaniny } from './miekkie-bryly.js';
+import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
@@ -715,6 +716,7 @@ async function wczytajSrodowiskoPozniej(){
       {nazwa: 'urban_courtyard_02', jakosc: '1k', moc: .34, tloHdri,
        zachowajHdr: wariantSSR === SSR_MODERN});
     if(odbiciaModern && srodowisko.hdr) odbiciaModern.setEnvMap(srodowisko.hdr);
+    TU?.ustawSrodowisko(scene);   // P29: stal odbija HDRI z własnym natężeniem
     if(tloHdri) niebo.visible = false;
   }catch(e){
     usterki.push('HDRI: ' + e.message + ' — zapasowe środowisko proceduralne');
@@ -741,16 +743,28 @@ async function wczytajSrodowiskoPozniej(){
 }
 
 
+/* ---------- P29 (10a): TEKSTURY UŻYTKOWNIKA ---------- */
+let TU = null;
+if(wlaczone('tekstury10a')){
+  try{
+    TU = await wczytajTeksturyUzytkownika(THREE, TEX);
+    scene.add(TU.wykonczenia(PLAN));
+  }catch(e){ usterki.push('Tekstury użytkownika: ' + e.message); }
+}
+window.__silnik.teksturyUzytkownika = TU;
+
 /* ---------- MEBEL ---------- */
 const materialBazowy = {
   /* Fornir: skan oak_veneer_03 w 2K — ten sam, którego używała wersja WebGL,
      z jej parametrami. Bez skanu wracamy do proceduralnego board(). */
-  wood:(w,h,kolor)=> MAT.maDrewno ? MAT.drewno(w,h,kolor) : board(0xdddddd,w,h),
+  wood:(w,h,kolor)=>{ const m = MAT.maDrewno ? MAT.drewno(w,h,kolor) : board(0xdddddd,w,h);
+    m.userData.kolorDrewna = kolor; return m; },   // P29: kolor regału dla ramy łóżka
   white:(w,h,kolor)=> MAT.lakier(kolor || 0xefe9d8, w, h),
   graphite:(w,h)=>board(0x33363b,w,h,34),
   peg:(w,h)=>pegMaterial(w,h),
   fabric:(w,h,color='#c9c04f',profile)=>{const m=fabricMaterial(color,undefined,{profile});setUV(m,w,h);return m;},
-  metal:()=>new THREE.MeshPhysicalMaterial({color:0xaeb3ba,metalness:.95,roughness:.25}),
+  metal:(w,h,kolor)=> TU ? TU.stalNierdzewna(kolor || '#b9bec2')   // P29: blat, zlew, uchwyty
+    : new THREE.MeshPhysicalMaterial({color:0xaeb3ba,metalness:.95,roughness:.25}),
   black:()=>new THREE.MeshPhysicalMaterial({color:0x151719,roughness:.44,metalness:.1})
 };
 /* Wszystkie meble pochodzą z biblioteki: manifesty, wersje i zatwierdzone
@@ -805,6 +819,16 @@ function skalujUVMebli(zrodlo){
        formatce słój biegł pionowo. */
     /* Formatki lekko poza pionem — tolerancja stolarska, nie błąd. */
     if(wpis.korzen) skrzywFormatki(wpis.korzen, THREE);
+    /* P29 (10a): rama łóżka z forniru regału w salonie, tkanina łóżka z tekstury użytkownika. */
+    if(wpis.korzen && TU){
+      if(wpis.korzen.name === 'biblioteka:lozko'){
+        let kolor = '#d8bd99';
+        zrodlo.meble.get('regal-salon')?.korzen?.traverse(o => { if(o.material?.userData?.kolorDrewna) kolor = o.material.userData.kolorDrewna; });
+        TU.ramaLozka(wpis.korzen, MAT, kolor);
+      }
+      wpis.korzen.traverse(o => { if(o.isMesh && o.material?.userData?.surface === 'fabric') TU.nalozTkanine(o.material); });
+      TU.ustawSrodowisko(scene);   // meble przebudowane po wczytaniu HDRI
+    }
     /* P26: materac i poduchy jako miękkie bryły — tylko geometria renderera, model bez zmian. */
     if(wpis.korzen && wlaczone('miekkie')) zmiekczTkaniny(wpis.korzen, THREE);
 

@@ -22,6 +22,7 @@ Podgląd: http://localhost:8123/webgpu/mieszkanie-webgpu-v1.html — katalog `we
 | P26 miękkie bryły tkanin | `miekkie` | `miekkie-bryly.js` (nowy) → `zmiekczTkaniny()`; `silnik.js` → `skalujUVMebli()` | materac i poduchy: zaokrąglenia, wypchanie, lamówka, zagniecenia, wgniecenia, UV, AO w kolorze wierzchołków |
 | P27 tkanina w TSL | — | bez zmian w kodzie | POMINIĘTE: po P26 tkanina ma splot, sheen i AO; mikrorelief = mały zysk, ryzyko w materiale |
 | P28 draperia zasłon | `zaslony2` | `draperia.js` (nowy) → `utworzDraperie()`; `zaslony.js` → tworzenie paneli, `zastosuj()` | losowe fałdy per panel, stała długość łuku, odsłanianie morfingiem zamiast scale.x |
+| P29 (10a) tekstury użytkownika | `tekstury10a` | `tekstury-uzytkownika.js` (nowy), `tekstury-uzytkownika/*.jpg` (sips z PNG użytkownika); `silnik.js` → `materialBazowy.metal/wood`, `skalujUVMebli()` | posadzka kuchni; łazienka i WC podłoga + ściany do sufitu (nakładki z otworami drzwi); stal nierdzewna dla typu `metal`; tkanina łóżka; rama łóżka z forniru regału |
 | P23 cień bez przerysowań | `cienstatyczny` | `silnik.js` → gałąź wiatru w `klatka()`, `skalujUVMebli()` (castShadow < 5 cm) | wiatr nie odświeża cienia; drobne części bez cienia |
 
 ## P19 — pomiar i przełączniki A/B
