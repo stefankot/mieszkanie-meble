@@ -576,7 +576,9 @@ const pulaLamp = utworzPuleObszarowa({gniazda: gniazdaLamp, ile: 2, nazwa: 'Lamp
 const lampySufitowe = pulaLamp.pula;
 
 const BAZA_LUNY = 0; // Z3a: wyłączona sztuczna łuna na suficie.
-const luny = Array.from({length: 2}, () => {
+/* P21: łuny mają moc 0, a każde PointLight i tak jest liczone w shaderze każdego
+   materiału. Bez nich obraz jest identyczny, a piksel tańszy. ?bez=luny przywraca. */
+const luny = Array.from({length: wlaczone('luny') ? 0 : 2}, () => {
   const l = new THREE.PointLight(0xffdfb7, 0, 160, 2);
   l.name = 'Łuna kuli';
   scene.add(l);

@@ -14,6 +14,8 @@ Podgląd: http://localhost:8123/webgpu/mieszkanie-webgpu-v1.html — katalog `we
 | Punkt | Flaga | Pliki | Wynik |
 |---|---|---|---|
 | P19 pomiar + flagi | — | `wydajnosc.js` (nowy), `flagi.js` (nowy), `silnik.js` | infrastruktura |
+| P20 anizotropia 16 | `aniso` | `materialy.js` → `maxAniso` | skany: anisotropy 1 → 16 |
+| P21 bez łun o mocy 0 | `luny` | `silnik.js` → `const luny` | 2 PointLight mniej w shaderach |
 
 ## P19 — pomiar i przełączniki A/B
 - Pliki: `wydajnosc.js` → `PERF`, `utworzPomiar()`; `flagi.js` → `wlaczone(id)`;
