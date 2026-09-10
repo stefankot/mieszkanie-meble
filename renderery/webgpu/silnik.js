@@ -20,6 +20,8 @@ import { ssr }  from 'three/addons/tsl/display/SSRNode.js';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 import { taau } from 'three/addons/tsl/display/TAAUNode.js';
+import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
+import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 import { sss } from 'three/addons/tsl/display/SSSNode.js';
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import SunCalc from 'suncalc';
@@ -36,6 +38,7 @@ import { utworzInterakcje } from './interakcje.js';
 import { utworzZaslony } from './zaslony.js';
 import { audytMrt } from './mrt-audit.js';
 import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
+import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -682,6 +685,8 @@ window.__silnik.swiatlo = {ustawCzas, ustawSwiatlo, stan: swiatlo,
    równomierna kopuła i delikatny kierunek od okna.
    Proceduralne pudełko zostaje jako zapas, gdyby HDRI nie doszło. */
 let srodowisko = null;
+const wariantSSR = wybierzSSR();
+let odbiciaModern = null;
 /* Środowisko HDRI ładuje się PO pokazaniu sceny (patrz koniec pliku).
    Pobranie pliku RGBE i wygenerowanie mapy PMREM to kilka sekund, a bez nich
    scena wygląda tylko płasko — nie ma powodu, żeby trzymać przez ten czas
@@ -690,7 +695,9 @@ async function wczytajSrodowiskoPozniej(){
   try{
     const tloHdri = new URLSearchParams(location.search).get('environment') === 'hdri';
     srodowisko = await wczytajSrodowisko(THREE, renderer, scene,
-                                         {nazwa: 'urban_courtyard_02', jakosc: '1k', moc: .34, tloHdri});
+      {nazwa: 'urban_courtyard_02', jakosc: '1k', moc: .34, tloHdri,
+       zachowajHdr: wariantSSR === SSR_MODERN});
+    if(odbiciaModern && srodowisko.hdr) odbiciaModern.setEnvMap(srodowisko.hdr);
     if(tloHdri) niebo.visible = false;
   }catch(e){
     usterki.push('HDRI: ' + e.message + ' — zapasowe środowisko proceduralne');
@@ -977,10 +984,15 @@ const wezelGI = gi.getGINode();
 
 /* --- SSR: standardowy r185; długości w jednostkach sceny (cm). --- */
 const odbicia = ssr(kKolor, kGlebia, normalnaSceny, {
+  stochastic: wariantSSR === SSR_MODERN,
+  diffuseNode: kAlbedo,
   metalnessNode: kMetRou.r,
-  roughnessNode: kMetRou.g
+  roughnessNode: kMetRou.g,
+  envImportanceSampling: wariantSSR === SSR_MODERN && SSR_MODERN_SETTINGS.envImportanceSampling,
+  binaryRefine: wariantSSR === SSR_MODERN && SSR_MODERN_SETTINGS.binaryRefine,
+  camera
 });
-odbicia.quality.value = .35;              // [Lumen] ssr.quality
+odbicia.quality.value = SSR_MODERN_SETTINGS.quality; // [Lumen] ssr.quality
 odbicia.intensity.value = 1.2;            // [Lumen] ssr.intensity
 /* Standardowy SSR ogranicza odległość punkt–płaszczyzna, nie stałą długość
    promienia. 1 cm pozostaje bazą do A/B z m(.5), m(1), ewentualnie m(2). */
@@ -990,8 +1002,30 @@ odbicia.mirrorBias.value = .5;            // [Lumen] ssr.mirrorBias
 odbicia.maxLuminance.value = 35;          // [Lumen] ssr.maxLuminance
 odbicia.screenEdgeFade.value = .2;        // [Lumen] ssr.screenEdgeFade
 odbicia.environmentIntensity.value = Math.PI;  // [Lumen] ssr.environmentIntensity
-odbicia.resolutionScale = .5;             // Z6: połowa wymiarów przebiegu odbić
-odbicia.binaryRefine = false;             // [Lumen] ssr.binaryRefine
+odbicia.resolutionScale = SSR_MODERN_SETTINGS.resolutionScale;
+odbicia.binaryRefine = wariantSSR === SSR_MODERN && SSR_MODERN_SETTINGS.binaryRefine;
+
+/* Oficjalny łańcuch r185 dla szumnego SSR: reprojekcja, rekurencyjne
+   odszumianie i feedback poprzedniej odszumionej klatki. Baseline nie tworzy
+   tych buforów ani shaderów. */
+const wezlyHistoriiSSR = new Set();
+let odbiciaDoKompozycji = odbicia;
+if(wariantSSR === SSR_MODERN){
+  odbiciaModern = odbicia;
+  const reprojekcjaSSR = temporalReproject(odbicia, kGlebia, kNormal, kPredkosc, camera,
+    {mode:'specular', accumulate:false});
+  const odszumioneSSR = recurrentDenoise(reprojekcjaSSR, camera, {
+    depth:kGlebia, normal:kNormal, raw:odbicia, metalRoughness:kMetRou,
+    mode:'specular', accumulate:true
+  });
+  odszumioneSSR.alphaSource = 'raylength';
+  odbicia.setHistory(odszumioneSSR, kPredkosc);
+  reprojekcjaSSR.setHistoryTexture(odszumioneSSR);
+  wezlyHistoriiSSR.add(reprojekcjaSSR); wezlyHistoriiSSR.add(odszumioneSSR);
+  odbiciaDoKompozycji = odszumioneSSR;
+}
+window.__silnik.ssr = {wariant:wariantSSR, modern:odbiciaModern,
+  opis:'modern = stochastic SSR + TemporalReproject + RecurrentDenoise + setHistory; tylko profil wysoka'};
 
 /* --- kompozycja: AO na kolorze, GI na albedo, SSR dodatkowo ---
    SSGI i SSR są włączone i potwierdzone wizualnie: przy włączonym SSGI
@@ -1036,7 +1070,7 @@ const kolorZAO = UZYJ_SSGI
   ? kKolor.rgb.mul(wezelAO.r).mul(cienKontaktowy.r)
   : kKolor.rgb;
 const zGI  = UZYJ_SSGI ? vec4(add(kolorZAO, kAlbedo.rgb.mul(giCzyste.rgb)), kKolor.a) : kKolor;
-const zSSR = UZYJ_SSGI ? vec4(zGI.rgb.add(odbicia.rgb), zGI.a) : zGI;
+const zSSR = UZYJ_SSGI ? vec4(zGI.rgb.add(odbiciaDoKompozycji.rgb), zGI.a) : zGI;
 
 /* --- bloom tylko z bufora emisji: [WebGI] intensity 0.5, radius 0.6, threshold 2 --- */
 const poswiata = bloom(kEmisja, .5, .6, 2.0);
@@ -1069,6 +1103,7 @@ function resetujHistorieTAAU(powod='manual'){
   camera.clearViewOffset();
   velocity.setProjectionMatrix?.(null);
   for(const n of wezlyTAAU) n.setSize(1,1);
+  for(const n of wezlyHistoriiSSR) n.setSize(1,1);
   const a=window.__silnik.aa;
   if(a){ a.resets++; a.lastReset=powod; }
 }
@@ -1481,6 +1516,7 @@ zapisz('WebGPU · ' + (LEKKI ? 'tryb lekki (bez SSGI/SSR)' : 'SSGI + SSR + bloom
      + '\nWorld GI: ' + (worldGI.odczyt().wariant === 'speedball'
        ? 'SSGI + Speedball 0.7.0 TEST (' + (worldGI.odczyt().aktywny ? 'aktywne' : 'tylko profil wysoka') + ')'
        : 'current SSGI')
+     + '\nSSR: ' + (wariantSSR === SSR_MODERN ? 'stochastic r185 TEST' : 'current')
      + (opis.pominiete.length ? '\nPominięte: ' + opis.pominiete.join(' · ') : '')
      + (usterki.length ? '\nUsterki: ' + usterki.join(' · ') : ''));
 }

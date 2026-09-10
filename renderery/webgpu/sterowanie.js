@@ -150,6 +150,10 @@ export function utworzSterowanie(api){
         <option value="ssgi" selected>SSGI — baseline</option>
         <option value="speedball">SSGI + Speedball 0.7.0 — TEST (wysoka)</option>
       </select>
+      <select id="ssrWariant" title="Porównanie odbić ekranowych">
+        <option value="current" selected>SSR current — baseline</option>
+        <option value="modern">Stochastic SSR r185 — TEST (wysoka)</option>
+      </select>
       <p class="uwaga" id="worldGIInfo"></p>
       <p class="uwaga" id="jakoscOpis"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
@@ -352,9 +356,11 @@ export function utworzSterowanie(api){
   const jakoscSel = $('#jakoscPoziom');
   const aaSel = $('#antyaliasing');
   const giSel = $('#worldGI');
+  const ssrSel = $('#ssrWariant');
   const parametry = new URLSearchParams(location.search);
   if(parametry.get('aa')==='taau') aaSel.value='taau';
   if(parametry.get('gi')==='speedball') giSel.value='speedball';
+  if(parametry.get('ssr')==='modern') ssrSel.value='modern';
   if(['minimalna','srednia','wysoka'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
   aaSel.addEventListener('change',()=>{
     window.__silnik.aa?.ustaw(aaSel.value);
@@ -368,6 +374,12 @@ export function utworzSterowanie(api){
     } else q.delete('gi');
     location.search = q.toString();
   });
+  ssrSel.addEventListener('change',()=>{
+    const q = new URLSearchParams(location.search);
+    if(ssrSel.value === 'modern') q.set('ssr','modern'); else q.delete('ssr');
+    q.set('quality','wysoka'); q.set('aa','smaa'); q.delete('gi');
+    location.search = q.toString();
+  });
   function opiszJakosc(){
     const j = window.__silnik.jakosc;
     const p = j?.POZIOMY?.[jakoscSel.value];
@@ -375,6 +387,7 @@ export function utworzSterowanie(api){
         ? p.opis + (aaSel.value==='taau' && jakoscSel.value==='wysoka'
         ? ' · TAAU: wejście 75%, wynik 100%' : ' · SMAA')
         + (giSel.value==='speedball' ? ' · Speedball GI TEST' : ' · current SSGI')
+        + (ssrSel.value==='modern' ? ' · stochastic SSR TEST' : ' · current SSR')
         + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
       : '';
   }
@@ -419,7 +432,7 @@ export function utworzSterowanie(api){
       const dane = {profilSwiatla: PROFIL_SWIATLA, pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
                     otwarty: el.open};
       for(const k of kontrolki()){
-        if(!k.id || k.id === 'worldGI') continue;
+        if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant') continue;
         dane.pola[k.id] = k.type === 'checkbox' ? k.checked : k.value;
       }
       localStorage.setItem(KLUCZ_UST, JSON.stringify(dane));
@@ -436,7 +449,7 @@ export function utworzSterowanie(api){
         rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'30'});
     }
     for(const k of kontrolki()){
-      if(!k.id || k.id === 'worldGI' || !(k.id in d.pola)) continue;
+      if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || !(k.id in d.pola)) continue;
       const v = d.pola[k.id];
       if(k.type === 'checkbox'){
         if(typeof v !== 'boolean') continue;
@@ -458,6 +471,7 @@ export function utworzSterowanie(api){
     if(['smaa','taau'].includes(aaZUrl)) aaSel.value=aaZUrl;
     const q=new URLSearchParams(location.search);
     giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
+    ssrSel.value=q.get('ssr')==='modern'?'modern':'current';
     if(['minimalna','srednia','wysoka'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
     /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
        więc po przywróceniu wołamy to wprost. */
