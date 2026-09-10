@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {createPhotoRasterState, updatePhotoRasterState, photoRasterSlices} from '../photo-raster.js';
+import {createPhotoRasterState, updatePhotoRasterState, photoRasterSlices} from '../renderery/webgpu/photo-raster.js';
 
 const state=createPhotoRasterState();
 updatePhotoRasterState(state,{active:true,moving:false});
