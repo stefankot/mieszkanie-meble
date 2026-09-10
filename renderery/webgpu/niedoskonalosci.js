@@ -22,8 +22,9 @@
    5. GEOMETRIA      — patrz skrzywFormatki(): formatki lekko poza pionem.
    ============================================================ */
 
-import { positionWorld, normalWorld, mx_fractal_noise_float, mx_worley_noise_float,
+import { positionWorld, normalWorld, mx_fractal_noise_float, mx_worley_noise_float, mx_noise_float,
          float, vec3, texture, mix, smoothstep, clamp, uniform } from 'three/tsl';
+import { wlaczone } from './flagi.js';
 
 /* P4: jedna zmienna A/B. Chropowatość i geometria nie zależą od przełącznika. */
 const wariacjaKoloru = uniform(new URLSearchParams(globalThis.location?.search || '')
@@ -43,22 +44,28 @@ const PROFILE = {
 };
 
 export function dodajNiedoskonalosci(material, rodzaj = 'drewno', przesuniecie = 0){
+  /* P31: ?bez=niedoskonalosci — pomiar kosztu warstwy (11 oktaw szumu 3D na piksel). */
+  if(!wlaczone('niedoskonalosci')) return material;
   const p = PROFILE[rodzaj] || PROFILE.drewno;
   const q = positionWorld.add(vec3(przesuniecie, przesuniecie * .7, przesuniecie * 1.3));
 
   /* 1. PRZEBARWIENIA — skala ~1,7 m, więc plamy są większe niż formatka. */
-  const plama = mx_fractal_noise_float(q.mul(0.006), 3, 2.0, 0.5);
+  /* P31: tańszy szum — 6 oktaw zamiast 11 i bez Worleya; ?bez=szumtani wraca do pełnego. */
+  const tani = wlaczone('szumtani');
+  const plama = mx_fractal_noise_float(q.mul(0.006), tani ? 2 : 3, 2.0, 0.5);
 
   /* 2. CHROPOWATOŚĆ — worley daje płaty o wyraźnych granicach, jak ślady
         polerowania albo nierówno rozprowadzony olej. */
-  const platy = mx_worley_noise_float(q.mul(0.02), 1.0, 1);
-  const drobne = mx_fractal_noise_float(q.mul(0.09), 4, 2.0, 0.5);
+  const platy = tani
+    ? smoothstep(float(.3), float(.7), mx_noise_float(q.mul(0.02)).mul(.5).add(.5))   // płaty z progowanego szumu
+    : mx_worley_noise_float(q.mul(0.02), 1.0, 1);
+  const drobne = mx_fractal_noise_float(q.mul(0.09), tani ? 2 : 4, 2.0, 0.5);
 
   /* 3. PRZYBRUDZENIA — kurz osiada na tym, co zwrócone do góry, i gromadzi się
         przy podłodze. Poniżej 25 cm brud narasta, powyżej 120 cm zanika. */
   const doGory = clamp(normalWorld.y, 0, 1);
   const przyPodlodze = smoothstep(float(120), float(25), positionWorld.y);
-  const zabrudzenie = mx_fractal_noise_float(q.mul(p.skalaBrudu), 4, 2.0, 0.5)
+  const zabrudzenie = mx_fractal_noise_float(q.mul(p.skalaBrudu), tani ? 2 : 4, 2.0, 0.5)
                         .mul(.5).add(.5)
                         .mul(doGory.mul(.6).add(przyPodlodze.mul(.7)).add(.15));
 
