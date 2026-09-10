@@ -20,6 +20,8 @@ Podgląd: http://localhost:8123/webgpu/mieszkanie-webgpu-v1.html — katalog `we
 | P24 tania szyba | — | bez zmian w kodzie | ODRZUCONE: 38,7 → 39,9 FPS (+3%, szum), regał salon, 840×987, wysoka+SMAA — szyba fizyczna zostaje |
 | P25 TAAU domyślnie na „wysokiej” | A/B: `?aa=smaa` | `sterowanie.js` → `<select id="antyaliasing">`, `PROFIL_AA` (jednorazowa migracja zapisanych ustawień) | SMAA 39,0 FPS / GPU 34,3 ms → TAAU (wejście 75%) 55,8 FPS / GPU 11,6 ms (+43%); wyjście 1,5× na Retinie 28,7 FPS — odrzucone |
 | P26 miękkie bryły tkanin | `miekkie` | `miekkie-bryly.js` (nowy) → `zmiekczTkaniny()`; `silnik.js` → `skalujUVMebli()` | materac i poduchy: zaokrąglenia, wypchanie, lamówka, zagniecenia, wgniecenia, UV, AO w kolorze wierzchołków |
+| P27 tkanina w TSL | — | bez zmian w kodzie | POMINIĘTE: po P26 tkanina ma splot, sheen i AO; mikrorelief = mały zysk, ryzyko w materiale |
+| P28 draperia zasłon | `zaslony2` | `draperia.js` (nowy) → `utworzDraperie()`; `zaslony.js` → tworzenie paneli, `zastosuj()` | losowe fałdy per panel, stała długość łuku, odsłanianie morfingiem zamiast scale.x |
 | P23 cień bez przerysowań | `cienstatyczny` | `silnik.js` → gałąź wiatru w `klatka()`, `skalujUVMebli()` (castShadow < 5 cm) | wiatr nie odświeża cienia; drobne części bez cienia |
 
 ## P19 — pomiar i przełączniki A/B

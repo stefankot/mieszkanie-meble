@@ -20,6 +20,8 @@ import { positionLocal, uv, vec3, vec4, float, mix, smoothstep,
          mx_fractal_noise_float, texture } from 'three/tsl';
 import { realizujMiekkaGeometrie, stanyMiekkiejGeometrii,
          statystykiCacheMiekkiejGeometrii } from './soft-geometry.js';
+import { utworzDraperie } from './draperia.js';
+import { wlaczone } from './flagi.js';
 
 const DO_PODLOGI = 0;        // tkanina sięga do podłogi
 const FALDY = 9;
@@ -126,7 +128,11 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
       const odOtwarty=lewy?-uklad.szerokosc/2+i*szerOtwarty
         :uklad.szerokosc/2-uklad.pasKoniec+(i-uklad.pary)*szerOtwarty;
       const odSciany=Math.abs(uklad.x-uklad.xSciany);
-      const geometria=realizujMiekkaGeometrie(THREE,{
+      /* P28: każdy panel ma własną draperię; stan odsłonięty jest celem morfingu. */
+      const draperia=wlaczone('zaslony2');
+      const geometria=draperia ? utworzDraperie(THREE,{szer:szerPanelu,szerOtwarta:szerOtwarty,wys:wysTkaniny,
+        glebMax:Math.max(2,2*(odSciany-1)),faldy:FALDY,amplituda:GLEBOKOSC_FALDY,
+        ziarno:`${uklad.id}:${uklad.rodzaj}:${i}`,zwis:uklad.id==='salon'?1.2:.7}) : realizujMiekkaGeometrie(THREE,{
         sourceVersion:String(plan.schemaVersion||plan.version||'apartment-v1'),
         semanticType:'curtain',dimensions:{widthCm:szerPanelu,heightCm:wysTkaniny,depthCm:GLEBOKOSC_FALDY*2},
         seed:`${uklad.id}:${uklad.rodzaj}`,pleatProfile:{type:'sine',count:FALDY,amplitudeCm:GLEBOKOSC_FALDY},
@@ -139,7 +145,7 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
       p.name=uklad.rodzaj+' · panel '+(i+1);
       p.position.y=DO_PODLOGI+wysTkaniny/2;
       p.castShadow=uklad.id==='salon';p.receiveShadow=true;
-      Object.assign(p.userData,{zaslona:true,szerPanelu,softState:stan,
+      Object.assign(p.userData,{zaslona:true,szerPanelu,softState:stan,draperia,
         xZamkniety:-uklad.szerokosc/2+(i+.5)*szerPanelu,
         xOtwarty:odOtwarty+szerOtwarty/2,skalaOtwarta:stan.open.scaleX});
       grupa.add(p);panele.push(p);
@@ -154,7 +160,8 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
   function zastosuj(sciana,t){
     for(const z of sciana.zestawy){
       for(const p of z.panele){
-        p.scale.x=1+(p.userData.skalaOtwarta-1)*t;
+        if(p.userData.draperia) p.morphTargetInfluences[0]=t;   // P28: tkanina się marszczy, nie ściska
+        else p.scale.x=1+(p.userData.skalaOtwarta-1)*t;
         p.scale.z=1; // głębokość 10 cm w każdym stanie odsłonięcia
         p.position.x=p.userData.xZamkniety+(p.userData.xOtwarty-p.userData.xZamkniety)*t;
       }
