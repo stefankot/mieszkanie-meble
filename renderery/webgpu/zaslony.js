@@ -18,6 +18,8 @@
 
 import { positionLocal, uv, vec3, vec4, float, mix, smoothstep,
          mx_fractal_noise_float, texture } from 'three/tsl';
+import { realizujMiekkaGeometrie, stanyMiekkiejGeometrii,
+         statystykiCacheMiekkiejGeometrii } from './soft-geometry.js';
 
 const DO_PODLOGI = 0;        // tkanina sięga do podłogi
 const FALDY = 9;
@@ -26,19 +28,6 @@ const OD_SCIANY = 16;        // odległość osi tkaniny od ściany salonu
 const CZAS_MS = 900;
 
 const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
-
-/* Przekrój jest jednakowy od sufitu do podłogi. Osiem segmentów na fałdę
-   zawiera jej ekstrema, więc rzeczywista głębokość siatki wynosi 10 cm. */
-function geometriaPanelu(THREE, szer, wys, faldy){
-  const g = new THREE.PlaneGeometry(szer, wys, Math.max(24, faldy*8), 10);
-  const poz = g.attributes.position;
-  for(let i=0;i<poz.count;i++){
-    const u=(poz.getX(i)+szer/2)/szer;
-    poz.setZ(i,Math.sin(u*Math.PI*2*faldy)*GLEBOKOSC_FALDY);
-  }
-  g.computeVertexNormals();
-  return g;
-}
 
 /* --- MATERIAŁY --- */
 function materialMajgul(THREE){
@@ -136,13 +125,23 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
       const szerOtwarty=(lewy?uklad.pasStart:uklad.pasKoniec)/uklad.pary;
       const odOtwarty=lewy?-uklad.szerokosc/2+i*szerOtwarty
         :uklad.szerokosc/2-uklad.pasKoniec+(i-uklad.pary)*szerOtwarty;
-      const p=new THREE.Mesh(geometriaPanelu(THREE,szerPanelu,wysTkaniny,FALDY),uklad.id==='salon'?majgul:glasort);
+      const odSciany=Math.abs(uklad.x-uklad.xSciany);
+      const geometria=realizujMiekkaGeometrie(THREE,{
+        sourceVersion:String(plan.schemaVersion||plan.version||'apartment-v1'),
+        semanticType:'curtain',dimensions:{widthCm:szerPanelu,heightCm:wysTkaniny,depthCm:GLEBOKOSC_FALDY*2},
+        seed:`${uklad.id}:${uklad.rodzaj}`,pleatProfile:{type:'sine',count:FALDY,amplitudeCm:GLEBOKOSC_FALDY},
+        gravitySagCm:uklad.id==='salon'?1.2:.7,
+        constraints:{floorYcm:DO_PODLOGI,maxWidthCm:uklad.szerokosc,
+          maxDepthCm:Math.max(2,2*(odSciany-1)),wallId:uklad.id,windowNames:uklad.otwory.map(o=>o.name)}
+      });
+      const stan=stanyMiekkiejGeometrii({closedWidthCm:szerPanelu,openWidthCm:szerOtwarty});
+      const p=new THREE.Mesh(geometria,uklad.id==='salon'?majgul:glasort);
       p.name=uklad.rodzaj+' · panel '+(i+1);
       p.position.y=DO_PODLOGI+wysTkaniny/2;
       p.castShadow=uklad.id==='salon';p.receiveShadow=true;
-      Object.assign(p.userData,{zaslona:true,szerPanelu,
+      Object.assign(p.userData,{zaslona:true,szerPanelu,softState:stan,
         xZamkniety:-uklad.szerokosc/2+(i+.5)*szerPanelu,
-        xOtwarty:odOtwarty+szerOtwarty/2,skalaOtwarta:szerOtwarty/szerPanelu});
+        xOtwarty:odOtwarty+szerOtwarty/2,skalaOtwarta:stan.open.scaleX});
       grupa.add(p);panele.push(p);
     }
     for(let i=0;i<uklad.pary;i++){
@@ -198,6 +197,7 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
     return ruch;
   }
   return {zestawy,sciany,kliknij,przelacz,ustaw,wszystkie,aktualizuj,
+    cache:statystykiCacheMiekkiejGeometrii,
     obserwuj(fn){obserwatorzy.add(fn);return ()=>obserwatorzy.delete(fn);},
     ile:zestawy.length,get opis(){return zestawy.map(z=>z.rodzaj+' · '+z.nazwa);}};
 }
