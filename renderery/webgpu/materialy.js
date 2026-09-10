@@ -23,6 +23,7 @@ import { texture, vec3 } from 'three/tsl';
 import { dodajNiedoskonalosci } from './niedoskonalosci.js';
 import { zTerminem, ponow, postep, pobierz } from './siec.js';
 import { semantyczneUV } from './uv-drewna.js';
+import { wlaczone } from './flagi.js';
 
 const CDN = 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg';
 const HDRI = 'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr';
@@ -51,7 +52,9 @@ const MAPY = {diff: 'diff', nor: 'nor_gl', arm: 'arm'};
 export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBledzie} = {}){
   const loader = new THREE.TextureLoader();
   loader.setCrossOrigin('anonymous');
-  const maxAniso = renderer.backend?.hasFeature?.('anisotropic-filtering') === false ? 1 : 16;
+  /* P20: WebGPU ma maxAnisotropy w samplerze bez osobnej „feature”. Warunek
+     hasFeature('anisotropic-filtering') zawsze dawał false, więc skany miały 1. */
+  const maxAniso = wlaczone('aniso') ? 16 : 1;
   const parametrKtx2=typeof location==='object'?new URLSearchParams(location.search).get('ktx2'):null;
   const wariantKtx2=['etc1s','uastc'].includes(parametrKtx2)?parametrKtx2:null;
   const pomiarKtx2={active:!!wariantKtx2,variant:wariantKtx2||'jpeg',files:[],fallback:false};
