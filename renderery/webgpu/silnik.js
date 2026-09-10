@@ -42,7 +42,7 @@ import { utworzInterakcje } from './interakcje.js';
 import { utworzZaslony } from './zaslony.js';
 import { audytMrt } from './mrt-audit.js';
 import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
-import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
+import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js?default-c';
 import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 import { createPhotoPathIntegration } from './photo-path.js';
