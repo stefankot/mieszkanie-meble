@@ -28,7 +28,7 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
 import { uruchomBiblioteke } from './biblioteka.js';
-import { utworzNawigacje } from './nawigacja.js';
+import { utworzNawigacje } from './nawigacja.js?p18';
 import { utworzSterowanie } from './sterowanie.js';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
@@ -42,6 +42,7 @@ import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
 import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 import { createPhotoPathIntegration } from './photo-path.js';
+import { runNavigationRegression } from './navigation-regression.js?p18b';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -1392,6 +1393,12 @@ function ustawAA(nazwa){
 }
 window.__silnik.aa={ustaw:ustawAA,get tryb(){return trybAA;},resets:0,lastReset:null,
   opis:'TAAU r185: wysoka używa wejścia 75%; PHOTO_RASTER akumuluje 64 pełne klatki'};
+if(new URLSearchParams(location.search).get('navtest')==='1'){
+  const wynik=runNavigationRegression({nav:nawigacja,camera,controls,canvas:renderer.domElement,THREE});
+  window.__silnik.navigationRegression=wynik;
+  const n=$('navigationRegressionInfo');
+  if(n) n.textContent='NAV TEST: '+(wynik.pass?'PASS':'FAIL')+' · '+JSON.stringify(wynik);
+}
 /* Zapisana jakość jest już odtworzona w panelu. Odczytujemy ją na końcu
    rozruchu, aby opóźnione ładowanie HDRI/LED nie nadpisało wyboru użytkownika. */
 function wybranaJakoscStartowa(){

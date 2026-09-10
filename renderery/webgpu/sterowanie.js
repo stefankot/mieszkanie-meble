@@ -183,6 +183,7 @@ export function utworzSterowanie(api){
         Krawędzie są wygładzane w każdej klatce.</p>
     </section>
     <section data-s="pomoc" hidden>
+      <p class="uwaga" id="navigationRegressionInfo"></p>
       <h3>Skróty</h3>
       <dl>
         <div><dt><kbd>W A S D</kbd></dt><dd>Chodzenie</dd></div>

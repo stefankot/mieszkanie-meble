@@ -1,4 +1,5 @@
 import { utworzKadrowanie } from './kadrowanie.js';
+import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js';
 
 /* ============================================================
    NAWIGACJA — Point & Go, spacer, widok z lotu ptaka
@@ -72,6 +73,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   let animacja = null, bylaBlokada = false, widokPrzedPtakiem = null;
   let resztaKroku = 0;
   const klaw = Object.create(null);
+  const zdarzenia={twoFingerLook:0,pinchDrive:0,dragLook:0,pointerLook:0,pointAndGo:0,keyboard:0,topView:0};
 
   /* ---------- pudełka mebli ---------- */
   let pudelka = [];
@@ -141,6 +143,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
      różnicę pozycji i DODAJEMY. Ten odwrócony znak to nie pomyłka: przy
      przeciąganiu obraz ma iść za palcem, jak przy panoramie. */
   function patrz(e, zablokowany){
+    zdarzenia[zablokowany?'pointerLook':'dragLook']++;
     ruszyl = true;                       // [oaksun] Wt
     const dx = zablokowany ? e.movementX : e.clientX - ostX;
     const dy = zablokowany ? e.movementY : e.clientY - ostY;
@@ -320,6 +323,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     znacznik.visible = false; controls.enabled = false;
     ustawKrycieWidoku?.(nowy === TRYBY.PTAK ? .42 : 1);
     if(nowy === TRYBY.PTAK){
+      zdarzenia.topView++;
       const w = widokPtaka();
       lec(w.poz, w.cel, POKOJ_MS, () => { controls.enabled = true; });
     }else if(poprzedniTryb === TRYBY.PTAK){
@@ -525,6 +529,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
       uplynelo: 0, czas: PODEJSCIE_MS, tylkoPozycja: true,
       po: () => { synchronizuj(); }};
     znacznik.visible = false;
+    zdarzenia.pointAndGo++;
     return true;
   }
 
@@ -596,11 +601,13 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const jednostka = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? plotno.clientHeight : 1;
     const deltaX = e.deltaX * jednostka, deltaY = e.deltaY * jednostka;
 
-    if(e.ctrlKey){
+    if(classifyTrackpadGesture(e)==='pinch-drive'){
+      zdarzenia.pinchDrive++;
       /* Szczypanie na gładziku albo Ctrl+kółko: dojazd wzdłuż patrzenia. */
       dojedz(THREE.MathUtils.clamp(-deltaY * .5, -KROK_KOLKA*3, KROK_KOLKA*3));
       return;
     }
+    zdarzenia.twoFingerLook++;
     /* Rozglądanie. Znak jak przy przeciąganiu: obraz idzie za palcami. */
     eulerPom.setFromQuaternion(camera.quaternion);
     eulerPom.y -= deltaX * CZULOSC_GLADZIKA;
@@ -629,8 +636,6 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   /* ---------- klawiatura ---------- */
   /* Strzałki są tym samym co WSAD — tak jest w źródle demo. */
-  const MAPA = {KeyW:'przod', ArrowUp:'przod', KeyS:'tyl', ArrowDown:'tyl',
-                KeyA:'lewo', ArrowLeft:'lewo', KeyD:'prawo', ArrowRight:'prawo'};
   /* Brief: sterowanie musi działać po użyciu panelu — ale wpisywanie daty nie
      może jednocześnie poruszać kamerą. */
   const wPolu = () => {
@@ -639,11 +644,12 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   };
   addEventListener('keydown', e => {
     if(e.metaKey || e.ctrlKey || e.altKey || wPolu()) return;
-    if(MAPA[e.code]){
+    if(NAV_KEY_MAP[e.code]){
       if(tryb === TRYBY.PTAK) return;
       e.preventDefault();
       if(animacja){ animacja=null; synchronizuj(); }
-      klaw[MAPA[e.code]] = true; return;
+      zdarzenia.keyboard++;
+      klaw[NAV_KEY_MAP[e.code]] = true; return;
     }
     if(e.repeat) return;
     switch(e.code){
@@ -664,7 +670,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     }
   });
   addEventListener('keyup', e => {
-    if(MAPA[e.code]) klaw[MAPA[e.code]] = false;
+    if(NAV_KEY_MAP[e.code]) klaw[NAV_KEY_MAP[e.code]] = false;
     if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') klaw.bieg = false;
     if(e.code === 'KeyC') kuca = false;
   });
@@ -700,6 +706,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     return Math.round(celOczu);
   }
   function przelaczKolizje(){ kolizje = !kolizje; odswiezPanel(); return kolizje; }
+  function sprawdzKolizje(){
+    return {currentBlocked:zablokowane(stopy.x,stopy.y,stopy.z),
+      outsideBlocked:zablokowane(-1000,stopy.y,-1000)};
+  }
 
   /* Zewnętrzne kadrowanie kończy się wyłącznie na wolnym miejscu w planie. */
   function ustawWidok(pozycja, cel){
@@ -831,7 +841,9 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, zmienWysokoscOczu, przelaczKolizje, naprawKamere,
           ustawWidok, kadrujMebel, synchronizuj, rysujZnacznik,
-          podejdz, zapiszStan, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
+          podejdz, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
+          diagnostyka:()=>({tryb,kolizje,wznowiono,zdarzenia:{...zdarzenia},
+            pozycja:camera.position.toArray().map(v=>+v.toFixed(2))}),
           get tryb(){ return tryb; }, get kolizje(){ return kolizje; },
           get wysokoscOczu(){ return Math.round(celOczu); }};
 }
