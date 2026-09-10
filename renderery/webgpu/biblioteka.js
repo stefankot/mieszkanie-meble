@@ -25,6 +25,9 @@
 
 import { pobierz, postep } from './siec.js';
 import { semantyczneUV } from './uv-drewna.js';
+import { STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
+         wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen,
+         singleFlight, statusPoZbudowaniu, odrzuconyStan } from './furniture-sync.js';
 
 const BAZA = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
 const MEBLE = [
@@ -219,6 +222,7 @@ export function zbudujModel(dane, ctx){
     throw Error('Niepoprawny model albo jednostki (wymagane mm).');
   if(!m.materials || typeof m.materials !== 'object')
     throw Error('Brak słownika materiałów.');
+  odrzucDuplikatyId(m);
 
   const THREE = ctx.THREE;
   const korzen = new THREE.Group();
@@ -288,8 +292,9 @@ function usun(scena, wpis){
 export async function uruchomBiblioteke(api){
   const {THREE, scena, materialBazowy, boxGeo, materialyMebla, przyZmianie} = api;
   const stan = new Map();
-  const wynik = {meble: stan, ruchy: [], odswiez, stop, zastosujRuch};
+  const wynik = {meble: stan, ruchy: [], stop, zastosujRuch};
   let timer = null;
+  const pokolenia = utworzBramkePokolen();
 
   /* Łóżko bazowe: zaufany moduł JS wydzielony z renderera, nie JSON.
      Format JSON nie odtwarza jego sprzężonych siłowników, więc dopóki nie
@@ -335,15 +340,18 @@ export async function uruchomBiblioteke(api){
   }
 
   async function zaladujMebel(id, nazwa){
+    const pokolenie = pokolenia.rozpocznij(id);
     const poprzedni = stan.get(id) || {};
     let manifest;
     try{
       manifest = await pobierzJSON('meble/' + id + '/manifest.json');
     }catch(e){
+      if(!pokolenia.aktualne(id, pokolenie)) return false;
       // nieudany odczyt nie usuwa poprawnego modelu z widoku
-      stan.set(id, {...poprzedni, nazwa, blad: 'Odczyt manifestu: ' + e.message});
+      stan.set(id, odrzuconyStan(poprzedni, {nazwa}, 'Odczyt manifestu: ' + e.message));
       return false;
     }
+    if(!pokolenia.aktualne(id, pokolenie)) return false;
 
     const wersje = Array.isArray(manifest.versions) ? manifest.versions : [];
     const wybrana = poprzedni.przypieta
@@ -351,20 +359,29 @@ export async function uruchomBiblioteke(api){
       : wersje.find(v => v.id === manifest.currentVersion);
 
     if(!wybrana){
-      if(poprzedni.korzen) usun(scena, poprzedni);
-      stan.set(id, {nazwa, manifest, wersja: null, korzen: null, ruchy: [], pominiete: [],
-                    brak: 'Czeka na model i położenie zaakceptowane na SVG.'});
-      return !!poprzedni.korzen;
+      const brak = 'Czeka na model i położenie zaakceptowane na SVG.';
+      stan.set(id, odrzuconyStan(poprzedni,
+        poprzedni.korzen ? {nazwa, manifest, brak} :
+          {nazwa, manifest, wersja:null, korzen:null, ruchy:[], pominiete:[], brak}, brak));
+      return false;
     }
-    if(poprzedni.wersja === wybrana.id && poprzedni.korzen) return false;
+    if(poprzedni.wersja === wybrana.id && poprzedni.korzen){
+      if(poprzedni.status === STATUS_MODELU.REJECTED){
+        stan.set(id, {...poprzedni, manifest, status: poprzedni.aktywnyStatus || STATUS_MODELU.COMPLETE,
+          blad: undefined, zachowanyPoprzedni: false});
+      }
+      return false;
+    }
 
-    const umiejscowienie = wybrana.placement || manifest.placement;
     try{
       let zbudowane;
+      let dane = null;
       if(wybrana.legacy){
+        const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana);
         zbudowane = await zbudujLegacy(wybrana, umiejscowienie);
       }else{
-        const dane = await pobierzJSON(wybrana.file);
+        dane = await pobierzJSON(wybrana.file);
+        if(!pokolenia.aktualne(id, pokolenie)) return false;
         if(dane.assetId !== id || dane.version !== wybrana.id)
           throw Error('Identyfikator albo wersja modelu nie pasuje do katalogu.');
         const uwagi = [];
@@ -372,37 +389,46 @@ export async function uruchomBiblioteke(api){
           // nowszy format wczytujemy najlepszym staraniem i mówimy o tym wprost
           uwagi.push(`model deklaruje schemaVersion ${dane.schemaVersion}, ten silnik zna ${SCHEMA_ZNANA}`);
         }
-        if(!umiejscowienie || !wektor(umiejscowienie.positionMm) || !liczba(umiejscowienie.rotationDeg, -360, 360))
-          throw Error('Brak potwierdzonego ustawienia.');
+        uwagi.push(...sprawdzRozszerzenia(dane));
+        const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana, dane);
         zbudowane = zbudujModel(dane, {THREE, materialBazowy, boxGeo});
         zbudowane.pominiete = uwagi.concat(zbudowane.pominiete);
         ustaw(zbudowane.korzen, umiejscowienie, THREE);
       }
+      if(!pokolenia.aktualne(id, pokolenie)){
+        usun(scena, zbudowane);
+        return false;
+      }
+      const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana, dane);
       if(poprzedni.korzen) usun(scena, poprzedni);
       scena.add(zbudowane.korzen);
+      const status = statusPoZbudowaniu(zbudowane.pominiete || []);
       stan.set(id, {nazwa, manifest, wersja: wybrana.id, opis: wybrana.summary,
                     korzen: zbudowane.korzen, ruchy: zbudowane.ruchy || [],
                     pominiete: zbudowane.pominiete || [],
+                    status, aktywnyStatus: status,
                     postep: zbudowane.postep, zaczepy: zbudowane.zaczepy,
                     przypieta: poprzedni.przypieta, umiejscowienie});
       return true;
     }catch(e){
+      if(!pokolenia.aktualne(id, pokolenie)) return false;
       // nieudany model nie usuwa poprzedniego poprawnego
-      stan.set(id, {...poprzedni, nazwa, manifest,
-                    blad: 'Nie zastosowano zmiany: ' + e.message + ' Poprzedni model pozostaje widoczny.'});
+      stan.set(id, odrzuconyStan(poprzedni, {nazwa, manifest},
+        'Nie zastosowano zmiany: ' + e.message + ' Poprzedni model pozostaje widoczny.'));
       return false;
     }
   }
 
   /* Przypięcie konkretnej wersji mebla; null wraca na „najnowszą". */
   async function przypnij(id, wersja){
+    pokolenia.uniewaznij(id);
     const w = stan.get(id) || {};
     stan.set(id, {...w, przypieta: wersja || undefined, wersja: null});
     return zaladujMebel(id, w.nazwa || id);
   }
   wynik.przypnij = przypnij;
 
-  async function odswiez(){
+  async function wykonajOdswiezenie(){
     let gotowych = 0;
     const wyniki = await Promise.all(MEBLE.map(async ([id, nazwa]) => {
       const r = await zaladujMebel(id, nazwa);
@@ -414,6 +440,8 @@ export async function uruchomBiblioteke(api){
     if(zmiana) przyZmianie?.(wynik);
     return zmiana;
   }
+  const odswiez = singleFlight(wykonajOdswiezenie);
+  wynik.odswiez = odswiez;
   function stop(){ if(timer){ clearInterval(timer); timer = null; } }
 
   await odswiez();

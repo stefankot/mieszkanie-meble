@@ -749,7 +749,7 @@ function opiszBiblioteke(b){
   const pominiete = wpisy.flatMap(w => (w.pominiete || []).map(t => w.nazwa + ': ' + t));
   wpisy.filter(w => w.blad).forEach(w => usterki.push(w.nazwa + ' — ' + w.blad));
   return {
-    wczytane: wczytane.map(w => w.nazwa + ' (' + w.wersja + ')'),
+    wczytane: wczytane.map(w => w.nazwa + ' (' + w.wersja + ' · ' + (w.status || 'legacy') + ')'),
     braki: braki.map(w => w.nazwa),
     pominiete
   };
