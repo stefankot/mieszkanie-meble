@@ -46,6 +46,7 @@ import { runNavigationRegression } from './navigation-regression.js?p18b';
 import { wlaczone } from './flagi.js';
 import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
+import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
@@ -359,13 +360,16 @@ function maskaGalezi(ziarno){
   return t;
 }
 const zielen = new THREE.Group(); zielen.name = 'Drzewa za oknami'; scene.add(zielen);
-const maskiGalezi = [0,1,2,3].map(i => maskaGalezi(104729 + i*7919));
+/* P30: drzewa 3D z wiatrem w shaderze zamiast płaskich kart; ?bez=drzewa3d przywraca karty. */
+const DRZEWA_3D = wlaczone('drzewa3d');
+if(DRZEWA_3D) zielen.add(utworzDrzewa(THREE, otwory));
+const maskiGalezi = DRZEWA_3D ? [] : [0,1,2,3].map(i => maskaGalezi(104729 + i*7919));
 const materialyKorony = maskiGalezi.map(map => new THREE.MeshBasicMaterial({
   map, alphaTest:.45, side:THREE.DoubleSide, toneMapped:true}));
 const materialPnia = new THREE.MeshPhysicalMaterial({color:0x4a4034, roughness:.95, metalness:0});
 const losKorony = rng(6102026);
 const galezie = [];
-for(const [nrOkna, o] of otwory.entries()){
+for(const [nrOkna, o] of (DRZEWA_3D ? [] : otwory).entries()){
   const [x,z,w,d] = o.rect, naZewnatrz = x < 500 ? -1 : 1;
   for(let i=0;i<4;i++){
     const oś = new THREE.Group();
