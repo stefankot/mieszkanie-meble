@@ -39,6 +39,7 @@ import { utworzZaslony } from './zaslony.js';
 import { audytMrt } from './mrt-audit.js';
 import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
 import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
+import { utworzArchPhoto } from './arch-photo.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -128,7 +129,9 @@ function odswiezCien(){
    miała chronić jasne pastele przed żółcią, ale przy tym materiale odbiera
    drewnu złocistość, którą użytkownik wskazał jako lepszą na porównaniu A/B.
    AgX zostaje do wyboru w zakładce Jakość, gdy dojdą kremowe fronty MDF. */
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const TONE_MAPPING = {aces:THREE.ACESFilmicToneMapping,neutral:THREE.NeutralToneMapping,agx:THREE.AgXToneMapping};
+const toneZUrl = new URLSearchParams(location.search).get('tone');
+renderer.toneMapping = TONE_MAPPING[toneZUrl] ?? THREE.ACESFilmicToneMapping;
 /* 0,72 przy tym oświetleniu wypalało fronty do bieli — albedo forniru jest
    poprawne (zmierzone: 0,48/0,35/0,24 liniowo), więc korekta idzie tutaj. */
 renderer.toneMappingExposure = 0.55;
@@ -878,10 +881,14 @@ skalujUVMebli(biblioteka);
 nawigacja.przeliczMeble();
 window.__silnik.nawigacja = nawigacja;
 
+const archPhoto = utworzArchPhoto({THREE,camera,nawigacja,
+  przyZmianie:powod=>{if(window.__silnik.aa)resetujHistorieTAAU(powod);}});
+window.__silnik.archPhoto = archPhoto;
+
 /* Panel sterowania — odbudowa zakładek z wersji WebGL. */
 sterowanie = utworzSterowanie({
   THREE, renderer, scene, camera, controls, nawigacja, plan: PLAN, biblioteka, interakcje, zaslony,
-  swiatlo: window.__silnik.swiatlo, krycie: window.__silnik.krycie, zielen: stanZieleni
+  swiatlo: window.__silnik.swiatlo, krycie: window.__silnik.krycie, zielen: stanZieleni, archPhoto
 });
 window.__silnik.sterowanie = sterowanie;
 window.__silnik.biblioteka = biblioteka;
@@ -1430,6 +1437,7 @@ async function klatka(){
   if(dopasujRozmiar()) invalidate();
   const dtKlatki = Math.min(1/15, (performance.now() - czasKlatki)/1000); czasKlatki = performance.now();
   nawigacja.aktualizuj();
+  archPhoto.aktualizuj();
   interakcje.aktualizuj();
   if(zaslony.aktualizuj()) odswiezCien();
   dopracuj(dtKlatki);

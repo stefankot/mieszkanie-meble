@@ -28,7 +28,7 @@ const STYL = `
  #sterowanie h3:first-child{margin-top:0}
  #sterowanie .siatka{display:flex;gap:4px;flex-wrap:wrap}
  #sterowanie .siatka>*{flex:1 1 0;min-width:56px}
- #sterowanie button.dzialanie,#sterowanie select,#sterowanie input[type=date],#sterowanie input[type=time]{
+ #sterowanie button.dzialanie,#sterowanie select,#sterowanie input[type=date],#sterowanie input[type=time],#sterowanie input[type=text]{
    font:inherit;padding:4px 6px;border:1px solid #bdbbac;border-radius:6px;background:#fffdf6;
    color:#25241f;cursor:pointer;width:100%}
  #sterowanie button.dzialanie[aria-pressed=true]{background:#25241f;color:#f8f7f1;border-color:#25241f}
@@ -49,7 +49,7 @@ const STYL = `
  #sterowanie #hud{margin-top:6px;overflow-wrap:anywhere}`;
 
 export function utworzSterowanie(api){
-  const {THREE, renderer, camera, controls, nawigacja, plan, biblioteka, swiatlo, krycie, zielen, zaslony} = api;
+  const {THREE, renderer, camera, controls, nawigacja, plan, biblioteka, swiatlo, krycie, zielen, zaslony, archPhoto} = api;
 
   const styl = document.createElement('style');
   styl.textContent = STYL;
@@ -88,6 +88,18 @@ export function utworzSterowanie(api){
         <button class="dzialanie" id="kadrMebel" style="flex:0 0 68px">Kadruj</button>
       </div>
       <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div>
+      <h3>ARCH_PHOTO</h3>
+      <select id="trybKamery">
+        <option value="interactive">Kamera interaktywna</option>
+        <option value="arch_photo">ARCH_PHOTO — pozioma</option>
+      </select>
+      <div class="suwak"><div class="naglowek"><label for="lensShiftY">Lens shift Y</label><output id="lensShiftYVal">8%</output></div>
+        <input id="lensShiftY" type="range" min="-20" max="20" value="8"></div>
+      <div class="siatka"><input id="nazwaKadru" type="text" maxlength="48" value="Kadr 1" aria-label="Nazwa zapisanego kadru">
+        <button class="dzialanie" id="zapiszKadr" style="flex:0 0 58px">Zapisz</button></div>
+      <div class="siatka" style="margin-top:4px"><select id="archKadry" aria-label="Zapisane kadry ARCH_PHOTO"></select>
+        <button class="dzialanie" id="wczytajKadr" style="flex:0 0 52px">Otwórz</button>
+        <button class="dzialanie" id="usunKadr" style="flex:0 0 45px">Usuń</button></div>
       <h3>Ruchome części</h3>
       <div class="siatka">
         <button class="dzialanie" id="otworzWsz">Otwórz wszystko</button>
@@ -145,6 +157,11 @@ export function utworzSterowanie(api){
       <select id="antyaliasing" title="Porównanie wygładzania">
         <option value="smaa" selected>SMAA — baseline</option>
         <option value="taau">TAAU r185 — TEST (wysoka)</option>
+      </select>
+      <select id="toneMapping" title="Porównanie tone mappingu">
+        <option value="aces" selected>ACES — baseline</option>
+        <option value="neutral">Neutral</option>
+        <option value="agx">AgX</option>
       </select>
       <select id="worldGI" title="Porównanie światła pośredniego">
         <option value="ssgi" selected>SSGI — baseline</option>
@@ -257,6 +274,31 @@ export function utworzSterowanie(api){
       : wynik.caly ? '' : 'Widok częściowy — w pokoju brakuje miejsca na objęcie całego mebla.';
   });
 
+  /* ARCH_PHOTO: pozioma kamera i przesunięcie osi optycznej. Kadry są stanem
+     użytkownika przeglądarki, nie trafiają do furniture.json. */
+  const trybKamery=$('#trybKamery'), lensShiftY=$('#lensShiftY'), archKadry=$('#archKadry');
+  trybKamery.value=archPhoto.tryb;
+  function odswiezArchKadry(){
+    const poprzedni=archKadry.value;archKadry.innerHTML='';
+    for(const k of archPhoto.kadry){const o=document.createElement('option');o.value=o.textContent=k.name;archKadry.append(o);}
+    if(poprzedni)archKadry.value=poprzedni;
+    if(!archKadry.options.length){const o=document.createElement('option');o.textContent='Brak zapisanych kadrów';o.value='';archKadry.append(o);}
+  }
+  trybKamery.addEventListener('change',()=>{
+    if(trybKamery.value==='arch_photo'){
+      const a=$('#antyaliasing');a.value='smaa';window.__silnik.aa?.ustaw('smaa');
+    }
+    archPhoto.ustaw(trybKamery.value);
+  });
+  lensShiftY.addEventListener('input',()=>{
+    $('#lensShiftYVal').textContent=lensShiftY.value+'%';
+    archPhoto.ustawParametry({shiftY:+lensShiftY.value/100});
+  });
+  $('#zapiszKadr').addEventListener('click',()=>{if(archPhoto.zapiszKadr($('#nazwaKadru').value))odswiezArchKadry();});
+  $('#wczytajKadr').addEventListener('click',()=>archKadry.value&&archPhoto.zastosujKadr(archKadry.value));
+  $('#usunKadr').addEventListener('click',()=>{if(archKadry.value)archPhoto.usunKadr(archKadry.value);odswiezArchKadry();});
+  odswiezArchKadry();
+
   /* Jedna wspólna szyna na ścianę: wszystkie pary odsuwają się na boczne pasy. */
   const odswiezZaslony=[];
   for(const s of zaslony?.sciany || []){
@@ -355,10 +397,12 @@ export function utworzSterowanie(api){
   });
   const jakoscSel = $('#jakoscPoziom');
   const aaSel = $('#antyaliasing');
+  const toneSel = $('#toneMapping');
   const giSel = $('#worldGI');
   const ssrSel = $('#ssrWariant');
   const parametry = new URLSearchParams(location.search);
   if(parametry.get('aa')==='taau') aaSel.value='taau';
+  if(['aces','neutral','agx'].includes(parametry.get('tone'))) toneSel.value=parametry.get('tone');
   if(parametry.get('gi')==='speedball') giSel.value='speedball';
   if(parametry.get('ssr')==='modern') ssrSel.value='modern';
   if(['minimalna','srednia','wysoka'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
@@ -366,6 +410,8 @@ export function utworzSterowanie(api){
     window.__silnik.aa?.ustaw(aaSel.value);
     opiszJakosc();
   });
+  const TONE={aces:THREE.ACESFilmicToneMapping,neutral:THREE.NeutralToneMapping,agx:THREE.AgXToneMapping};
+  toneSel.addEventListener('change',()=>{renderer.toneMapping=TONE[toneSel.value]??TONE.aces;});
   giSel.addEventListener('change',()=>{
     const q = new URLSearchParams(location.search);
     if(giSel.value === 'speedball') {
@@ -470,6 +516,8 @@ export function utworzSterowanie(api){
     const aaZUrl=new URLSearchParams(location.search).get('aa');
     if(['smaa','taau'].includes(aaZUrl)) aaSel.value=aaZUrl;
     const q=new URLSearchParams(location.search);
+    if(['aces','neutral','agx'].includes(q.get('tone'))){toneSel.value=q.get('tone');toneSel.dispatchEvent(new Event('change'));}
+    if(q.get('camera')==='arch'){trybKamery.value='arch_photo';trybKamery.dispatchEvent(new Event('change'));}
     giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
     ssrSel.value=q.get('ssr')==='modern'?'modern':'current';
     if(['minimalna','srednia','wysoka'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
