@@ -41,6 +41,7 @@ import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
 import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js';
 import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
+import { createPhotoPathIntegration } from './photo-path.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -1218,6 +1219,13 @@ const ostatniObrot = new THREE.Quaternion();
 let poprawkaRuchu = true, czasOdDrgniecia = Infinity;
 const PROG_OBROTU = Math.cos(THREE.MathUtils.degToRad(.02)/2);
 const stanPhotoRaster = createPhotoRasterState();
+const photoPath = createPhotoPathIntegration({revision:THREE.REVISION,
+  adapter:globalThis.__FURNITURE_WEBGPU_PATH_TRACER__});
+window.__silnik.photoPath=photoPath;
+const photoPathInfo=$('photoPathInfo');
+if(photoPathInfo) photoPathInfo.textContent=photoPath.capability.supported
+  ? 'PHOTO_PATH: zgodny adapter eksperymentalny dostępny'
+  : `PHOTO_PATH: ${photoPath.capability.reason}; używany jest PHOTO_RASTER fallback`;
 const SSR_INTERACTIVE = {quality:SSR_MODERN_SETTINGS.quality, resolutionScale:SSR_MODERN_SETTINGS.resolutionScale};
 function ustawCiezkiPhotoRaster(wlaczony){
   odbicia.quality.value = wlaczony ? .7 : SSR_INTERACTIVE.quality;
@@ -1248,7 +1256,7 @@ function dopracuj(dt){
      kasuje dopracowanie i obraz mruga. */
   klatekRuchu = drgniecie ? klatekRuchu + 1 : 0;
   const photoZmiana=updatePhotoRasterState(stanPhotoRaster, {
-    active:poziomJakosci==='photo_raster', moving:drgniecie && klatekRuchu>=3
+    active:['photo_raster','photo_path'].includes(poziomJakosci), moving:drgniecie && klatekRuchu>=3
   });
   if(photoZmiana.resetHistory) resetujHistorieTAAU('photo-camera-move');
   if(photoZmiana.heavyChanged) ustawCiezkiPhotoRaster(stanPhotoRaster.heavy);
@@ -1319,6 +1327,11 @@ const POZIOMY = {
     potok: 'photo', ssgiSkala: 1, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
     ledPodPolka: true, cienZieleni: true, dopracowanie: true,
     opis: 'PHOTO_RASTER: 64-klatkowa akumulacja; pełne GI i odbicia po zatrzymaniu'
+  },
+  photo_path: {
+    potok: 'photo', ssgiSkala: 1, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
+    ledPodPolka: true, cienZieleni: true, dopracowanie: true,
+    opis: `PHOTO_PATH niedostępny: ${photoPath.capability.reason}; podgląd PHOTO_RASTER`
   }
 };
 let poziomJakosci = 'srednia';
@@ -1333,7 +1346,7 @@ function ustawPoziomJakosci(nazwa){
   const temporal=trybAA==='taau' && nazwa==='wysoka';
   przebieg.setResolutionScale(temporal ? .75 : 1);
   resetujHistorieTAAU('profile-switch');
-  stanPhotoRaster.active=nazwa==='photo_raster';
+  stanPhotoRaster.active=['photo_raster','photo_path'].includes(nazwa);
   stanPhotoRaster.samples=0; stanPhotoRaster.moving=false; stanPhotoRaster.heavy=false;
   ustawCiezkiPhotoRaster(false);
   const photoInfo=$('photoRasterInfo');

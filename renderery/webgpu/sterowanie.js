@@ -154,6 +154,7 @@ export function utworzSterowanie(api){
         <option value="srednia">Średnia</option>
         <option value="wysoka">Wysoka</option>
         <option value="photo_raster">PHOTO_RASTER — statyczny kadr</option>
+        <option value="photo_path">PHOTO_PATH — integration TEST</option>
       </select>
       <select id="antyaliasing" title="Porównanie wygładzania">
         <option value="smaa" selected>SMAA — baseline</option>
@@ -175,6 +176,7 @@ export function utworzSterowanie(api){
       <p class="uwaga" id="worldGIInfo"></p>
       <p class="uwaga" id="jakoscOpis"></p>
       <p class="uwaga" id="photoRasterInfo"></p>
+      <p class="uwaga" id="photoPathInfo"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
       <label class="pole"><input type="checkbox" id="szkloFiz" checked>Szkło fizyczne (refrakcja, IOR 1,52)</label>
       <p class="uwaga">Po zatrzymaniu kamery jakość światła pośredniego stopniowo rośnie.
@@ -407,7 +409,7 @@ export function utworzSterowanie(api){
   if(['aces','neutral','agx'].includes(parametry.get('tone'))) toneSel.value=parametry.get('tone');
   if(parametry.get('gi')==='speedball') giSel.value='speedball';
   if(parametry.get('ssr')==='modern') ssrSel.value='modern';
-  if(['minimalna','srednia','wysoka','photo_raster'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
+  if(['minimalna','srednia','wysoka','photo_raster','photo_path'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
   aaSel.addEventListener('change',()=>{
     window.__silnik.aa?.ustaw(aaSel.value);
     opiszJakosc();
@@ -432,7 +434,7 @@ export function utworzSterowanie(api){
     const j = window.__silnik.jakosc;
     const p = j?.POZIOMY?.[jakoscSel.value];
     $('#jakoscOpis').textContent = p
-        ? p.opis + (jakoscSel.value==='photo_raster'
+        ? p.opis + (['photo_raster','photo_path'].includes(jakoscSel.value)
         ? ' · TAAU 64 próbek, pełna rozdzielczość'
         : aaSel.value==='taau' && jakoscSel.value==='wysoka'
         ? ' · TAAU: wejście 75%, wynik 100%' : ' · SMAA')
@@ -524,7 +526,7 @@ export function utworzSterowanie(api){
     if(q.get('camera')==='arch'){trybKamery.value='arch_photo';trybKamery.dispatchEvent(new Event('change'));}
     giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
     ssrSel.value=q.get('ssr')==='modern'?'modern':'current';
-    if(['minimalna','srednia','wysoka','photo_raster'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
+    if(['minimalna','srednia','wysoka','photo_raster','photo_path'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
     /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
        więc po przywróceniu wołamy to wprost. */
     zastosujCzas();
