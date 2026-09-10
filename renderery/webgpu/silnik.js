@@ -126,7 +126,13 @@ renderer.shadowMap.autoUpdate = false;
    Ustawia obie flagi: tę na rendererze (dla ścieżki WebGL, gdyby wróciła)
    i tę na świetle, która JEDYNA działa w WebGPU — patrz komentarz przy `slonce`. */
 let swiatloCienia = null;          // wypełniane przy tworzeniu słońca, niżej
+/* P22: klatki rysujemy tylko przez chwilę po zmianie. Zmiana sceny przechodzi przez
+   odswiezCien(), zdarzenia DOM albo ruch kamery i przesuwa ten znacznik czasu. */
+let ostatniaZmiana = performance.now();
+const oznaczZmiane = () => { ostatniaZmiana = performance.now(); };
+window.__silnik.oznaczZmiane = oznaczZmiane;
 function odswiezCien(){
+  oznaczZmiane();
   renderer.shadowMap.needsUpdate = true;
   if(swiatloCienia) swiatloCienia.shadow.needsUpdate = true;
 }
@@ -1495,17 +1501,33 @@ addEventListener('resize', ()=>{ if(dopasujRozmiar()) invalidate(); });
 odswiezCien();
 const pomiar = utworzPomiar(renderer);   // P19
 window.__silnik.perf = pomiar;
+/* P22: po RYSUJ_PO_ZMIANIE_MS bez zmian (drabinka SSGI, odszumianie i TAAU zdążą się
+   ustalić) przestajemy rysować; raz na sekundę idzie klatka kontrolna. */
+const RYSUJ_PO_ZMIANIE_MS = 2500;
+let ostatnieRysowanie = 0, podpisKamery = '';
+for(const typ of ['pointerdown','pointermove','wheel','keydown','keyup','input','change','click','touchstart','touchmove'])
+  addEventListener(typ, e => { if(typ !== 'pointermove' || e.buttons) oznaczZmiane(); }, {capture: true, passive: true});
 async function klatka(){
   const startCPU = performance.now();
-  if(dopasujRozmiar()) invalidate();
+  if(dopasujRozmiar()){ invalidate(); oznaczZmiane(); }
   const dtKlatki = Math.min(1/15, (performance.now() - czasKlatki)/1000); czasKlatki = performance.now();
   nawigacja.aktualizuj();
   archPhoto.aktualizuj();
-  interakcje.aktualizuj();
+  if(interakcje.aktualizuj()) oznaczZmiane();
   if(zaslony.aktualizuj()) odswiezCien();
   dopracuj(dtKlatki);
   worldGI.aktualizuj();
-  if(stanZieleni.animuj){
+  const pk = camera.position, qk = camera.quaternion, sh = archPhoto.shift;
+  const podpis = [pk.x, pk.y, pk.z, qk.x, qk.y, qk.z, qk.w, camera.fov, camera.aspect, camera.zoom, sh.x, sh.y]
+    .map(v => v.toFixed(4)).join();
+  if(podpis !== podpisKamery){ podpisKamery = podpis; oznaczZmiane(); }
+  const teraz = performance.now();
+  const aktywny = !wlaczone('bezczynnosc') || !potokGotowy
+    || (stanPhotoRaster.active && stanPhotoRaster.samples < stanPhotoRaster.target)
+    || teraz - ostatniaZmiana < RYSUJ_PO_ZMIANIE_MS;
+  if(!aktywny && teraz - ostatnieRysowanie < 1000){ nawigacja.rysujZnacznik(); return; }
+  ostatnieRysowanie = teraz;
+  if(stanZieleni.animuj && aktywny){
     /* MIGOTANIE CO ~0,1 s — przyczyna i naprawa.
        Liście poruszały się w KAŻDEJ klatce, a ich cień odświeżał się co ósmą.
        Cień doskakiwał więc o osiem klatek ruchu naraz, kilka razy na sekundę —
@@ -1521,7 +1543,7 @@ async function klatka(){
       poruszZielen(performance.now()/1000);
     }else if((klatki & 7) === 0){
       poruszZielen(performance.now()/1000 * WOLNIEJSZY_WIATR);
-      odswiezCien();
+      slonce.shadow.needsUpdate = true;   // P22: wiatr sam nie podtrzymuje rysowania
     }
   }
   /* Dopóki potok post-processingu nie jest skompilowany, rysujemy scenę wprost.
@@ -1574,6 +1596,7 @@ try{ globalThis.__postep?.koniec?.(); }catch(e){}
   try{
     ustawPoziomJakosci(wybranaJakoscStartowa());
     potokGotowy = true;
+    oznaczZmiane();   // P22: potok gotowy — pełne klatki przez okres ustalania
   }catch(e){
     usterki.push('Potok efektów: ' + e.message);
   }
