@@ -142,6 +142,10 @@ export function utworzSterowanie(api){
         <option value="srednia">Średnia</option>
         <option value="wysoka">Wysoka</option>
       </select>
+      <select id="antyaliasing" title="Porównanie wygładzania">
+        <option value="smaa" selected>SMAA — baseline</option>
+        <option value="taau">TAAU r185 — TEST (wysoka)</option>
+      </select>
       <p class="uwaga" id="jakoscOpis"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
       <label class="pole"><input type="checkbox" id="szkloFiz" checked>Szkło fizyczne (refrakcja, IOR 1,52)</label>
@@ -341,11 +345,19 @@ export function utworzSterowanie(api){
     $('#ekspozycjaVal').textContent = (+e.target.value).toFixed(2).replace('.', ',');
   });
   const jakoscSel = $('#jakoscPoziom');
+  const aaSel = $('#antyaliasing');
+  if(new URLSearchParams(location.search).get('aa')==='taau') aaSel.value='taau';
+  aaSel.addEventListener('change',()=>{
+    window.__silnik.aa?.ustaw(aaSel.value);
+    opiszJakosc();
+  });
   function opiszJakosc(){
     const j = window.__silnik.jakosc;
     const p = j?.POZIOMY?.[jakoscSel.value];
     $('#jakoscOpis').textContent = p
-      ? p.opis + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
+      ? p.opis + (aaSel.value==='taau' && jakoscSel.value==='wysoka'
+        ? ' · TAAU: wejście 75%, wynik 100%' : ' · SMAA')
+        + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
       : '';
   }
   jakoscSel.addEventListener('change', () => {
@@ -424,6 +436,8 @@ export function utworzSterowanie(api){
       if(b) b.click();
     }
     if(typeof d.otwarty === 'boolean') el.open = d.otwarty;
+    const aaZUrl=new URLSearchParams(location.search).get('aa');
+    if(['smaa','taau'].includes(aaZUrl)) aaSel.value=aaZUrl;
     /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
        więc po przywróceniu wołamy to wprost. */
     zastosujCzas();

@@ -53,7 +53,8 @@ const TRYBY = {ORBITA:'orbita', SPACER:'spacer', PTAK:'ptak'};
 const KROK_KOLKA = 26;   // cm na jeden ząbek
 
 export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblioteka, scena, sufit,
-                                 ustawKrycieWidoku, przyZmianie, przyKlikniecie, czyInteraktywne}){
+                                 ustawKrycieWidoku, przyZmianie, przyKlikniecie, czyInteraktywne,
+                                 przySkokuKamery}){
   const {APARTMENT} = plan;
   const plotno = renderer.domElement;
   const kadrowanie = utworzKadrowanie({THREE, plan, biblioteka});
@@ -311,6 +312,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   function ustawTryb(nowy, opcje = {}){
     if(!Object.values(TRYBY).includes(nowy) || (nowy === tryb && !opcje.wymus)) return;
     const poprzedniTryb = tryb;
+    przySkokuKamery?.('navigation-mode');
     if(nowy === TRYBY.PTAK && poprzedniTryb !== TRYBY.PTAK) widokPrzedPtakiem = zapamietajWidok();
     tryb = nowy;
     if(nowy !== TRYBY.SPACER && document.pointerLockElement === plotno) document.exitPointerLock();
@@ -704,6 +706,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     kadrowanie.odswiez();
     if(pozycja && !kadrowanie.wolne(pozycja)) return false;
     if(cel && ![cel.x,cel.y,cel.z].every(Number.isFinite)) return false;
+    przySkokuKamery?.('camera-cut');
     tryb = TRYBY.ORBITA; controls.enabled = false; animacja = null;
     if(document.pointerLockElement === plotno) document.exitPointerLock();
     zatrzymajRuch(); znacznik.visible = false; ustawKrycieWidoku?.(1);

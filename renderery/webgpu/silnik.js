@@ -19,6 +19,7 @@ import { ssgi } from 'three/addons/tsl/display/SSGINode.js';
 import { ssr }  from 'three/addons/tsl/display/SSRNode.js';
 import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+import { taau } from 'three/addons/tsl/display/TAAUNode.js';
 import { sss } from 'three/addons/tsl/display/SSSNode.js';
 import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 import SunCalc from 'suncalc';
@@ -850,6 +851,7 @@ window.__silnik.interakcje = interakcje;
 
 nawigacja = utworzNawigacje({THREE, camera, controls, renderer, plan: PLAN, biblioteka, scena: scene, sufit,
                              ustawKrycieWidoku: v => window.__silnik.krycie?.ustawKrycieWidoku(v),
+                             przySkokuKamery: powod => resetujHistorieTAAU(powod),
                              przyZmianie: st => sterowanie?.odswiezStan(st),
                              /* Kolejność ma znaczenie: tkanina, potem mechanizm mebla,
                                 a dopiero gdy nic nie trafiło — podejście. */
@@ -1037,6 +1039,16 @@ const LUMA = vec3(0.2126, 0.7152, 0.0722);
    każdym uruchomieniu.
    ============================================================ */
 const zbudowane = new Map();
+const wezlyTAAU = new Set();
+let trybAA = document.getElementById('antyaliasing')?.value === 'taau' ? 'taau' : 'smaa';
+
+function resetujHistorieTAAU(powod='manual'){
+  camera.clearViewOffset();
+  velocity.setProjectionMatrix?.(null);
+  for(const n of wezlyTAAU) n.setSize(1,1);
+  const a=window.__silnik.aa;
+  if(a){ a.resets++; a.lastReset=powod; }
+}
 
 function gradacja(zrodlo){
   const pod = zrodlo.rgb.sub(PIVOT).mul(KONTRAST).add(PIVOT).max(0);
@@ -1045,7 +1057,9 @@ function gradacja(zrodlo){
 }
 
 function wyjscieDla(poziom){
-  if(zbudowane.has(poziom)) return zbudowane.get(poziom);
+  const temporal=trybAA==='taau' && poziom==='pelny';
+  const klucz=poziom+':'+(temporal?'taau':'smaa');
+  if(zbudowane.has(klucz)) return zbudowane.get(klucz);
   let kompozyt;
   if(poziom === 'pelny'){
     /* Okluzja, światło pośrednie, cień kontaktowy i odbicia ekranowe. */
@@ -1061,10 +1075,17 @@ function wyjscieDla(poziom){
        nie ma światła pośredniego ani odbić. */
     kompozyt = vec4(kKolor.rgb.add(poswiata.rgb), kKolor.a);
   }
-  /* B2: jitter TRAA powodował osobne migotanie cienkich krawędzi frontów.
-     SMAA wygładza pojedynczą klatkę bez jittera i bez kopii historii głębi. */
-  const wynik = gradacja(smaa(kompozyt));
-  zbudowane.set(poziom, wynik);
+  let aa;
+  if(temporal){
+    aa=taau(kompozyt,kGlebia,kPredkosc,camera);
+    aa.currentFrameWeight=.06;
+    aa.depthThreshold=.00045;
+    aa.edgeDepthDiff=.001;
+    aa.maxVelocityLength=96;
+    wezlyTAAU.add(aa);
+  }else aa=smaa(kompozyt);
+  const wynik = gradacja(aa);
+  zbudowane.set(klucz, wynik);
   return wynik;
 }
 
@@ -1213,6 +1234,10 @@ function ustawPoziomJakosci(nazwa){
   if(!j) return poziomJakosci;
   poziomJakosci = nazwa;
 
+  const temporal=trybAA==='taau' && nazwa==='wysoka';
+  przebieg.setResolutionScale(temporal ? .75 : 1);
+  resetujHistorieTAAU('profile-switch');
+
   potok.outputNode = wyjscieDla(j.potok);
   potok.needsUpdate = true;
 
@@ -1244,6 +1269,14 @@ function ustawPoziomJakosci(nazwa){
 }
 window.__silnik.jakosc = {ustawPoziomJakosci, POZIOMY,
                           get poziom(){ return poziomJakosci; }};
+function ustawAA(nazwa){
+  if(!['smaa','taau'].includes(nazwa)) return trybAA;
+  trybAA=nazwa;
+  if(potokGotowy) ustawPoziomJakosci(poziomJakosci);
+  return trybAA;
+}
+window.__silnik.aa={ustaw:ustawAA,get tryb(){return trybAA;},resets:0,lastReset:null,
+  opis:'TAAU r185 działa tylko w profilu wysoka; scene pass 0.75, wynik w rozdzielczości ekranu'};
 /* Zapisana jakość jest już odtworzona w panelu. Odczytujemy ją na końcu
    rozruchu, aby opóźnione ładowanie HDRI/LED nie nadpisało wyboru użytkownika. */
 function wybranaJakoscStartowa(){
@@ -1328,6 +1361,7 @@ function dopasujRozmiar(){
   const d = renderer.domElement;
   if(d.width === Math.floor(w*renderer.getPixelRatio()) && d.height === Math.floor(h*renderer.getPixelRatio())) return false;
   renderer.setSize(w,h); camera.aspect = w/h; camera.updateProjectionMatrix();
+  resetujHistorieTAAU('resize');
   return true;
 }
 addEventListener('resize', ()=>{ if(dopasujRozmiar()) invalidate(); });
