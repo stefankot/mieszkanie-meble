@@ -153,6 +153,7 @@ zapisz('Pobieranie skanów PBR (Poly Haven, CC0)…');
 let MAT = {maDrewno:false, maTynk:false, maParkiet:false, braki:['nie próbowano']};
 try{
   MAT = await wczytajMaterialy(THREE, renderer, {jakosc: '1k'});
+  window.__silnik.ktx2=MAT.ktx2;
   if(MAT.braki.length) usterki.push('Skany: ' + MAT.braki.join(' · '));
 }catch(e){ usterki.push('Skany PBR: ' + e.message); }
 

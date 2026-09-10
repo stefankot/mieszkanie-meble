@@ -21,7 +21,7 @@
 
 import { texture, vec3 } from 'three/tsl';
 import { dodajNiedoskonalosci } from './niedoskonalosci.js';
-import { zTerminem, ponow, postep } from './siec.js';
+import { zTerminem, ponow, postep, pobierz } from './siec.js';
 import { semantyczneUV } from './uv-drewna.js';
 
 const CDN = 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg';
@@ -52,6 +52,18 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
   const loader = new THREE.TextureLoader();
   loader.setCrossOrigin('anonymous');
   const maxAniso = renderer.backend?.hasFeature?.('anisotropic-filtering') === false ? 1 : 16;
+  const parametrKtx2=typeof location==='object'?new URLSearchParams(location.search).get('ktx2'):null;
+  const wariantKtx2=['etc1s','uastc'].includes(parametrKtx2)?parametrKtx2:null;
+  const pomiarKtx2={active:!!wariantKtx2,variant:wariantKtx2||'jpeg',files:[],fallback:false};
+  const startPilota=performance.now();
+  let loaderKtx2=null;
+
+  if(wariantKtx2){
+    const {KTX2Loader}=await import('three/addons/loaders/KTX2Loader.js');
+    loaderKtx2=new KTX2Loader().setTranscoderPath(
+      'https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/libs/basis/'
+    ).setWorkerLimit(2).detectSupport(renderer);
+  }
 
   let pobrane = 0;
   const WSZYSTKICH = Object.keys(ZBIOR).length * 3;
@@ -71,11 +83,45 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
     return t;
   }
 
+  async function wczytajKtx2(nazwa,rodzaj,codec){
+    const url=new URL(`./experymenty/P10-ktx2/${nazwa}`,import.meta.url).href;
+    const t0=performance.now();
+    const odp=await pobierz(url,{cache:'no-cache'},{opis:`KTX2 ${rodzaj}`});
+    const bufor=await odp.arrayBuffer();
+    const t1=performance.now();
+    const tex=await new Promise((resolve,reject)=>loaderKtx2.parse(bufor,resolve,reject));
+    const t2=performance.now();
+    tex.wrapS=tex.wrapT=THREE.RepeatWrapping; tex.anisotropy=maxAniso;
+    tex.colorSpace=rodzaj==='diff'?THREE.SRGBColorSpace:THREE.NoColorSpace;
+    tex.needsUpdate=true;
+    const gpuFormat=Object.entries(THREE).find(([k,v])=>v===tex.format && /Format$/.test(k))?.[0] || String(tex.format);
+    pomiarKtx2.files.push({rodzaj,codec,bytes:bufor.byteLength,
+      downloadMs:Math.round(t1-t0),transcodeMs:Math.round(t2-t1),gpuFormat});
+    return tex;
+  }
+
+  async function wczytajDrewnoKtx2(){
+    const albedo=wariantKtx2==='etc1s'?'oak_albedo_etc1s.ktx2':'oak_albedo_uastc.ktx2';
+    return Promise.all([
+      wczytajKtx2(albedo,'diff',wariantKtx2.toUpperCase()),
+      wczytajKtx2('oak_normal_uastc.ktx2','nor','UASTC'),
+      wczytajKtx2('oak_arm_uastc.ktx2','arm','UASTC')
+    ]);
+  }
+
   const zestaw = {};
   const braki = [];
   await Promise.all(Object.entries(ZBIOR).map(async ([nazwa, {id, cm, jakosc: jak}]) => {
     try{
-      const [diff, nor, arm] = await Promise.all(['diff','nor','arm'].map(r => wczytaj(id, r, jak)));
+      let mapy;
+      if(nazwa==='drewno' && wariantKtx2){
+        try{ mapy=await wczytajDrewnoKtx2(); }
+        catch(e){
+          pomiarKtx2.fallback=true; pomiarKtx2.error=e.message;
+          mapy=await Promise.all(['diff','nor','arm'].map(r => wczytaj(id,r,jak)));
+        }
+      }else mapy=await Promise.all(['diff','nor','arm'].map(r => wczytaj(id,r,jak)));
+      const [diff, nor, arm] = mapy;
       zestaw[nazwa] = {diff, nor, arm, cm, id, slojPionowy: !!ZBIOR[nazwa].slojPionowy};
     }catch(e){
       /* Brak skanu nie może wywalić sceny — silnik wraca wtedy do tekstur
@@ -84,6 +130,8 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
       przyBledzie?.(nazwa, e);
     }
   }));
+  loaderKtx2?.dispose();
+  pomiarKtx2.totalMs=Math.round(performance.now()-startPilota);
 
   /* ------------------------------------------------------------
      BEZ KLONOWANIA TEKSTUR.
@@ -259,7 +307,7 @@ export async function wczytajMaterialy(THREE, renderer, {jakosc = '1k', przyBled
     g.userData.uvSkala = [su, sv, pionowa ? 'pion' : 'poziom', lustroU, lustroV];
   }
 
-  return {zestaw, braki, drewno, lakier, tynk, parkiet, skalujUV, powierzchnia,
+  return {zestaw, braki, drewno, lakier, tynk, parkiet, skalujUV, powierzchnia,ktx2:pomiarKtx2,
           maDrewno: jest('drewno'), maTynk: jest('tynk'), maParkiet: jest('parkiet')};
 }
 
