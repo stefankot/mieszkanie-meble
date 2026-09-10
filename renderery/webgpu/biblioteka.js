@@ -30,7 +30,7 @@ import { STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
          singleFlight, statusPoZbudowaniu, odrzuconyStan } from './furniture-sync.js';
 import { normalizeFurnitureDocument } from './furniture-schema-v2.js?p8b';
 
-const BAZA = new URLSearchParams(location.search).get('furnitureSource')==='local'
+const BAZA = new URLSearchParams(globalThis.location?.search || '').get('furnitureSource')==='local'
   ? new URL('../../',import.meta.url).href
   : 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/';
 const MEBLE = [
