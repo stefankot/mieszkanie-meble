@@ -62,6 +62,7 @@ export function utworzSterowanie(api){
       <button role="tab" data-z="widok"  aria-selected="true">Widok</button>
       <button role="tab" data-z="swiatlo" aria-selected="false">Światło</button>
       <button role="tab" data-z="jakosc" aria-selected="false">Jakość</button>
+      <button role="tab" data-z="dev" aria-selected="false">DEV</button>
       <button role="tab" data-z="pomoc"  aria-selected="false">?</button>
     </div>
     <section data-s="widok">
@@ -183,6 +184,29 @@ export function utworzSterowanie(api){
         Krawędzie są wygładzane w każdej klatce.</p>
       <h3>Parametry obrazu</h3>
       <div id="suwakiJakosci"><p class="uwaga">Suwaki pojawią się po zbudowaniu potoku efektów.</p></div>
+    </section>
+    <section data-s="dev" hidden>
+      <h3>P7–P18 / P8 — presety</h3>
+      <select id="devPreset" aria-label="Preset testowy funkcji">
+        <option value="baseline">Baseline — wyłącz warianty</option>
+        <option value="all-compatible">Wszystkie zgodne funkcje</option>
+        <option value="taau">TAAU r185</option>
+        <option value="ktx-etc1s">KTX2 — ETC1S albedo</option>
+        <option value="ktx-uastc">KTX2 — UASTC albedo</option>
+        <option value="speedball">Speedball GI 0.7.0</option>
+        <option value="modern-ssr">Stochastic SSR r185</option>
+        <option value="arch-aces">ARCH_PHOTO + ACES</option>
+        <option value="arch-neutral">ARCH_PHOTO + Neutral</option>
+        <option value="arch-agx">ARCH_PHOTO + AgX</option>
+        <option value="photo-raster">PHOTO_RASTER</option>
+        <option value="photo-path">PHOTO_PATH gate</option>
+        <option value="navigation">Test nawigacji</option>
+        <option value="furniture-v2">Furniture v2 POC</option>
+      </select>
+      <button class="dzialanie" id="devApply" type="button" style="margin-top:6px">Uruchom i przeładuj</button>
+      <p class="uwaga" id="devOpis"></p>
+      <a id="devUrl" href="#" style="display:block;margin-top:6px;overflow-wrap:anywhere">Adres presetu</a>
+      <p class="uwaga">P7 i P9 są aktywne stale. P11 pozostaje audytem MRT bez zmiany architektury.</p>
     </section>
     <section data-s="pomoc" hidden>
       <p class="uwaga" id="navigationRegressionInfo"></p>
@@ -461,6 +485,52 @@ export function utworzSterowanie(api){
     renderer.shadowMap.enabled = e.target.checked;
     renderer.shadowMap.needsUpdate = true;
   });
+
+  /* ---------- DEV: jawne, odwracalne presety query ---------- */
+  const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest',
+    'furnitureV2','furnitureSource'];
+  const DEV_PRESETS = {
+    baseline: {quality:'srednia', aa:'smaa', tone:'aces', camera:'interactive'},
+    'all-compatible': {quality:'wysoka', aa:'taau', tone:'agx', gi:'speedball',
+      ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0005-poc-v2',
+      furnitureSource:'local'},
+    taau: {quality:'wysoka', aa:'taau', tone:'aces'},
+    'ktx-etc1s': {quality:'wysoka', aa:'smaa', tone:'aces', ktx2:'etc1s'},
+    'ktx-uastc': {quality:'wysoka', aa:'smaa', tone:'aces', ktx2:'uastc'},
+    speedball: {quality:'wysoka', aa:'smaa', tone:'aces', gi:'speedball'},
+    'modern-ssr': {quality:'wysoka', aa:'smaa', tone:'aces', ssr:'modern'},
+    'arch-aces': {quality:'wysoka', aa:'smaa', tone:'aces', camera:'arch'},
+    'arch-neutral': {quality:'wysoka', aa:'smaa', tone:'neutral', camera:'arch'},
+    'arch-agx': {quality:'wysoka', aa:'smaa', tone:'agx', camera:'arch'},
+    'photo-raster': {quality:'photo_raster', aa:'taau', tone:'aces'},
+    'photo-path': {quality:'photo_path', aa:'taau', tone:'aces'},
+    navigation: {quality:'minimalna', aa:'smaa', tone:'aces', navtest:'1'},
+    'furniture-v2': {quality:'srednia', aa:'smaa', tone:'aces',
+      furnitureV2:'regal-salon:v0005-poc-v2', furnitureSource:'local'}
+  };
+  const DEV_OPIS = {
+    baseline: 'Bez eksperymentalnych parametrów; current SSGI/SSR, SMAA i ACES.',
+    'all-compatible': 'Test integracyjny wariantów zgodnych w jednym kadrze; nie służy do izolowanych pomiarów A/B.',
+    'photo-path': 'Eksperymentalna bramka integracji; r185 nie dostarcza produkcyjnego WebGPU path tracera.'
+  };
+  function devAdres(){
+    const q = new URLSearchParams(location.search);
+    for(const k of DEV_KEYS) q.delete(k);
+    const preset = DEV_PRESETS[$('#devPreset').value] || DEV_PRESETS.baseline;
+    for(const [k,v] of Object.entries(preset)) q.set(k,v);
+    const url = new URL(location.href); url.search = q.toString(); url.hash = '';
+    return url;
+  }
+  function odswiezDev(){
+    const url = devAdres();
+    $('#devUrl').href = url.href;
+    $('#devUrl').textContent = url.href;
+    $('#devOpis').textContent = DEV_OPIS[$('#devPreset').value]
+      || 'Izolowany preset TEST/COMPARE; przeładowanie zachowuje pozostałe, niezależne parametry query.';
+  }
+  $('#devPreset').addEventListener('change', odswiezDev);
+  $('#devApply').addEventListener('click', () => { location.href = devAdres().href; });
+  odswiezDev();
 
   /* ---------- pomoc ---------- */
   $('#brakujace').textContent =
