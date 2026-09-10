@@ -43,6 +43,8 @@ import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 import { createPhotoPathIntegration } from './photo-path.js';
 import { runNavigationRegression } from './navigation-regression.js?p18b';
+import { wlaczone } from './flagi.js';
+import { PERF, utworzPomiar } from './wydajnosc.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -102,7 +104,7 @@ async function wymaganeLimity(){
 const limity = await wymaganeLimity();
 const renderer = new THREE.WebGPURenderer({
   antialias: false, alpha: false, powerPreference: 'high-performance', stencil: false, samples: 0,
-  requiredLimits: limity
+  requiredLimits: limity, trackTimestamp: PERF   // P19: czas GPU tylko przy ?perf=1
 });
 /* MRT ma sześć załączników, więc każdy dodatkowy piksel kosztuje sześć buforów.
    Na 8 GB pixelRatio 1 to różnica między płynnym obrazem a zamuloną maszyną. */
@@ -1489,7 +1491,10 @@ function dopasujRozmiar(){
 addEventListener('resize', ()=>{ if(dopasujRozmiar()) invalidate(); });
 
 odswiezCien();
+const pomiar = utworzPomiar(renderer);   // P19
+window.__silnik.perf = pomiar;
 async function klatka(){
+  const startCPU = performance.now();
   if(dopasujRozmiar()) invalidate();
   const dtKlatki = Math.min(1/15, (performance.now() - czasKlatki)/1000); czasKlatki = performance.now();
   nawigacja.aktualizuj();
@@ -1526,6 +1531,7 @@ async function klatka(){
     await renderer.renderAsync(scene, camera);
   }
   nawigacja.rysujZnacznik();
+  pomiar.poKlatce(performance.now() - startCPU);
   klatki++; window.__silnik.klatki = klatki;
   if((klatki & 31) === 0) aktualizujDiagnostykeGI();
   zmierzKlatke(performance.now());
