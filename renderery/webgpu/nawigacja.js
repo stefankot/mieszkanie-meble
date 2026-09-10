@@ -1,5 +1,6 @@
 import { utworzKadrowanie } from './kadrowanie.js';
 import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js';
+import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 
 /* ============================================================
    NAWIGACJA — Point & Go, spacer, widok z lotu ptaka
@@ -12,7 +13,7 @@ import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js
    · na poprawnym celu na podłodze ostre NIEBIESKIE kółko,
    · przeciąganie rozgląda kamerę i nigdy nie wywołuje podejścia,
    · ←/→ przesuwają kamerę bokiem, jak A/D w OAKSUN; Q/E zmieniają wysokość,
-   · domyślna wysokość oczu 170 cm,
+   · domyślna wysokość oczu 167 cm,
    · Point & Go trwa ~1 s i zachowuje kierunek patrzenia, zatrzymując się
      80 cm przed celem; przejście do pomieszczenia trwa 2,5 s i na końcu
      kieruje wzrok na najbliższy sensowny obiekt, a nie w ścianę,
@@ -22,7 +23,7 @@ import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js
    ile klatek wyrobi karta.
    ============================================================ */
 
-const OCZY = 170;            // brief: wysokość oczu po teleportacji
+const OCZY = DEFAULT_EYE_HEIGHT_CM;
 const OCZY_KUCANIE = 95;
 const PROMIEN = 20;          // promień kolidera gracza [cm]
 const CZULOSC = .0013;       // [oaksun] st — rad na piksel
@@ -55,7 +56,7 @@ const KROK_KOLKA = 26;   // cm na jeden ząbek
 
 export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblioteka, scena, sufit,
                                  ustawKrycieWidoku, przyZmianie, przyKlikniecie, czyInteraktywne,
-                                 przySkokuKamery}){
+                                 przyNajechaniu, przySkokuKamery}){
   const {APARTMENT} = plan;
   const plotno = renderer.domElement;
   const kadrowanie = utworzKadrowanie({THREE, plan, biblioteka});
@@ -482,12 +483,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const wolne = najblizszeWolne(cel.x, cel.z);
     if(!wolne) return null;
     cel.x = wolne.x; cel.z = wolne.z;
-    const kroki = Math.max(1, Math.ceil(Math.hypot(cel.x-camera.position.x, cel.z-camera.position.z)/10));
-    for(let i=1; i<=kroki; i++){
-      const t=i/kroki;
-      if(zablokowane(camera.position.x+(cel.x-camera.position.x)*t, 0,
-                     camera.position.z+(cel.z-camera.position.z)*t)) return null;
-    }
+    /* Point & Go jest teleportem z animacją, nie symulacją przejścia gracza.
+       Promień dowodzi widoczności celu, a walidacja miejsca chroni pozycję
+       końcową. Sprawdzanie całego prostego odcinka blokowało przejścia przez
+       drzwi i do sąsiednich pomieszczeń, gdy promień gracza zahaczał o ościeże. */
     return cel;
   }
   function widocznyObiekt(o){
@@ -498,21 +497,34 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   const kameraZnacznika = new THREE.Vector3(), obrotZnacznika = new THREE.Quaternion();
   function odswiezZnacznik(e){
     znacznik.visible = false; ostatnieTrafienie = null;
+    przyNajechaniu?.(null);
     if(tryb !== TRYBY.ORBITA || animacja) return;
     naprawKamere(); camera.updateMatrixWorld();
     const r = plotno.getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) return;
     promien.setFromCamera(new THREE.Vector2(
       (e.clientX-r.left)/r.width*2-1, -(e.clientY-r.top)/r.height*2+1), camera);
-    const traf = promien.intersectObjects(scena.children, true).find(t =>
+    const trafienia = promien.intersectObjects(scena.children, true).filter(t =>
       widocznyObiekt(t.object) && t.object !== znacznik && !znacznik.children.includes(t.object)
-      && t.object.name !== 'Pasek LED');
+      && t.object.name !== 'Pasek LED' && !t.object.userData?.interactiveHoverOutline);
+    if(!trafienia.length) return;
+    const pierwsze = trafienia[0];
+    const interaktywny = czyInteraktywne?.(pierwsze.object);
+    if(interaktywny){
+      ostatnieTrafienie = pierwsze.object;
+      przyNajechaniu?.(interaktywny);
+      return;
+    }
+    /* Wybierz pierwsze trafienie prowadzące do legalnego celu. Przezroczysta
+       albo cienka geometria przed podłogą nie może unieważnić dalszego trafienia. */
+    let traf = null, cel = null;
+    for(const kandydat of trafienia){
+      if(camera.position.distanceTo(kandydat.point) < 100) continue;
+      const c = celPodejsciaDla(kandydat.point);
+      if(c){ traf = kandydat; cel = c; break; }
+    }
     if(!traf) return;
     ostatnieTrafienie = traf.object;
-    if(czyInteraktywne?.(traf.object)) return;
-    if(camera.position.distanceTo(traf.point) < 100) return;
-    const cel = celPodejsciaDla(traf.point);
-    if(!cel) return;
     const n = traf.face ? traf.face.normal.clone().applyMatrix3(
       macierzNormalnej.getNormalMatrix(traf.object.matrixWorld)).normalize() : OS_Y.clone();
     if(n.dot(promien.ray.direction) > 0) n.negate();
@@ -558,10 +570,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     wcisniety=false; pointerId=null;
     try{ plotno.releasePointerCapture?.(e.pointerId); }catch(err){}
   });
-  function anulujWskaznik(){ wcisniety=false; pointerId=null; ruszyl=true; znacznik.visible=false; }
+  function anulujWskaznik(){ wcisniety=false; pointerId=null; ruszyl=true; znacznik.visible=false; przyNajechaniu?.(null); }
   plotno.addEventListener('pointercancel', anulujWskaznik);
   plotno.addEventListener('lostpointercapture', () => { if(wcisniety) anulujWskaznik(); });
-  plotno.addEventListener('pointerleave', () => { znacznik.visible=false; });
+  plotno.addEventListener('pointerleave', () => { znacznik.visible=false; przyNajechaniu?.(null); });
   plotno.addEventListener('click', e => {
     if(e.button !== 0 || tryb === TRYBY.PTAK || animacja || wcisniety || ruszyl) return;
     if(tryb === TRYBY.SPACER){ if(document.pointerLockElement !== plotno) zablokujWskaznik(); return; }
@@ -771,6 +783,11 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     if(!d || !wek(d.poz,3) || !obrot(d.obr) || !wek(d.cel,3)) return false;
     kadrowanie.odswiez();
     const p=punkt(d.poz), cel=punkt(d.cel);
+    /* Migracja dawnej wartości zapisanej przez renderer. Bez niej localStorage
+       utrzymywał 122 cm mimo zmiany nowej wartości domyślnej. */
+    if(Math.abs(d.celOczu - 122) < .5 && Math.abs(p.y - 122) < .5){
+      p.y = OCZY; d.celOczu = OCZY;
+    }
     const ptak=d.tryb===TRYBY.PTAK;
     if(ptak){
       // Widok z góry może być poza obrysem, lecz musi patrzeć na mieszkanie.

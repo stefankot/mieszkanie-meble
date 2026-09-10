@@ -32,8 +32,8 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
-import { utworzNawigacje } from './nawigacja.js?p18';
-import { utworzSterowanie } from './sterowanie.js';
+import { utworzNawigacje } from './nawigacja.js?p18c';
+import { utworzSterowanie } from './sterowanie.js?dev1';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
 import { skrzywFormatki } from './niedoskonalosci.js';
@@ -52,6 +52,7 @@ import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
+import { utworzHoverOutline } from './hover-outline.js';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -920,6 +921,8 @@ interakcje = utworzInterakcje({
   przyZmianie: () => { odswiezCien(); }
 });
 window.__silnik.interakcje = interakcje;
+const hoverOutline = utworzHoverOutline({THREE});
+window.__silnik.hoverOutline = hoverOutline;
 
 nawigacja = utworzNawigacje({THREE, camera, controls, renderer, plan: PLAN, biblioteka, scena: scene, sufit,
                              ustawKrycieWidoku: v => window.__silnik.krycie?.ustawKrycieWidoku(v),
@@ -931,10 +934,11 @@ nawigacja = utworzNawigacje({THREE, camera, controls, renderer, plan: PLAN, bibl
                                const ruchy = interakcje.ruchy();
                                for(let p=o; p; p=p.parent){
                                  if(zaslony.zestawy.some(z => z.panele.includes(p))
-                                    || ruchy.some(r => r.ruch.id === p.userData?.ruchId)) return true;
+                                    || ruchy.some(r => r.ruch.id === p.userData?.ruchId)) return p;
                                }
-                               return false;
+                               return null;
                              },
+                             przyNajechaniu: o => hoverOutline.ustaw(o),
                              przyKlikniecie: o => zaslony.kliknij(o) || interakcje.kliknij(o)});
 skalujUVMebli(biblioteka);
 /* LED-y wykrywane są promieniami po froncie mebla — odkładamy to na po
