@@ -9,5 +9,5 @@ export const SSR_MODERN_SETTINGS = Object.freeze({
 });
 
 export function wybierzSSR(search = globalThis.location?.search || '') {
-  return new URLSearchParams(search).get('ssr') === SSR_MODERN ? SSR_MODERN : SSR_BASELINE;
+  return new URLSearchParams(search).get('ssr') === SSR_BASELINE ? SSR_BASELINE : SSR_MODERN;
 }

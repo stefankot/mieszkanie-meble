@@ -151,9 +151,9 @@ export function utworzSterowanie(api){
         <input id="ekspozycja" type="range" min="0.35" max="2.2" step="0.01" value="0.72"></div>
       <h3>Jakość obrazu</h3>
       <select id="jakoscPoziom">
-        <option value="minimalna" selected>Minimalna — płynność</option>
+        <option value="minimalna">Minimalna — płynność</option>
         <option value="srednia">Średnia</option>
-        <option value="wysoka">Wysoka</option>
+        <option value="wysoka" selected>Wysoka — domyślna</option>
         <option value="photo_raster">PHOTO_RASTER — statyczny kadr</option>
         <option value="photo_path">PHOTO_PATH — integration TEST</option>
       </select>
@@ -171,8 +171,8 @@ export function utworzSterowanie(api){
         <option value="speedball">SSGI + Speedball 0.7.0 — TEST (wysoka)</option>
       </select>
       <select id="ssrWariant" title="Porównanie odbić ekranowych">
-        <option value="current" selected>SSR current — baseline</option>
-        <option value="modern">Stochastic SSR r185 — TEST (wysoka)</option>
+        <option value="current">SSR current — fallback</option>
+        <option value="modern" selected>Stochastic SSR r185 — domyślne</option>
       </select>
       <p class="uwaga" id="worldGIInfo"></p>
       <p class="uwaga" id="jakoscOpis"></p>
@@ -437,10 +437,10 @@ export function utworzSterowanie(api){
   const giSel = $('#worldGI');
   const ssrSel = $('#ssrWariant');
   const parametry = new URLSearchParams(location.search);
-  if(parametry.get('aa')==='taau') aaSel.value='taau';
+  if(['smaa','taau'].includes(parametry.get('aa'))) aaSel.value=parametry.get('aa');
   if(['aces','neutral','agx'].includes(parametry.get('tone'))) toneSel.value=parametry.get('tone');
   if(parametry.get('gi')==='speedball') giSel.value='speedball';
-  if(parametry.get('ssr')==='modern') ssrSel.value='modern';
+  ssrSel.value=parametry.get('ssr')==='current'?'current':'modern';
   if(['minimalna','srednia','wysoka','photo_raster','photo_path'].includes(parametry.get('quality'))) jakoscSel.value=parametry.get('quality');
   aaSel.addEventListener('change',()=>{
     window.__silnik.aa?.ustaw(aaSel.value);
@@ -458,8 +458,8 @@ export function utworzSterowanie(api){
   });
   ssrSel.addEventListener('change',()=>{
     const q = new URLSearchParams(location.search);
-    if(ssrSel.value === 'modern') q.set('ssr','modern'); else q.delete('ssr');
-    q.set('quality','wysoka'); q.set('aa','smaa'); q.delete('gi');
+    if(ssrSel.value === 'current') q.set('ssr','current'); else q.delete('ssr');
+    q.set('quality','wysoka'); q.set('aa',aaSel.value); q.delete('gi');
     location.search = q.toString();
   });
   function opiszJakosc(){
@@ -471,7 +471,7 @@ export function utworzSterowanie(api){
         : aaSel.value==='taau' && jakoscSel.value==='wysoka'
         ? ' · TAA (TRAA) w pełnej rozdzielczości + wyostrzanie RCAS' : ' · SMAA')
         + (giSel.value==='speedball' ? ' · Speedball GI TEST' : ' · current SSGI')
-        + (ssrSel.value==='modern' ? ' · stochastic SSR TEST' : ' · current SSR')
+        + (ssrSel.value==='modern' ? ' · stochastic SSR' : ' · current SSR fallback')
         + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
       : '';
   }
@@ -495,14 +495,14 @@ export function utworzSterowanie(api){
   const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest','bez',
     'furnitureV2','furnitureSource'];
   const DEV_PRESETS = {
-    baseline: {quality:'srednia', aa:'smaa', tone:'aces', camera:'interactive'},
-    'candidate-a': {quality:'wysoka', aa:'taau', tone:'aces', camera:'interactive'},
-    'candidate-b': {quality:'wysoka', aa:'taau', tone:'agx', camera:'interactive'},
+    baseline: {quality:'srednia', aa:'smaa', tone:'aces', ssr:'current', camera:'interactive'},
+    'candidate-a': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'current', camera:'interactive'},
+    'candidate-b': {quality:'wysoka', aa:'taau', tone:'agx', ssr:'current', camera:'interactive'},
     'candidate-c': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'modern', camera:'interactive'},
     'all-compatible': {quality:'wysoka', aa:'taau', tone:'agx', gi:'speedball',
       ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0005-poc-v2',
       furnitureSource:'local'},
-    'p19-current': {quality:'wysoka', aa:'taau', tone:'aces'},
+    'p19-current': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'modern'},
     'p19-off': {quality:'wysoka', aa:'smaa', tone:'aces', bez:'wszystko'},
     taau: {quality:'wysoka', aa:'taau', tone:'aces'},
     'ktx-etc1s': {quality:'wysoka', aa:'smaa', tone:'aces', ktx2:'etc1s'},
@@ -564,11 +564,13 @@ export function utworzSterowanie(api){
   const KLUCZ_UST = 'mieszkanie-webgpu:ustawienia:1';
   const PROFIL_SWIATLA = 'z3a-1';
   const PROFIL_AA = 'p25-taau';   // P25: jednorazowo przełącza zapisane SMAA na TAAU
+  const PROFIL_RENDER = 'candidate-c-1';
   const kontrolki = () => [...el.querySelectorAll('input, select')];
 
   function zapiszUstawienia(){
     try{
-      const dane = {profilSwiatla: PROFIL_SWIATLA, profilAA: PROFIL_AA, pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
+      const dane = {profilSwiatla: PROFIL_SWIATLA, profilAA: PROFIL_AA, profilRender: PROFIL_RENDER,
+                    pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
                     otwarty: el.open};
       for(const k of kontrolki()){
         if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant') continue;
@@ -583,6 +585,8 @@ export function utworzSterowanie(api){
     try{ d = JSON.parse(localStorage.getItem(KLUCZ_UST) || 'null'); }catch(e){ return false; }
     if(!d || !d.pola || typeof d.pola !== 'object') return false;
     if(d.profilAA !== PROFIL_AA) d.pola.antyaliasing = 'taau';   // P25
+    if(d.profilRender !== PROFIL_RENDER)
+      Object.assign(d.pola, {jakoscPoziom:'wysoka', antyaliasing:'taau', toneMapping:'aces'});
     // Jednorazowo zastosuj uzgodnione światło; zachowaj pozostałe ustawienia.
     if(d.profilSwiatla !== PROFIL_SWIATLA){
       Object.assign(d.pola, {data:'2026-09-15', godzina:'16:30', cieplo:'45',
@@ -613,7 +617,7 @@ export function utworzSterowanie(api){
     if(['aces','neutral','agx'].includes(q.get('tone'))){toneSel.value=q.get('tone');toneSel.dispatchEvent(new Event('change'));}
     if(q.get('camera')==='arch'){trybKamery.value='arch_photo';trybKamery.dispatchEvent(new Event('change'));}
     giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
-    ssrSel.value=q.get('ssr')==='modern'?'modern':'current';
+    ssrSel.value=q.get('ssr')==='current'?'current':'modern';
     if(['minimalna','srednia','wysoka','photo_raster','photo_path'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
     /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
        więc po przywróceniu wołamy to wprost. */

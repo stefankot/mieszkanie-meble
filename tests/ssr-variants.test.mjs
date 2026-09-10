@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {wybierzSSR,SSR_MODERN_SETTINGS} from '../renderery/webgpu/ssr-variants.js';
 
-test('P14 modern SSR is explicit opt-in',()=>{
-  assert.equal(wybierzSSR(''),'current');
+test('approved candidate C makes modern SSR default with an explicit current fallback',()=>{
+  assert.equal(wybierzSSR(''),'modern');
   assert.equal(wybierzSSR('?ssr=modern'),'modern');
-  assert.equal(wybierzSSR('?ssr=dev'),'current');
+  assert.equal(wybierzSSR('?ssr=current'),'current');
+  assert.equal(wybierzSSR('?ssr=dev'),'modern');
 });
 
 test('P14 compile-time modern settings stay pinned',()=>{

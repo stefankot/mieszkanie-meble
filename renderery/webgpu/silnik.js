@@ -33,7 +33,7 @@ import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
 import { utworzNawigacje } from './nawigacja.js?p18d';
-import { utworzSterowanie } from './sterowanie.js?dev3';
+import { utworzSterowanie } from './sterowanie.js?default-c';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
 import { skrzywFormatki } from './niedoskonalosci.js';
