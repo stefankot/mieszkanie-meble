@@ -181,6 +181,8 @@ export function utworzSterowanie(api){
       <label class="pole"><input type="checkbox" id="szkloFiz" checked>Szkło fizyczne (refrakcja, IOR 1,52)</label>
       <p class="uwaga">Po zatrzymaniu kamery jakość światła pośredniego stopniowo rośnie.
         Krawędzie są wygładzane w każdej klatce.</p>
+      <h3>Parametry obrazu</h3>
+      <div id="suwakiJakosci"><p class="uwaga">Suwaki pojawią się po zbudowaniu potoku efektów.</p></div>
     </section>
     <section data-s="pomoc" hidden>
       <p class="uwaga" id="navigationRegressionInfo"></p>

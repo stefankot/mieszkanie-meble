@@ -22,6 +22,8 @@ import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 import { taau } from 'three/addons/tsl/display/TAAUNode.js';
 import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
+import { dodajSuwakiJakosci } from './suwaki-jakosci.js';
+import { ustawWariacjeKoloru } from './niedoskonalosci.js';
 import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
 import { recurrentDenoise } from 'three/addons/tsl/display/RecurrentDenoiseNode.js';
 import { sss } from 'three/addons/tsl/display/SSSNode.js';
@@ -1218,8 +1220,9 @@ function wyjscieDla(poziom){
   /* P35: RCAS po TAAU oddaje ostrość zjedzoną przez filtr gaussowski rekonstrukcji.
      sharpness: 0 = najmocniej, 2 = brak; ?ostrosc=<liczba>, ?bez=wyostrz wyłącza.
      P36: jitter TRAA uśrednia słój w obrębie piksela — RCAS 0,4 przywraca jego kontrast (zrzut vs SMAA). */
-  const ostrosc = +(new URLSearchParams(location.search).get('ostrosc') ?? (uzyjTRAA ? .4 : .35));
-  const wynik = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, ostrosc) : aa);
+  /* P37: siła wyostrzania jako wspólny uniform — suwak w panelu zmienia ją bez rekompilacji. */
+  wyjscieDla.ostrosc ??= uniform(+(new URLSearchParams(location.search).get('ostrosc') ?? .4));
+  const wynik = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, wyjscieDla.ostrosc) : aa);
   zbudowane.set(klucz, wynik);
   return wynik;
 }
@@ -1447,6 +1450,7 @@ function ustawPoziomJakosci(nazwa){
   dopracowanieWlaczone = j.dopracowanie;
   stopien = -1; klatekRuchu = 0; bezRuchu = 0;
   ustawJakosc(PLASTRY_RUCH);
+  window.__silnik.suwakiJakosci?.zastosujNadpisania();   // P37: ręczne wartości wygrywają z presetem
 
   return poziomJakosci;
 }
@@ -1656,6 +1660,75 @@ try{ globalThis.__postep?.koniec?.(); }catch(e){}
     ustawPoziomJakosci(wybranaJakoscStartowa());
     potokGotowy = true;
     oznaczZmiane();   // P22: potok gotowy — pełne klatki przez okres ustalania
+    /* P37: suwaki parametrów obrazu — tylko to, co działa na żywo (uniformy i właściwości
+       czytane w każdej klatce); progi TRAA i liczba kroków SSGI wymagają rekompilacji. */
+    const kontenerSuwakow = document.getElementById('suwakiJakosci');
+    if(kontenerSuwakow && wlaczone('suwakijakosci')){
+      kontenerSuwakow.innerHTML = '';
+      const u = n => ({get: () => n?.value, set: v => { n.value = v; }});
+      const pole = (id, etykieta, min, max, krok, gs, extra = {}) => ({id, etykieta, min, max, krok, ...gs, ...extra});
+      let skalaObrazu = 0, skalaGI = 0, aniso = 16;
+      window.__silnik.suwakiJakosci = dodajSuwakiJakosci({kontener: kontenerSuwakow, grupy: [
+        {nazwa: 'Obraz', pola: [
+          pole('qSkalaObrazu', 'Skala obrazu (auto = wg poziomu)', 0, 2, .05, {get: () => skalaObrazu, set: v => {
+            skalaObrazu = v;
+            renderer.setPixelRatio(v > 0 ? v : Math.min(window.devicePixelRatio || 1, POZIOMY[poziomJakosci].pixelRatio));
+            renderer.setSize(szerokosc(), wysokosc()); resetujHistorieTAAU('skala-obrazu');
+          }}, {auto: true, zdarzenie: 'change', poPoziomie: true}),
+          pole('qOstrosc', 'Wyostrzanie (0 = najmocniej, 2 = brak)', 0, 2, .05, u(wyjscieDla.ostrosc)),
+          pole('qKontrast', 'Kontrast', .8, 1.4, .01, u(KONTRAST)),
+          pole('qNasycenie', 'Nasycenie', .5, 1.5, .01, u(NASYCENIE)),
+          pole('qPivot', 'Środek kontrastu', .05, .5, .01, u(PIVOT)),
+          pole('qAniso', 'Filtrowanie anizotropowe', 1, 16, 1, {get: () => aniso, set: v => {
+            aniso = v;
+            scene.traverse(o => { if(!o.isMesh) return; for(const mt of [].concat(o.material))
+              for(const k of ['map', 'normalMap', 'roughnessMap']){ const t = mt?.[k]; if(t && t.anisotropy !== v){ t.anisotropy = v; t.needsUpdate = true; } } });
+          }}, {zdarzenie: 'change'}),
+          pole('qSrodowisko', 'Światło otoczenia (HDRI)', 0, 1.5, .01, {get: () => scene.environmentIntensity, set: v => { scene.environmentIntensity = v; }})
+        ]},
+        {nazwa: 'Światło pośrednie (SSGI)', pola: [
+          pole('qGiSila', 'Siła światła pośredniego', 0, 8, .1, u(gi.giIntensity)),
+          pole('qAoSila', 'Siła okluzji (AO)', 0, 2, .01, u(gi.aoIntensity)),
+          pole('qGiZasieg', 'Zasięg [cm]', 20, 600, 5, u(gi.radius)),
+          pole('qGiGrubosc', 'Grubość obiektów [cm]', 1, 200, 1, u(gi.thickness)),
+          pole('qGiSkala', 'Rozdzielczość GI (auto = wg poziomu)', 0, 1, .05, {get: () => skalaGI, set: v => {
+            skalaGI = v; ustawSkaleSSGI(v > 0 ? v : (POZIOMY[poziomJakosci].ssgiSkala ?? 1));
+          }}, {auto: true, zdarzenie: 'change', poPoziomie: true}),
+          pole('qOdszJasnosc', 'Odszumianie: jasność', 0, 40, .5, u(giCzyste.lumaPhi)),
+          pole('qOdszGlebia', 'Odszumianie: głębia', 0, 10, .1, u(giCzyste.depthPhi)),
+          pole('qOdszNormalne', 'Odszumianie: normalne', 0, 20, .1, u(giCzyste.normalPhi)),
+          pole('qOdszPromien', 'Odszumianie: promień', 1, 20, 1, u(giCzyste.radius))
+        ]},
+        {nazwa: 'Odbicia (SSR, poziom wysoki)', pola: [
+          pole('qSsrSila', 'Siła odbić', 0, 3, .05, u(odbicia.intensity)),
+          pole('qSsrJakosc', 'Jakość śledzenia', 0, 1, .05, u(odbicia.quality)),
+          pole('qSsrDystans', 'Maks. odległość [cm]', 0, 50, .5, u(odbicia.maxDistance)),
+          pole('qSsrGrubosc', 'Grubość [cm]', 0, 5, .05, u(odbicia.thickness)),
+          pole('qSsrLustro', 'Próg lustra', 0, 1, .01, u(odbicia.mirrorBias)),
+          pole('qSsrJasnosc', 'Maks. jasność odbicia', 1, 100, 1, u(odbicia.maxLuminance)),
+          pole('qSsrKrawedz', 'Zanikanie przy krawędzi ekranu', 0, 1, .01, u(odbicia.screenEdgeFade)),
+          pole('qSsrOtoczenie', 'Odbicie otoczenia', 0, 6, .1, u(odbicia.environmentIntensity)),
+          pole('qSsrSkala', 'Rozdzielczość odbić', .25, 1, .05, {get: () => odbicia.resolutionScale, set: v => { odbicia.resolutionScale = v; }},
+               {zdarzenie: 'change', poPoziomie: true})
+        ]},
+        {nazwa: 'Cienie', pola: [
+          pole('qSssDystans', 'Cień kontaktowy: zasięg [cm]', 0, 30, .5, u(cienKontaktowy?.maxDistance)),
+          pole('qSssGrubosc', 'Cień kontaktowy: grubość [cm]', .1, 10, .1, u(cienKontaktowy?.thickness)),
+          pole('qSssSila', 'Cień kontaktowy: siła', 0, 1, .01, u(cienKontaktowy?.shadowIntensity)),
+          pole('qSssJakosc', 'Cień kontaktowy: jakość', 0, 1, .05, u(cienKontaktowy?.quality)),
+          pole('qCienBias', 'Cień słońca: przesunięcie (bias)', -.005, .002, .0001, {get: () => slonce.shadow.bias, set: v => { slonce.shadow.bias = v; odswiezCien(); }}),
+          pole('qCienNormal', 'Cień słońca: przesunięcie wzdłuż normalnej', 0, 3, .05, {get: () => slonce.shadow.normalBias, set: v => { slonce.shadow.normalBias = v; odswiezCien(); }})
+        ]},
+        {nazwa: 'Poświata (bloom)', pola: [
+          pole('qBloomSila', 'Siła', 0, 3, .05, u(poswiata.strength)),
+          pole('qBloomPromien', 'Promień', 0, 1, .01, u(poswiata.radius)),
+          pole('qBloomProg', 'Próg jasności', 0, 6, .05, u(poswiata.threshold))
+        ]},
+        {nazwa: 'Materiały', pola: [
+          {id: 'qPlamy', etykieta: 'Plamy i przebarwienia powierzchni', typ: 'przelacznik', get: () => 1, set: v => ustawWariacjeKoloru(!!v)}
+        ]}
+      ]});
+    }
   }catch(e){
     usterki.push('Potok efektów: ' + e.message);
   }
