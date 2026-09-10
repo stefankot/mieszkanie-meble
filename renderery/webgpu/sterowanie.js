@@ -157,8 +157,8 @@ export function utworzSterowanie(api){
         <option value="photo_path">PHOTO_PATH — integration TEST</option>
       </select>
       <select id="antyaliasing" title="Porównanie wygładzania">
-        <option value="smaa" selected>SMAA — baseline</option>
-        <option value="taau">TAAU r185 — TEST (wysoka)</option>
+        <option value="taau" selected>TAAU — domyślne (wysoka, +43% FPS)</option>
+        <option value="smaa">SMAA (P18)</option>
       </select>
       <select id="toneMapping" title="Porównanie tone mappingu">
         <option value="aces" selected>ACES — baseline</option>
@@ -478,11 +478,12 @@ export function utworzSterowanie(api){
      która mogłaby się rozjechać z pierwszą. */
   const KLUCZ_UST = 'mieszkanie-webgpu:ustawienia:1';
   const PROFIL_SWIATLA = 'z3a-1';
+  const PROFIL_AA = 'p25-taau';   // P25: jednorazowo przełącza zapisane SMAA na TAAU
   const kontrolki = () => [...el.querySelectorAll('input, select')];
 
   function zapiszUstawienia(){
     try{
-      const dane = {profilSwiatla: PROFIL_SWIATLA, pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
+      const dane = {profilSwiatla: PROFIL_SWIATLA, profilAA: PROFIL_AA, pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
                     otwarty: el.open};
       for(const k of kontrolki()){
         if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant') continue;
@@ -496,6 +497,7 @@ export function utworzSterowanie(api){
     let d;
     try{ d = JSON.parse(localStorage.getItem(KLUCZ_UST) || 'null'); }catch(e){ return false; }
     if(!d || !d.pola || typeof d.pola !== 'object') return false;
+    if(d.profilAA !== PROFIL_AA) d.pola.antyaliasing = 'taau';   // P25
     // Jednorazowo zastosuj uzgodnione światło; zachowaj pozostałe ustawienia.
     if(d.profilSwiatla !== PROFIL_SWIATLA){
       Object.assign(d.pola, {data:'2026-09-15', godzina:'16:30', cieplo:'45',
