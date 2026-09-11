@@ -74,6 +74,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   let animacja = null, bylaBlokada = false, widokPrzedPtakiem = null;
   let resztaKroku = 0;
   const klaw = Object.create(null);
+  const joystick = {x:0, y:0};
   const zdarzenia={twoFingerLook:0,pinchDrive:0,dragLook:0,pointerLook:0,pointAndGo:0,keyboard:0,topView:0};
 
   /* ---------- pudełka mebli ---------- */
@@ -181,23 +182,26 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const kr = dt * 60;                  // demo liczy na klatkę 60 Hz
     camera.updateMatrix();
 
-    const idzie = klaw.przod || klaw.tyl || klaw.lewo || klaw.prawo;
+    const osPrzod = (klaw.przod ? 1 : 0) - (klaw.tyl ? 1 : 0) - joystick.y;
+    const osBok = (klaw.prawo ? 1 : 0) - (klaw.lewo ? 1 : 0) + joystick.x;
+    const idzie = Math.abs(osPrzod) > .04 || Math.abs(osBok) > .04;
     if(idzie){
       kierunek.set(0, 0, 0);
-      if(klaw.przod || klaw.tyl){
+      if(Math.abs(osPrzod) > .04){
         kolumna.setFromMatrixColumn(camera.matrix, 2);
         kolumna.y = 0; kolumna.normalize();
-        kolumna.multiplyScalar((klaw.tyl ? 1 : 0) - (klaw.przod ? 1 : 0));
+        kolumna.multiplyScalar(-osPrzod);
         kierunek.add(kolumna);
       }
-      if(klaw.lewo || klaw.prawo){
+      if(Math.abs(osBok) > .04){
         bokWek.setFromMatrixColumn(camera.matrix, 0);
         bokWek.y = 0; bokWek.normalize();
-        bokWek.multiplyScalar((klaw.prawo ? 1 : 0) - (klaw.lewo ? 1 : 0));
+        bokWek.multiplyScalar(osBok);
         kierunek.add(bokWek);
       }
       if(kierunek.length() > 0){
-        kierunek.normalize();
+        const sila = Math.min(1, Math.hypot(osPrzod, osBok));
+        kierunek.normalize().multiplyScalar(sila);
         const m = kuca ? .5 : (klaw.bieg ? 2 : 1);
         biezacaSzybkosc = Math.min(biezacaSzybkosc + RUCH.acceleration*m*kr, RUCH.maxSpeed*m);
         predkoscRuchu.add(kierunek.multiplyScalar(biezacaSzybkosc*kr));
@@ -310,6 +314,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   }
   function zatrzymajRuch(){
     for(const k in klaw) klaw[k] = false;
+    wyzerujJoystick();
     predkoscRuchu.set(0, 0, 0); biezacaSzybkosc = 0; resztaKroku = 0;
     vy = 0; kuca = false;
   }
@@ -332,11 +337,12 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
       kadrowanie.odswiez();
       const p = kadrowanie.bezpiecznyStart(zapis ? new THREE.Vector3().fromArray(zapis.poz) : null);
       if(!p){ tryb=TRYBY.PTAK; controls.enabled=true; ustawKrycieWidoku?.(.42); odswiezPanel(); return; }
+      p.y = OCZY;
       const q = zapis ? new THREE.Quaternion().fromArray(zapis.obr) : camera.quaternion.clone();
       const cel = p.clone().add(new THREE.Vector3(0, 0, -260).applyQuaternion(q));
       lec(p, cel, PODEJSCIE_MS, () => {
         camera.quaternion.copy(q); synchronizuj();
-        celOczu = wysokoscOczu = p.y;
+        celOczu = wysokoscOczu = OCZY;
       });
       if(nowy === TRYBY.SPACER) zablokujWskaznik();
     }else{
@@ -498,7 +504,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   function odswiezZnacznik(e){
     znacznik.visible = false; ostatnieTrafienie = null;
     przyNajechaniu?.(null);
-    if(tryb !== TRYBY.ORBITA || animacja) return;
+    if((tryb !== TRYBY.ORBITA && tryb !== TRYBY.PTAK) || animacja) return;
     naprawKamere(); camera.updateMatrixWorld();
     const r = plotno.getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) return;
@@ -509,7 +515,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
       && t.object.name !== 'Pasek LED' && !t.object.userData?.interactiveHoverOutline);
     if(!trafienia.length) return;
     const pierwsze = trafienia[0];
-    const interaktywny = czyInteraktywne?.(pierwsze.object);
+    const interaktywny = tryb === TRYBY.PTAK ? null : czyInteraktywne?.(pierwsze.object);
     if(interaktywny){
       ostatnieTrafienie = pierwsze.object;
       przyNajechaniu?.(interaktywny);
@@ -533,9 +539,39 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     znacznik.visible = true; celPodejscia.copy(cel);
     kameraZnacznika.copy(camera.position); obrotZnacznika.copy(camera.quaternion);
   }
+  function zejdzZPtakaDo(cel){
+    if(tryb !== TRYBY.PTAK) return false;
+    zatrzymajRuch();
+      const zapis = widokPrzedPtakiem;
+      const q = zapis ? new THREE.Quaternion().fromArray(zapis.obr).normalize()
+                      : new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 0, 0, 'YXZ'));
+      cel.y = OCZY;
+      stopy.set(cel.x, 0, cel.z);
+      celOczu = wysokoscOczu = OCZY;
+      tryb = TRYBY.ORBITA;
+      controls.enabled = false;
+      ustawKrycieWidoku?.(1);
+      const patrzNa = cel.clone().add(new THREE.Vector3(0, 0, -260).applyQuaternion(q));
+      lec(cel, patrzNa, PODEJSCIE_MS, () => {
+        camera.quaternion.copy(q);
+        synchronizuj();
+        celOczu = wysokoscOczu = OCZY;
+        odswiezPanel();
+      });
+      znacznik.visible = false;
+      zdarzenia.pointAndGo++;
+      odswiezPanel();
+      return true;
+  }
+  function teleportujZPtaka(punkt){
+    if(tryb !== TRYBY.PTAK || !punkt) return false;
+    const wolne = najblizszeWolne(punkt.x, punkt.z);
+    return !!wolne && zejdzZPtakaDo(new THREE.Vector3(wolne.x, OCZY, wolne.z));
+  }
   function podejdzDoZnacznika(){
     if(!znacznik.visible) return false;
     const cel = celPodejscia.clone();
+    if(tryb === TRYBY.PTAK) return zejdzZPtakaDo(cel);
     zatrzymajRuch();
     animacja = {odP: camera.position.clone(), doP: cel,
       uplynelo: 0, czas: PODEJSCIE_MS, tylkoPozycja: true,
@@ -550,14 +586,19 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   plotno.addEventListener('pointerdown', e => {
     if(e.button !== 0 || e.isPrimary === false) return;
     plotno.focus({preventScroll: true});
-    if(tryb === TRYBY.PTAK) return;
     wcisniety = true; ruszyl = false; pointerId = e.pointerId;
     ostX = startX = e.clientX; ostY = startY = e.clientY;
     odswiezZnacznik(e);
     try{ plotno.setPointerCapture?.(e.pointerId); }catch(err){}
   });
   plotno.addEventListener('pointermove', e => {
-    if(tryb === TRYBY.PTAK || e.isPrimary === false) return;
+    if(e.isPrimary === false) return;
+    if(tryb === TRYBY.PTAK){
+      if(wcisniety && e.pointerId === pointerId){
+        if(Math.hypot(e.clientX-startX,e.clientY-startY) >= 3){ ruszyl = true; znacznik.visible = false; }
+      }else odswiezZnacznik(e);
+      return;
+    }
     if(tryb === TRYBY.SPACER && document.pointerLockElement === plotno){ patrz(e,true); return; }
     if(wcisniety && e.pointerId === pointerId){
       if(!ruszyl && Math.hypot(e.clientX-startX,e.clientY-startY) < 3) return;
@@ -575,10 +616,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   plotno.addEventListener('lostpointercapture', () => { if(wcisniety) anulujWskaznik(); });
   plotno.addEventListener('pointerleave', () => { znacznik.visible=false; przyNajechaniu?.(null); });
   plotno.addEventListener('click', e => {
-    if(e.button !== 0 || tryb === TRYBY.PTAK || animacja || wcisniety || ruszyl) return;
+    if(e.button !== 0 || animacja || wcisniety || ruszyl) return;
     if(tryb === TRYBY.SPACER){ if(document.pointerLockElement !== plotno) zablokujWskaznik(); return; }
     odswiezZnacznik(e); // klik/tap bez wcześniejszego hoveru też wyznacza cel
-    if(ostatnieTrafienie && przyKlikniecie?.(ostatnieTrafienie)){ znacznik.visible=false; return; }
+    if(tryb !== TRYBY.PTAK && ostatnieTrafienie && przyKlikniecie?.(ostatnieTrafienie)){ znacznik.visible=false; return; }
     podejdzDoZnacznika();
   });
 
@@ -695,11 +736,68 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
      opacity:0;transition:opacity .2s;pointer-events:none}
    #celownik::before,#celownik::after{content:'';position:absolute;background:#fff;box-shadow:0 0 2px #0009}
    #celownik::before{left:7px;top:0;width:2px;height:16px}
-   #celownik::after{top:7px;left:0;height:2px;width:16px}`;
+   #celownik::after{top:7px;left:0;height:2px;width:16px}
+   #joystickRuchu{display:none;position:fixed;left:max(18px,env(safe-area-inset-left));
+     bottom:max(20px,env(safe-area-inset-bottom));width:116px;height:116px;border-radius:50%;
+     z-index:24;touch-action:none;user-select:none;-webkit-user-select:none;
+     border:2px solid #fff;background:#25241f42;box-shadow:0 2px 14px #0007,inset 0 0 0 1px #0005}
+   #joystickRuchu .galka{position:absolute;left:50%;top:50%;width:48px;height:48px;
+     margin:-24px;border-radius:50%;background:#fff;border:2px solid #25241f99;
+     box-shadow:0 2px 8px #0008;pointer-events:none;will-change:transform}
+   @media (hover:none) and (pointer:coarse){#joystickRuchu{display:block}}
+   #joystickRuchu[hidden]{display:none!important}`;
   document.head.append(styl);
   const celownik = document.createElement('div');
   celownik.id = 'celownik';
   document.body.append(celownik);
+
+  /* Analogowy joystick jest widoczny tylko na urządzeniach dotykowych.
+     Używa tej samej prędkości i tych samych kolizji co WASD. */
+  const joystickEl = document.createElement('div');
+  joystickEl.id = 'joystickRuchu';
+  joystickEl.setAttribute('role', 'application');
+  joystickEl.setAttribute('aria-label', 'Joystick poruszania po mieszkaniu');
+  joystickEl.innerHTML = '<div class="galka"></div>';
+  document.body.append(joystickEl);
+  const galkaJoystick = joystickEl.firstElementChild;
+  let joystickPointer = null;
+  function wyzerujJoystick(){
+    joystick.x = joystick.y = 0;
+    if(galkaJoystick) galkaJoystick.style.transform = '';
+    joystickPointer = null;
+  }
+  function ustawJoystick(e){
+    const r = joystickEl.getBoundingClientRect();
+    let x = (e.clientX - (r.left + r.width/2)) / 38;
+    let y = (e.clientY - (r.top + r.height/2)) / 38;
+    const dl = Math.hypot(x, y);
+    if(dl > 1){ x /= dl; y /= dl; }
+    const sila = Math.hypot(x, y);
+    if(sila < .12){ x = y = 0; }
+    else{
+      const skala = (sila - .12) / (.88 * sila);
+      x *= skala; y *= skala;
+    }
+    joystick.x = x; joystick.y = y;
+    galkaJoystick.style.transform = `translate(${(x*34).toFixed(1)}px,${(y*34).toFixed(1)}px)`;
+    odswiezPanel();
+  }
+  joystickEl.addEventListener('pointerdown', e => {
+    if(e.isPrimary === false || tryb === TRYBY.PTAK) return;
+    e.preventDefault(); e.stopPropagation();
+    joystickPointer = e.pointerId;
+    joystickEl.setPointerCapture?.(e.pointerId);
+    ustawJoystick(e);
+  });
+  joystickEl.addEventListener('pointermove', e => {
+    if(e.pointerId !== joystickPointer) return;
+    e.preventDefault(); e.stopPropagation(); ustawJoystick(e);
+  });
+  for(const typ of ['pointerup','pointercancel','lostpointercapture'])
+    joystickEl.addEventListener(typ, e => {
+      if(joystickPointer !== null && e.pointerId !== undefined && e.pointerId !== joystickPointer) return;
+      e.preventDefault?.(); e.stopPropagation?.(); wyzerujJoystick();
+    });
 
   let sposobPatrzenia = 'klik = podejdź · przeciągnij = rozejrzyj się';
   function wskazowka(przeciaganie){
@@ -709,6 +807,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     odswiezPanel();
   }
   function odswiezPanel(){
+    if(joystickEl) joystickEl.hidden = tryb === TRYBY.PTAK;
     przyZmianie?.({tryb, kolizje, sposobPatrzenia, wysokoscOczu: Math.round(celOczu)});
   }
 
@@ -818,6 +917,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     synchronizuj();
     if(start) zapiszStan();
   }
+  joystickEl.hidden = tryb === TRYBY.PTAK;
   addEventListener('pagehide', zapiszStan);
   addEventListener('visibilitychange', () => { if(document.hidden){ zapiszStan(); zatrzymajRuch(); anulujWskaznik(); } });
 
@@ -838,7 +938,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
       while(resztaKroku + 1e-9 >= 1/60){ krok(1/60); resztaKroku -= 1/60; }
     }
     else if(controls.enabled && !animacja) controls.update();
-    znacznik.visible = znacznik.visible && tryb === TRYBY.ORBITA && !animacja
+    znacznik.visible = znacznik.visible && (tryb === TRYBY.ORBITA || tryb === TRYBY.PTAK) && !animacja
       && kameraZnacznika.distanceToSquared(camera.position) < .0001
       && Math.abs(obrotZnacznika.dot(camera.quaternion)) > .999999;
     if(sufit) sufit.visible = camera.position.y < APARTMENT.height - 6;
@@ -859,8 +959,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, zmienWysokoscOczu, przelaczKolizje, naprawKamere,
           ustawWidok, kadrujMebel, synchronizuj, rysujZnacznik,
-          podejdz, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
-          diagnostyka:()=>({tryb,kolizje,wznowiono,zdarzenia:{...zdarzenia},
+          podejdz, teleportujZPtaka, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
+          diagnostyka:()=>({tryb,kolizje,wznowiono,joystick:{...joystick},zdarzenia:{...zdarzenia},
             pozycja:camera.position.toArray().map(v=>+v.toFixed(2))}),
           get tryb(){ return tryb; }, get kolizje(){ return kolizje; },
           get wysokoscOczu(){ return Math.round(celOczu); }};

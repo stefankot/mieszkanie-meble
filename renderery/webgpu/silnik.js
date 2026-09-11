@@ -22,6 +22,7 @@ import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 import { taau } from 'three/addons/tsl/display/TAAUNode.js';
 import { sharpen } from 'three/addons/tsl/display/SharpenNode.js';
 import { traa } from 'three/addons/tsl/display/TRAANode.js';
+import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 import { dodajSuwakiJakosci } from './suwaki-jakosci.js';
 import { ustawWariacjeKoloru } from './niedoskonalosci.js';
 import { temporalReproject } from 'three/addons/tsl/display/TemporalReprojectNode.js';
@@ -32,7 +33,7 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
-import { utworzNawigacje } from './nawigacja.js?p18d';
+import { utworzNawigacje } from './nawigacja.js?mobile-nav-v1';
 import { utworzSterowanie } from './sterowanie.js?default-c';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
@@ -46,13 +47,13 @@ import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js?d
 import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 import { createPhotoPathIntegration } from './photo-path.js';
-import { runNavigationRegression } from './navigation-regression.js?p18b';
+import { runNavigationRegression } from './navigation-regression.js?mobile-top-v1';
 import { wlaczone } from './flagi.js';
 import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
-import { utworzHoverOutline } from './hover-outline.js';
+import { utworzHoverOutline } from './hover-outline.js?silhouette-v1';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -769,6 +770,7 @@ const materialBazowy = {
   wood:(w,h,kolor)=>{ const m = MAT.maDrewno ? MAT.drewno(w,h,kolor) : board(0xdddddd,w,h);
     m.userData.kolorDrewna = kolor; return m; },   // P29: kolor regału dla ramy łóżka
   white:(w,h,kolor)=> MAT.lakier(kolor || 0xefe9d8, w, h),
+  solid:(w,h,kolor)=> MAT.lakier(kolor || 0x7b2f34, w, h),
   graphite:(w,h)=>board(0x33363b,w,h,34),
   peg:(w,h)=>pegMaterial(w,h),
   fabric:(w,h,color='#c9c04f',profile)=>{const m=fabricMaterial(color,undefined,{profile});setUV(m,w,h);return m;},
@@ -921,7 +923,7 @@ interakcje = utworzInterakcje({
   przyZmianie: () => { odswiezCien(); }
 });
 window.__silnik.interakcje = interakcje;
-const hoverOutline = utworzHoverOutline({THREE});
+const hoverOutline = utworzHoverOutline({outline, uniform, scena:scene, camera});
 window.__silnik.hoverOutline = hoverOutline;
 
 nawigacja = utworzNawigacje({THREE, camera, controls, renderer, plan: PLAN, biblioteka, scena: scene, sufit,
@@ -938,7 +940,7 @@ nawigacja = utworzNawigacje({THREE, camera, controls, renderer, plan: PLAN, bibl
                                }
                                return null;
                              },
-                             przyNajechaniu: o => hoverOutline.ustaw(o),
+                             przyNajechaniu: o => { if(hoverOutline.ustaw(o)) oznaczZmiane(); },
                              przyKlikniecie: o => zaslony.kliknij(o) || interakcje.kliknij(o)});
 skalujUVMebli(biblioteka);
 /* LED-y wykrywane są promieniami po froncie mebla — odkładamy to na po
@@ -1232,7 +1234,11 @@ function wyjscieDla(poziom){
      P36: jitter TRAA uśrednia słój w obrębie piksela — RCAS 0,4 przywraca jego kontrast (zrzut vs SMAA). */
   /* P37: siła wyostrzania jako wspólny uniform — suwak w panelu zmienia ją bez rekompilacji. */
   wyjscieDla.ostrosc ??= uniform(+(new URLSearchParams(location.search).get('ostrosc') ?? .4));
-  const wynik = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, wyjscieDla.ostrosc) : aa);
+  const poAA = gradacja(temporal && wlaczone('wyostrz') ? sharpen(aa, wyjscieDla.ostrosc) : aa);
+  /* OutlineNode r185 tworzy maskę całego wskazanego Object3D. edgeGlow=0 i
+     downSampleRatio=1 dają zwarty biały kontur 3 px bez krawędzi siatki. */
+  const bialyObrys = vec3(hoverOutline.wezel.visibleEdge).mul(3);
+  const wynik = vec4(poAA.rgb.add(bialyObrys), poAA.a);
   zbudowane.set(klucz, wynik);
   return wynik;
 }

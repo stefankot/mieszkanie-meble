@@ -53,6 +53,10 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     nav.ustawTryb(nav.TRYBY.PTAK);
     for(let i=0;i<170;i++) nav.aktualizuj(1/60);
     results.topView=nav.tryb===nav.TRYBY.PTAK && camera.position.y>300;
+    const topAccepted=nav.teleportujZPtaka({x:startPos.x,z:startPos.z});
+    for(let i=0;i<80;i++) nav.aktualizuj(1/60);
+    results.topTeleport=topAccepted && nav.tryb===nav.TRYBY.ORBITA
+      && Math.abs(camera.position.y-167)<.6;
 
     const target=startPos.clone().add(new THREE.Vector3(0,0,-260).applyQuaternion(startQ));
     nav.ustawWidok(startPos,target); camera.quaternion.copy(startQ); nav.synchronizuj();
@@ -67,7 +71,7 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     if(nav.kolizje!==startCollisions) nav.przelaczKolizje();
     if(nav.tryb!==startMode && startMode!==nav.TRYBY.PTAK) nav.ustawTryb(startMode,{wymus:true,punkt:startPos});
   }
-  results.pass=['twoFingerLook','pinchDrive','dragLook','wasd','arrows','pointAndGoEngine','collisions','topView','stateSave']
+  results.pass=['twoFingerLook','pinchDrive','dragLook','wasd','arrows','pointAndGoEngine','collisions','topView','topTeleport','stateSave']
     .every(k=>results[k]===true);
   return results;
 }

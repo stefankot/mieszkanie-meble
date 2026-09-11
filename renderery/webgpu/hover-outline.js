@@ -1,31 +1,25 @@
-/* Biały obrys jest tworzony tylko dla aktualnie wskazanego elementu.
-   Geometrie krawędzi są cache'owane według współdzielonego BufferGeometry. */
-export function utworzHoverOutline({THREE}){
-  const cache = new WeakMap();
-  const material = new THREE.LineBasicMaterial({color:0xffffff, transparent:true,
-    opacity:.96, depthTest:false, depthWrite:false, toneMapped:false});
-  let aktywny = null, linie = [];
+/* Ekranowy obrys zaznaczenia z oficjalnego OutlineNode Three.js r185.
+   Maska scala wszystkie siatki ruchomej części, więc widać wyłącznie jej
+   sylwetkę — bez triangulacji i wewnętrznych krawędzi EdgesGeometry. */
+export function utworzHoverOutline({outline, uniform, scena, camera}){
+  const zaznaczone = [];
+  const wezel = outline(scena, camera, {
+    selectedObjects: zaznaczone,
+    edgeThickness: uniform(3),
+    edgeGlow: uniform(0),
+    downSampleRatio: 1
+  });
+  let aktywny = null;
 
-  function wyczysc(){
-    for(const linia of linie) linia.removeFromParent();
-    linie = []; aktywny = null;
-  }
   function ustaw(obiekt){
-    if(obiekt === aktywny) return;
-    wyczysc();
-    if(!obiekt) return;
-    aktywny = obiekt;
-    obiekt.traverse?.(mesh => {
-      if(!mesh.isMesh || !mesh.geometry || mesh.userData?.interactiveHoverOutline) return;
-      let geo = cache.get(mesh.geometry);
-      if(!geo){ geo = new THREE.EdgesGeometry(mesh.geometry, 24); cache.set(mesh.geometry, geo); }
-      const linia = new THREE.LineSegments(geo, material);
-      linia.name = 'Obrys interakcji';
-      linia.userData.interactiveHoverOutline = true;
-      linia.renderOrder = 10000;
-      linia.scale.setScalar(1.002);
-      mesh.add(linia); linie.push(linia);
-    });
+    if(obiekt === aktywny) return false;
+    zaznaczone.length = 0;
+    aktywny = obiekt || null;
+    if(aktywny) zaznaczone.push(aktywny);
+    return true;
   }
-  return {ustaw, wyczysc, get aktywny(){ return aktywny; }};
+  function wyczysc(){ return ustaw(null); }
+
+  return {wezel, zaznaczone, ustaw, wyczysc,
+          get aktywny(){ return aktywny; }};
 }
