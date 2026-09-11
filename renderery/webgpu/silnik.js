@@ -770,7 +770,10 @@ const materialBazowy = {
   wood:(w,h,kolor)=>{ const m = MAT.maDrewno ? MAT.drewno(w,h,kolor) : board(0xdddddd,w,h);
     m.userData.kolorDrewna = kolor; return m; },   // P29: kolor regału dla ramy łóżka
   white:(w,h,kolor)=> MAT.lakier(kolor || 0xefe9d8, w, h),
-  solid:(w,h,kolor)=> MAT.lakier(kolor || 0x7b2f34, w, h),
+  solid:(w,h,kolor)=>{ const m = new THREE.MeshPhysicalNodeMaterial({
+    color:kolor || 0x7b2f34, roughness:.88, metalness:0,
+    clearcoat:0, clearcoatRoughness:1, envMapIntensity:.65
+  }); m.name='Kolor solid mat'; return m; },
   graphite:(w,h)=>board(0x33363b,w,h,34),
   peg:(w,h)=>pegMaterial(w,h),
   fabric:(w,h,color='#c9c04f',profile)=>{const m=fabricMaterial(color,undefined,{profile});setUV(m,w,h);return m;},
