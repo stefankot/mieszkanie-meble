@@ -22,11 +22,11 @@ import { realizujMiekkaGeometrie, stanyMiekkiejGeometrii,
          statystykiCacheMiekkiejGeometrii } from './soft-geometry.js';
 import { utworzDraperie } from './draperia.js';
 import { wlaczone } from './flagi.js';
+import { wyznaczScianyZaslon } from './uklad-zaslon.mjs';
 
 const DO_PODLOGI = 0;        // tkanina sięga do podłogi
 const FALDY = 9;
 const GLEBOKOSC_FALDY = 5;   // amplituda ±5 cm: łącznie 10 cm
-const OD_SCIANY = 16;        // odległość osi tkaniny od ściany salonu
 const CZAS_MS = 900;
 
 const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
@@ -79,32 +79,6 @@ function materialGlasort(THREE){
 
 /* Odczyt zatwierdzonego planu: szerokość to cała wewnętrzna ściana pokoju.
    Zewnętrzne końce otworów wyznaczają dokładne pasy parkowania tkaniny. */
-export function wyznaczScianyZaslon(plan){
-  const {APARTMENT:a}=plan;
-  const otwory=[...a.windows,...a.doors.filter(o=>o.name==='Drzwi balkonowe')];
-  const wynik=[];
-  for(const pokoj of a.rooms){
-    const salon=pokoj.name==='Salon';
-    const sypialnia=pokoj.name==='Pokój' && Math.min(...pokoj.polygon.map(p=>p[1]))>500;
-    if(!salon && !sypialnia) continue;
-    const xs=pokoj.polygon.map(p=>p[0]),zs=pokoj.polygon.map(p=>p[1]);
-    const minX=Math.min(...xs),maxX=Math.max(...xs),od=Math.min(...zs),doZ=Math.max(...zs);
-    const xSciany=salon?maxX:minX;
-    const pasujace=otwory.filter(o=>{
-      const [x,z,w,h]=o.rect;
-      return w<h && Math.min(Math.abs(x-xSciany),Math.abs(x+w-xSciany))<.01 && z>=od && z+h<=doZ;
-    }).sort((a,b)=>a.rect[1]-b.rect[1]);
-    if(!pasujace.length) continue;
-    const poczatek=Math.min(...pasujace.map(o=>o.rect[1]));
-    const koniec=Math.max(...pasujace.map(o=>o.rect[1]+o.rect[3]));
-    wynik.push({id:salon?'salon':'sypialnia',nazwa:salon?'Salon':'Sypialnia',
-      rodzaj:salon?'MAJGUL':'GLASÖRT',pary:salon?3:1,
-      x:xSciany+(salon?-OD_SCIANY:8),xSciany,od,do:doZ,
-      szerokosc:doZ-od,pasStart:poczatek-od,pasKoniec:doZ-koniec,otwory:pasujace});
-  }
-  return wynik;
-}
-
 export function utworzZaslony({THREE, scena, plan, przyZmianie}){
   const majgul=materialMajgul(THREE),glasort=materialGlasort(THREE);
   const zestawy=[],sciany=[],obserwatorzy=new Set();

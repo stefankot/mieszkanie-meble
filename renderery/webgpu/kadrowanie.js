@@ -1,3 +1,5 @@
+import {DEFAULT_EYE_HEIGHT_CM} from './navigation-config.mjs';
+
 /* Wyłącznie odczyt planu i biblioteki; pozycje/meble pozostają bez zmian. */
 export function utworzKadrowanie({THREE, plan, biblioteka}){
   const promien = 20;
@@ -77,7 +79,8 @@ export function utworzKadrowanie({THREE, plan, biblioteka}){
     for(const kat of [0,-15,15,-30,30,-45,45,-60,60]){
       const kier=front.clone().applyAxisAngle(new THREE.Vector3(0,1,0),kat*Math.PI/180);
       for(let d=30;d<=zasieg;d+=10){
-        const p=c.clone().addScaledVector(kier,d);p.y=THREE.MathUtils.clamp(c.y,60,maxOczy);
+        const p=c.clone().addScaledVector(kier,d);
+        p.y=THREE.MathUtils.clamp(DEFAULT_EYE_HEIGHT_CM,60,maxOczy);
         if(pokoj && plan.roomAt(p.x,p.z)!==pokoj) continue;
         if(!wolne(p) || !widocznyCel(p,c,korzen)) continue;
         probna.position.copy(p);probna.lookAt(c);probna.updateMatrixWorld(true);

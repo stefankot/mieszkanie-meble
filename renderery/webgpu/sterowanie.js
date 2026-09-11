@@ -146,8 +146,8 @@ export function utworzSterowanie(api){
         <input id="gOkna" type="range" min="0" max="200" step="5" value="100"></div>
       <div class="suwak"><div class="naglowek"><label for="gSlonce">Słońce</label><output id="gSlonceVal">100%</output></div>
         <input id="gSlonce" type="range" min="0" max="200" step="5" value="100"></div>
-      <div class="suwak"><div class="naglowek"><label for="gKule">Kule sufitowe</label><output id="gKuleVal">30%</output></div>
-        <input id="gKule" type="range" min="0" max="200" step="5" value="30"></div>
+      <div class="suwak"><div class="naglowek"><label for="gKule">Kule sufitowe</label><output id="gKuleVal">0%</output></div>
+        <input id="gKule" type="range" min="0" max="200" step="5" value="0"></div>
       <label class="pole"><input type="checkbox" id="animacjaTla" checked>Animacja tła (wiatr w koronach)</label>
       <label class="pole"><input type="checkbox" id="cienLisci">Cień liści na ścianach (komorebi)</label>
     </section>
@@ -564,7 +564,7 @@ export function utworzSterowanie(api){
      drogą co ruch suwaka. Nie ma więc drugiej ścieżki stosowania ustawień,
      która mogłaby się rozjechać z pierwszą. */
   const KLUCZ_UST = 'mieszkanie-webgpu:ustawienia:1';
-  const PROFIL_SWIATLA = 'sezony-1';
+  const PROFIL_SWIATLA = 'daylight-2';
   const PROFIL_AA = 'p25-taau';   // P25: jednorazowo przełącza zapisane SMAA na TAAU
   const PROFIL_RENDER = 'candidate-c-1';
   const kontrolki = () => [...el.querySelectorAll('input, select')];
@@ -592,7 +592,7 @@ export function utworzSterowanie(api){
     // Jednorazowo zastosuj uzgodnione światło; zachowaj pozostałe ustawienia.
     if(d.profilSwiatla !== PROFIL_SWIATLA){
       Object.assign(d.pola, {presetSwiatla:DOMYSLNY_PRESET_SWIATLA, cieplo:'45',
-        rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'30'});
+        rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'0'});
     }
     for(const k of kontrolki()){
       if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || !(k.id in d.pola)) continue;

@@ -1,4 +1,4 @@
-import { utworzKadrowanie } from './kadrowanie.js';
+import { utworzKadrowanie } from './kadrowanie.js?eye-167-v1';
 import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js?turn-v2';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 

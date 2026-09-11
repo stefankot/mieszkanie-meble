@@ -33,14 +33,14 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js?zp3-v1';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
-import { utworzNawigacje } from './nawigacja.js?turn-v2';
-import { utworzSterowanie } from './sterowanie.js?light-presets-v1';
+import { utworzNawigacje } from './nawigacja.js?frame-eye-v3';
+import { utworzSterowanie } from './sterowanie.js?daylight-v2';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
 import { skrzywFormatki } from './niedoskonalosci.js';
 import { postep, koniecPomiaru } from './siec.js';
 import { utworzInterakcje } from './interakcje.js';
-import { utworzZaslony } from './zaslony.js';
+import { utworzZaslony } from './zaslony.js?mirror-v2';
 import { audytMrt } from './mrt-audit.js';
 import { utworzWorldGI, wybierzWorldGI } from './world-gi.js';
 import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js?default-c';
@@ -55,6 +55,7 @@ import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 import { utworzHoverOutline } from './hover-outline.js?silhouette-v1';
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
+import {modelSwiatlaDziennego} from './model-swiatla-dziennego.mjs';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -660,27 +661,32 @@ window.__silnik.krycie = {ustawKrycieMieszkania, ustawKrycieWidoku};
 const ODN = {wysokosc: Math.sin(THREE.MathUtils.degToRad(27.1)), rozproszenie: .72};
 const BAZA = {slonce: 6, okno: 6, hemi: .27};
 const ZIMNE = new THREE.Color(0xdbe7ff), CIEPLE = new THREE.Color(0xffd9a6);
-const swiatlo = {cieplo: .45, rozproszenie: .90, okna: 1, slonce: 1, kule: .30};
+const DZIEN = new THREE.Color(0xeaf2ff), NISKIE_SLONCE = new THREE.Color(0xffa05c);
+const swiatlo = {cieplo: .45, rozproszenie: .90, okna: 1, slonce: 1, kule: 0};
 
 function przeliczSwiatlo(){
   const {cieplo, rozproszenie} = swiatlo;
-  const barwa = ZIMNE.clone().lerp(CIEPLE, cieplo);
+  const pora=modelSwiatlaDziennego(wysokoscSlonca,chwila.getHours()+chwila.getMinutes()/60);
+  const barwaNaturalna=NISKIE_SLONCE.clone().lerp(DZIEN,1-pora.cieploNaturalne);
+  const barwa=barwaNaturalna.lerp(ZIMNE.clone().lerp(CIEPLE,cieplo),.28);
   /* Nocą słońce gaśnie; miękkość zabiera mu moc i oddaje ją niebu oraz oknom,
      tak jak „Rozproszenie" w wersji WebGL. */
   const nadHoryzontem = Math.max(0, Math.sin(wysokoscSlonca));
   const tlumienie = (1 - .55*rozproszenie) / (1 - .55*ODN.rozproszenie);
   slonce.color.copy(barwa);
-  slonce.intensity = BAZA.slonce * swiatlo.slonce * (nadHoryzontem/ODN.wysokosc) * tlumienie;
+  const wysokoscWzgledna=Math.min(1.25,nadHoryzontem/ODN.wysokosc);
+  slonce.intensity = BAZA.slonce * swiatlo.slonce * wysokoscWzgledna
+    * pora.widocznoscSlonca * tlumienie;
   /* Przy VSM promień to realne rozmycie mapy, więc suwak rozproszenia
      steruje wielkością półcienia — od ostrego słońca po zachmurzenie. */
   slonce.shadow.radius = 6 + 30*rozproszenie;   // mocne rozmycie: cętki liści mają się zlewać
-  niebieskie.intensity = BAZA.hemi * (1 + 3*rozproszenie);
+  niebieskie.intensity = BAZA.hemi * (1 + 3*rozproszenie) * pora.jasnoscNieba;
   /* Moc ustawiamy na GNIAZDACH, nie na światłach: pula nadpisuje własne wartości
      przy każdym przestawieniu, więc ustawienie wprost na źródle znikałoby
      przy najbliższym ruchu kamery. */
   for(const g of gniazdaOkien){
     g.kolor.copy(barwa);
-    g.moc = BAZA.okno * swiatlo.okna * (1 + .5*rozproszenie);
+    g.moc = BAZA.okno * swiatlo.okna * (1 + .5*rozproszenie) * pora.jasnoscNieba;
   }
   pulaOkien.aktualizuj(camera, true);
   /* Świecą dwie lampy z siedmiu — pozostałe są w pokojach zza ściany, ale te
@@ -689,6 +695,14 @@ function przeliczSwiatlo(){
   pulaLamp.aktualizuj(camera, true);
   odswiezLuny(camera, true);
   materialZarowki.emissiveIntensity = 6 * swiatlo.kule;
+  scene.environmentIntensity=.34*pora.jasnoscNieba;
+  scene.backgroundIntensity=.05+.95*pora.jasnoscNieba;
+  materialNieba.color.setRGB(
+    .025+(2.6-.025)*pora.jasnoscNieba,
+    .035+(2.55-.035)*pora.jasnoscNieba,
+    .075+(2.4-.075)*pora.jasnoscNieba);
+  if(scene.background?.isColor) scene.background.setRGB(
+    .025+.86*pora.jasnoscNieba,.035+.87*pora.jasnoscNieba,.065+.88*pora.jasnoscNieba);
   odswiezCien();
 }
 
@@ -731,6 +745,7 @@ async function wczytajSrodowiskoPozniej(){
     if(odbiciaModern && srodowisko.hdr) odbiciaModern.setEnvMap(srodowisko.hdr);
     TU?.ustawSrodowisko(scene);   // P29: stal odbija HDRI z własnym natężeniem
     if(tloHdri) niebo.visible = false;
+    przeliczSwiatlo();
   }catch(e){
     usterki.push('HDRI: ' + e.message + ' — zapasowe środowisko proceduralne');
     try{
@@ -751,6 +766,7 @@ async function wczytajSrodowiskoPozniej(){
       scene.environment = pmrem.fromScene(sc, 0.02, 1, 900).texture;
       scene.environmentIntensity = 0.35;
       pmrem.dispose();
+      przeliczSwiatlo();
     }catch(e2){ usterki.push('PMREM zapasowy: ' + e2.message); }
   }
 }
