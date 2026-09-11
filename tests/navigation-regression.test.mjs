@@ -8,5 +8,7 @@ assert.equal(NAV_KEY_MAP.KeyW,NAV_KEY_MAP.ArrowUp);
 assert.equal(NAV_KEY_MAP.KeyA,NAV_KEY_MAP.ArrowLeft);
 assert.equal(NAV_KEY_MAP.KeyS,NAV_KEY_MAP.ArrowDown);
 assert.equal(NAV_KEY_MAP.KeyD,NAV_KEY_MAP.ArrowRight);
+assert.equal(NAV_KEY_MAP.ArrowLeft,'obrotLewo');
+assert.equal(NAV_KEY_MAP.ArrowRight,'obrotPrawo');
 assert.equal(DEFAULT_EYE_HEIGHT_CM,167);
-console.log('navigation-regression: 7 assertions passed');
+console.log('navigation-regression: 9 assertions passed');

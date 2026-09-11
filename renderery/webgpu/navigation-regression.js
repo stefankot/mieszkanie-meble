@@ -1,6 +1,6 @@
 export const NAV_KEY_MAP=Object.freeze({
   KeyW:'przod', ArrowUp:'przod', KeyS:'tyl', ArrowDown:'tyl',
-  KeyA:'lewo', ArrowLeft:'lewo', KeyD:'prawo', ArrowRight:'prawo'
+  KeyA:'obrotLewo', ArrowLeft:'obrotLewo', KeyD:'obrotPrawo', ArrowRight:'obrotPrawo'
 });
 
 export function classifyTrackpadGesture(event){
@@ -29,9 +29,16 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     results.pinchDrive=moved(p,camera.position);
 
     q=camera.quaternion.clone(); const c=center();
-    canvas.dispatchEvent(new PointerEvent('pointerdown',{pointerId:71,isPrimary:true,button:0,clientX:c.x,clientY:c.y,bubbles:true}));
-    canvas.dispatchEvent(new PointerEvent('pointermove',{pointerId:71,isPrimary:true,button:0,clientX:c.x+20,clientY:c.y+10,bubbles:true}));
-    canvas.dispatchEvent(new PointerEvent('pointerup',{pointerId:71,isPrimary:true,button:0,clientX:c.x+20,clientY:c.y+10,bubbles:true}));
+    /* Syntetyczny PointerEvent nie ma aktywnego systemowego wskaźnika. r185
+       OrbitControls wywołuje wtedy setPointerCapture(), więc na czas testu
+       zastępujemy wyłącznie tę metodę bez wpływu na prawdziwe gesty. */
+    const capture=canvas.setPointerCapture, release=canvas.releasePointerCapture;
+    try{
+      canvas.setPointerCapture=()=>{}; canvas.releasePointerCapture=()=>{};
+      canvas.dispatchEvent(new PointerEvent('pointerdown',{pointerId:71,isPrimary:true,button:0,clientX:c.x,clientY:c.y,bubbles:true}));
+      canvas.dispatchEvent(new PointerEvent('pointermove',{pointerId:71,isPrimary:true,button:0,clientX:c.x+20,clientY:c.y+10,bubbles:true}));
+      canvas.dispatchEvent(new PointerEvent('pointerup',{pointerId:71,isPrimary:true,button:0,clientX:c.x+20,clientY:c.y+10,bubbles:true}));
+    }finally{canvas.setPointerCapture=capture;canvas.releasePointerCapture=release;}
     results.dragLook=rotated(q,camera.quaternion);
 
     p=camera.position.clone();
@@ -39,11 +46,12 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     for(let i=0;i<20;i++) nav.aktualizuj(1/60);
     dispatchEvent(new KeyboardEvent('keyup',{code:'KeyW',bubbles:true}));
     results.wasd=moved(p,camera.position);
-    p=camera.position.clone();
+    nav.synchronizuj(); // usuń bezwładność W przed izolowanym pomiarem obrotu
+    p=camera.position.clone(); q=camera.quaternion.clone();
     dispatchEvent(new KeyboardEvent('keydown',{code:'ArrowRight',bubbles:true}));
     for(let i=0;i<20;i++) nav.aktualizuj(1/60);
     dispatchEvent(new KeyboardEvent('keyup',{code:'ArrowRight',bubbles:true}));
-    results.arrows=moved(p,camera.position);
+    results.arrows=rotated(q,camera.quaternion) && !moved(p,camera.position);
 
     p=camera.position.clone();
     const accepted=nav.podejdz({x:p.x+140,z:p.z+90},120);

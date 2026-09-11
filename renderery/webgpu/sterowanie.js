@@ -217,7 +217,8 @@ export function utworzSterowanie(api){
       <p class="uwaga" id="navigationRegressionInfo"></p>
       <h3>Skróty</h3>
       <dl>
-        <div><dt><kbd>W A S D</kbd></dt><dd>Chodzenie</dd></div>
+        <div><dt><kbd>W S</kbd></dt><dd>Przód / tył</dd></div>
+        <div><dt><kbd>A D</kbd> / <kbd>← →</kbd></dt><dd>Obrót kamery</dd></div>
         <div><dt><kbd>Shift</kbd> / <kbd>Spacja</kbd></dt><dd>Bieg / skok</dd></div>
         <div><dt><kbd>Q</kbd> <kbd>E</kbd> / <kbd>C</kbd></dt><dd>Wysokość oczu / kucanie</dd></div>
         <div><dt><kbd>F</kbd> <kbd>O</kbd> <kbd>B</kbd></dt><dd>Spacer / rozglądanie / z góry</dd></div>

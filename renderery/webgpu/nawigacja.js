@@ -1,5 +1,5 @@
 import { utworzKadrowanie } from './kadrowanie.js';
-import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js';
+import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js?turn-v2';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 
 /* ============================================================
@@ -12,7 +12,7 @@ import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
    · JEDEN klik podchodzi w wskazane miejsce — nie dwuklik,
    · na poprawnym celu na podłodze ostre NIEBIESKIE kółko,
    · przeciąganie rozgląda kamerę i nigdy nie wywołuje podejścia,
-   · ←/→ przesuwają kamerę bokiem, jak A/D w OAKSUN; Q/E zmieniają wysokość,
+   · ←/→ oraz A/D obracają kamerę; Q/E zmieniają wysokość,
    · domyślna wysokość oczu 167 cm,
    · Point & Go trwa ~1 s i zachowuje kierunek patrzenia, zatrzymując się
      80 cm przed celem; przejście do pomieszczenia trwa 2,5 s i na końcu
@@ -28,6 +28,7 @@ const OCZY_KUCANIE = 95;
 const PROMIEN = 20;          // promień kolidera gracza [cm]
 const CZULOSC = .0013;       // [oaksun] st — rad na piksel
 const PITCH_MAX = Math.PI/3; // [oaksun] Kt — ±60°
+const PREDKOSC_OBROTU = 1.65; // rad/s przy pełnym wychyleniu lub klawiszu
 const TLUMIENIE = .92;       // [oaksun] dampening (na klatkę 60 Hz)
 /* Parametry ruchu przepisane wprost z demo (ie = {...}), przeliczone z metrów
    na centymetry. Kluczowy jest mechanizm, nie same liczby: prędkość NIE jest
@@ -136,7 +137,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
      ============================================================ */
   const eulerPom = new THREE.Euler(0, 0, 0, 'YXZ');
   let pochylenie = 0;                    // [oaksun] de
-  const kolumna = new THREE.Vector3(), bokWek = new THREE.Vector3(), kierunek = new THREE.Vector3();
+  const kolumna = new THREE.Vector3(), kierunek = new THREE.Vector3();
   const predkoscRuchu = new THREE.Vector3();   // [oaksun] w.velocity
   let biezacaSzybkosc = 0;                     // [oaksun] w.currentSpeed
 
@@ -180,27 +181,26 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   function krok(dt){
     dt = Math.min(dt, .05);
     const kr = dt * 60;                  // demo liczy na klatkę 60 Hz
+    const osPrzod = (klaw.przod ? 1 : 0) - (klaw.tyl ? 1 : 0) - joystick.y;
+    const osObrot = (klaw.obrotPrawo ? 1 : 0) - (klaw.obrotLewo ? 1 : 0) + joystick.x;
+    if(Math.abs(osObrot) > .04){
+      eulerPom.setFromQuaternion(camera.quaternion);
+      eulerPom.y -= osObrot * PREDKOSC_OBROTU * dt;
+      eulerPom.x = pochylenie;
+      camera.quaternion.setFromEuler(eulerPom);
+      znacznik.visible = false;
+    }
     camera.updateMatrix();
 
-    const osPrzod = (klaw.przod ? 1 : 0) - (klaw.tyl ? 1 : 0) - joystick.y;
-    const osBok = (klaw.prawo ? 1 : 0) - (klaw.lewo ? 1 : 0) + joystick.x;
-    const idzie = Math.abs(osPrzod) > .04 || Math.abs(osBok) > .04;
+    const idzie = Math.abs(osPrzod) > .04;
     if(idzie){
       kierunek.set(0, 0, 0);
-      if(Math.abs(osPrzod) > .04){
-        kolumna.setFromMatrixColumn(camera.matrix, 2);
-        kolumna.y = 0; kolumna.normalize();
-        kolumna.multiplyScalar(-osPrzod);
-        kierunek.add(kolumna);
-      }
-      if(Math.abs(osBok) > .04){
-        bokWek.setFromMatrixColumn(camera.matrix, 0);
-        bokWek.y = 0; bokWek.normalize();
-        bokWek.multiplyScalar(osBok);
-        kierunek.add(bokWek);
-      }
+      kolumna.setFromMatrixColumn(camera.matrix, 2);
+      kolumna.y = 0; kolumna.normalize();
+      kolumna.multiplyScalar(-osPrzod);
+      kierunek.add(kolumna);
       if(kierunek.length() > 0){
-        const sila = Math.min(1, Math.hypot(osPrzod, osBok));
+        const sila = Math.min(1, Math.abs(osPrzod));
         kierunek.normalize().multiplyScalar(sila);
         const m = kuca ? .5 : (klaw.bieg ? 2 : 1);
         biezacaSzybkosc = Math.min(biezacaSzybkosc + RUCH.acceleration*m*kr, RUCH.maxSpeed*m);
@@ -688,7 +688,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   });
 
   /* ---------- klawiatura ---------- */
-  /* Strzałki są tym samym co WSAD — tak jest w źródle demo. */
+  /* Strzałki odpowiadają WSAD: góra/dół idą, lewo/prawo obracają kamerę. */
   /* Brief: sterowanie musi działać po użyciu panelu — ale wpisywanie daty nie
      może jednocześnie poruszać kamerą. */
   const wPolu = () => {
@@ -754,11 +754,11 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   document.body.append(celownik);
 
   /* Analogowy joystick jest widoczny tylko na urządzeniach dotykowych.
-     Używa tej samej prędkości i tych samych kolizji co WASD. */
+     Oś pionowa porusza, pozioma obraca; ruch używa tych samych kolizji co WS. */
   const joystickEl = document.createElement('div');
   joystickEl.id = 'joystickRuchu';
   joystickEl.setAttribute('role', 'application');
-  joystickEl.setAttribute('aria-label', 'Joystick poruszania po mieszkaniu');
+  joystickEl.setAttribute('aria-label', 'Joystick: góra i dół poruszają, lewo i prawo obracają kamerę');
   joystickEl.classList.toggle('dotykowy', (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window);
   joystickEl.innerHTML = '<div class="galka"></div>';
   document.body.append(joystickEl);
