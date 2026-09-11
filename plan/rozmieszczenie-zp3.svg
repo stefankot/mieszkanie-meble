@@ -39,4 +39,14 @@
 <rect x="3570" y="3410" width="120" height="790" fill="#d77b32"><title>Drzwi — salon</title></rect>
 <rect x="6120" y="970" width="550" height="600" fill="#666"/>
 <rect x="-1000" y="150" width="1000" height="4840" fill="#d9dde0" stroke="#454b42" stroke-width="14"/>
+<g fill="#c62828" fill-opacity=".48" stroke="#8b1111" stroke-width="18">
+<rect x="6920" y="150" width="2900" height="600"><title>Kuchnia 2900 × 600; słup 300 mm przy oknie</title></rect>
+<rect x="7370" y="2080" width="1200" height="310"><title>Regał kuchenny wyśrodkowany</title></rect>
+<rect x="496" y="150" width="3074" height="423"><title>Regał salonowy przy łazience</title></rect>
+</g>
+<g font-family="sans-serif" font-size="92" font-weight="bold" fill="#7a1111">
+<text x="8370" y="880" text-anchor="middle">KUCHNIA · słup 300 mm przy oknie →</text>
+<text x="7970" y="2010" text-anchor="middle">REGAŁ KUCHNIA · środek W3</text>
+<text x="2033" y="700" text-anchor="middle">REGAŁ SALON · bok przy łazience →</text>
+</g>
 </svg>

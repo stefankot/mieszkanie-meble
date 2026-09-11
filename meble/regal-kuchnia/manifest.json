@@ -6,12 +6,16 @@
     "confirmed": true,
     "roomId": "KUCHNIA",
     "wallId": "KUCHNIA-W3",
-    "positionMm": [2090, 0, 2235],
+    "positionMm": [
+      7970,
+      0,
+      2235
+    ],
     "rotationDeg": 180,
-    "confirmationSvg": "meble/regal-kuchnia/plany/v0001.svg",
-    "description": "Kuchnia. Regał 1200 × 310 × 2400 mm wyśrodkowany przy KUCHNIA-W3: po 1250 mm od obu narożników tej ściany. Tylna krawędź przylega do W3; lokalny +Z/front jest skierowany do KUCHNIA-W1. Na rysunku potwierdzającym pokazano także kontekst zabudowy kuchennej 2900 × 600 mm przy W1, dosuniętej do lewego narożnika. Ustawienie zaakceptowane 2026-09-08."
+    "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+    "description": "Kuchnia ZP3. Regał 1200 × 310 × 2400 mm jest wyśrodkowany przy KUCHNIA-W3, po 1250 mm od narożników; front jest skierowany do KUCHNIA-W1."
   },
-  "currentVersion": "v0001",
+  "currentVersion": "v0002",
   "versions": [
     {
       "id": "v0001",
@@ -22,10 +26,33 @@
         "confirmed": true,
         "roomId": "KUCHNIA",
         "wallId": "KUCHNIA-W3",
-        "positionMm": [2090, 0, 2235],
+        "positionMm": [
+          2090,
+          0,
+          2235
+        ],
         "rotationDeg": 180,
         "confirmationSvg": "meble/regal-kuchnia/plany/v0001.svg",
         "description": "Kuchnia. Regał 1200 × 310 × 2400 mm wyśrodkowany przy KUCHNIA-W3: po 1250 mm od obu narożników tej ściany. Tylna krawędź przylega do W3; lokalny +Z/front jest skierowany do KUCHNIA-W1. Na rysunku potwierdzającym pokazano także kontekst zabudowy kuchennej 2900 × 600 mm przy W1, dosuniętej do lewego narożnika. Ustawienie zaakceptowane 2026-09-08."
+      }
+    },
+    {
+      "id": "v0002",
+      "file": "meble/regal-kuchnia/wersje/v0002.json",
+      "summary": "Położenie dostosowane do rzutu ZP3: regał pozostaje wyśrodkowany przy KUCHNIA-W3.",
+      "createdAt": "2026-09-11T12:00:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "KUCHNIA",
+        "wallId": "KUCHNIA-W3",
+        "positionMm": [
+          7970,
+          0,
+          2235
+        ],
+        "rotationDeg": 180,
+        "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+        "description": "Kuchnia ZP3. Regał 1200 × 310 × 2400 mm jest wyśrodkowany przy KUCHNIA-W3, po 1250 mm od narożników; front jest skierowany do KUCHNIA-W1."
       }
     }
   ]

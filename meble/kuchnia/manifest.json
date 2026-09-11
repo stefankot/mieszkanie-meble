@@ -6,12 +6,16 @@
     "confirmed": true,
     "roomId": "KUCHNIA",
     "wallId": "KUCHNIA-W1",
-    "positionMm": [1690, 0, 450],
+    "positionMm": [
+      8370,
+      0,
+      450
+    ],
     "rotationDeg": 0,
-    "confirmationSvg": "meble/kuchnia/plany/v0001.svg",
-    "description": "Kuchnia. Zabudowa 2900 × 600 mm dosunięta do lewego narożnika KUCHNIA-W1: 600 mm kolumna lodówki + 2000 mm ciąg główny + 300 mm prawy słup. Tylna krawędź przylega do W1; lokalny +Z/front jest skierowany do wnętrza kuchni i w stronę regału przy KUCHNIA-W3. Ustawienie obu elementów zostało zaakceptowane na wspólnym rysunku 2026-09-08."
+    "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+    "description": "Kuchnia ZP3. Zabudowa 2900 × 600 mm przy KUCHNIA-W1; prawy słup 300 mm jest dosunięty do ściany z oknem KUCHNIA-W2. Lokalny +Z/front jest skierowany do wnętrza kuchni."
   },
-  "currentVersion": "v0001",
+  "currentVersion": "v0002",
   "versions": [
     {
       "id": "v0001",
@@ -22,10 +26,33 @@
         "confirmed": true,
         "roomId": "KUCHNIA",
         "wallId": "KUCHNIA-W1",
-        "positionMm": [1690, 0, 450],
+        "positionMm": [
+          1690,
+          0,
+          450
+        ],
         "rotationDeg": 0,
         "confirmationSvg": "meble/kuchnia/plany/v0001.svg",
         "description": "Kuchnia. Zabudowa 2900 × 600 mm dosunięta do lewego narożnika KUCHNIA-W1: 600 mm kolumna lodówki + 2000 mm ciąg główny + 300 mm prawy słup. Tylna krawędź przylega do W1; lokalny +Z/front jest skierowany do wnętrza kuchni i w stronę regału przy KUCHNIA-W3. Ustawienie obu elementów zostało zaakceptowane na wspólnym rysunku 2026-09-08."
+      }
+    },
+    {
+      "id": "v0002",
+      "file": "meble/kuchnia/wersje/v0002.json",
+      "summary": "Położenie dostosowane do rzutu ZP3: zabudowa przy KUCHNIA-W1, prawy słup 300 mm dosunięty do ściany okiennej KUCHNIA-W2.",
+      "createdAt": "2026-09-11T12:00:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "KUCHNIA",
+        "wallId": "KUCHNIA-W1",
+        "positionMm": [
+          8370,
+          0,
+          450
+        ],
+        "rotationDeg": 0,
+        "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+        "description": "Kuchnia ZP3. Zabudowa 2900 × 600 mm przy KUCHNIA-W1; prawy słup 300 mm jest dosunięty do ściany z oknem KUCHNIA-W2. Lokalny +Z/front jest skierowany do wnętrza kuchni."
       }
     }
   ]

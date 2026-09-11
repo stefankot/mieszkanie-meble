@@ -7,15 +7,15 @@
     "roomId": "SALON",
     "wallId": "SALON-W1",
     "positionMm": [
-      8027,
+      2033,
       0,
       361.5
     ],
-    "rotationDeg": 0.0,
-    "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
-    "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
+    "rotationDeg": 0,
+    "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+    "description": "Salon ZP3. Plecy regału przylegają do SALON-W1, a prawy bok x=3570 mm do SALON-W2, ściany dzielonej z łazienką. Lewy bok x=496 mm; do ściany okiennej pozostaje 256 mm."
   },
-  "currentVersion": "v0004",
+  "currentVersion": "v0006",
   "versions": [
     {
       "id": "v0001",
@@ -91,6 +91,44 @@
         "rotationDeg": 0.0,
         "confirmationSvg": "meble/regal-salon/plany/v0003.svg",
         "description": "Plecy przy SALON-W1, lewy krótszy bok przy SALON-W4 (ściana bez zasłon); front do wnętrza salonu. Lewy bok x=6490 mm, prawy x=9564 mm. Do ściany z zasłonami SALON-W2 pozostaje 256 mm. Bez zmiany geometrii i obrotu."
+      }
+    },
+    {
+      "id": "v0006",
+      "file": "meble/regal-salon/wersje/v0006.json",
+      "summary": "Położenie dostosowane do rzutu ZP3: regał przy SALON-W1, prawy bok dosunięty do ściany dzielonej z łazienką.",
+      "createdAt": "2026-09-11T12:00:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "SALON",
+        "wallId": "SALON-W1",
+        "positionMm": [
+          2033,
+          0,
+          361.5
+        ],
+        "rotationDeg": 0,
+        "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+        "description": "Salon ZP3. Plecy regału przylegają do SALON-W1, a prawy bok x=3570 mm do SALON-W2, ściany dzielonej z łazienką. Lewy bok x=496 mm; do ściany okiennej pozostaje 256 mm."
+      }
+    },
+    {
+      "id": "v0007-poc-v2",
+      "file": "meble/regal-salon/wersje/v0007-poc-v2.json",
+      "summary": "Schema v2 POC regału salonowego na poprawionym rzucie ZP3; geometria i semantic IDs bez zmian.",
+      "createdAt": "2026-09-11T12:00:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "SALON",
+        "wallId": "SALON-W1",
+        "positionMm": [
+          2033,
+          0,
+          361.5
+        ],
+        "rotationDeg": 0,
+        "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+        "description": "Salon ZP3. Plecy regału przylegają do SALON-W1, a prawy bok x=3570 mm do SALON-W2, ściany dzielonej z łazienką. Lewy bok x=496 mm; do ściany okiennej pozostaje 256 mm."
       }
     }
   ]

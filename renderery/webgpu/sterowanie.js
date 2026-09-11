@@ -500,7 +500,7 @@ export function utworzSterowanie(api){
     'candidate-b': {quality:'wysoka', aa:'taau', tone:'agx', ssr:'current', camera:'interactive'},
     'candidate-c': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'modern', camera:'interactive'},
     'all-compatible': {quality:'wysoka', aa:'taau', tone:'agx', gi:'speedball',
-      ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0005-poc-v2',
+      ssr:'modern', ktx2:'etc1s', camera:'arch', furnitureV2:'regal-salon:v0007-poc-v2',
       furnitureSource:'local'},
     'p19-current': {quality:'wysoka', aa:'taau', tone:'aces', ssr:'modern'},
     'p19-off': {quality:'wysoka', aa:'smaa', tone:'aces', bez:'wszystko'},
@@ -516,7 +516,7 @@ export function utworzSterowanie(api){
     'photo-path': {quality:'photo_path', aa:'taau', tone:'aces'},
     navigation: {quality:'minimalna', aa:'smaa', tone:'aces', navtest:'1'},
     'furniture-v2': {quality:'srednia', aa:'smaa', tone:'aces',
-      furnitureV2:'regal-salon:v0005-poc-v2', furnitureSource:'local'}
+      furnitureV2:'regal-salon:v0007-poc-v2', furnitureSource:'local'}
   };
   const DEV_OPIS = {
     baseline: 'Bez eksperymentalnych parametrów; current SSGI/SSR, SMAA i ACES.',
