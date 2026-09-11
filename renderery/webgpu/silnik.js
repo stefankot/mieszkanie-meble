@@ -34,7 +34,7 @@ import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js?zp3-v1';
 import { uruchomBiblioteke } from './biblioteka.js?p8';
 import { utworzNawigacje } from './nawigacja.js?turn-v2';
-import { utworzSterowanie } from './sterowanie.js?turn-v2';
+import { utworzSterowanie } from './sterowanie.js?light-presets-v1';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
 import { skrzywFormatki } from './niedoskonalosci.js';
@@ -54,6 +54,7 @@ import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 import { utworzHoverOutline } from './hover-outline.js?silhouette-v1';
+import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 
 /* Jednostka sceny: centymetr. Dane mebli pozostają w mm; konwersja w bibliotece.
    Helpery dotyczą długości w scenie, nie promieni filtrów w pikselach. */
@@ -457,10 +458,12 @@ function kierunekSlonca(chwila){
   wysokoscSlonca = p.altitude;
   return p;
 }
-/* Z3a: 15 września 16:30, Warszawa. SunCalc: kierunek (0.639, 0.352, 0.684).
-   Późniejsze słońce przesuwa plamę bliżej prawej strony regału. */
+/* Domyślny preset jest wspólny z panelem; dzięki temu pierwsza klatka i stan
+   po odtworzeniu ustawień nigdy nie pokazują różnych pór dnia. */
 ustawOrientacje(335);
-let chwila = new Date(2026, 8, 15, 16, 30, 0);
+const presetSwiatlaZUrl = new URLSearchParams(location.search).get('light');
+let chwila = dataPresetuSwiatla(PRESSETY_SWIATLA[presetSwiatlaZUrl]
+  ? presetSwiatlaZUrl : DOMYSLNY_PRESET_SWIATLA);
 kierunekSlonca(chwila);
 
 const cel = new THREE.Object3D(); cel.position.set(503,90,378); scene.add(cel);

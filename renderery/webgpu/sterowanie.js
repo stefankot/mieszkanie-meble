@@ -1,3 +1,5 @@
+import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
+
 /* ============================================================
    PANEL STEROWANIA
    ------------------------------------------------------------
@@ -32,6 +34,8 @@ const STYL = `
    font:inherit;padding:4px 6px;border:1px solid #bdbbac;border-radius:6px;background:#fffdf6;
    color:#25241f;cursor:pointer;width:100%}
  #sterowanie button.dzialanie[aria-pressed=true]{background:#25241f;color:#f8f7f1;border-color:#25241f}
+ #sterowanie .pora{display:grid;grid-template-columns:42px repeat(3,1fr);gap:4px;align-items:center}
+ #sterowanie .pora>strong{font-size:10px;letter-spacing:.04em;color:#6f6d5f}
  #sterowanie .suwak{margin:6px 0}
  #sterowanie .suwak .naglowek{display:flex;justify-content:space-between;font-size:11px;color:#4a4a42}
  #sterowanie input[type=range]{width:100%;margin:2px 0 0}
@@ -120,15 +124,16 @@ export function utworzSterowanie(api){
     </section>
     <section data-s="swiatlo" hidden>
       <h3>Pora dnia</h3>
-      <div class="siatka">
-        <input type="date" id="data" value="2026-09-15">
-        <input type="time" id="godzina" value="16:30" step="60">
-      </div>
-      <div class="siatka" style="margin-top:5px">
-        <button class="dzialanie" id="zastosujCzas">Zastosuj</button>
-        <button class="dzialanie" id="terazCzas">Teraz</button>
-        <button class="dzialanie" data-godz="08:00">08:00</button>
-        <button class="dzialanie" data-godz="16:00">16:00</button>
+      <input type="hidden" id="presetSwiatla" value="${DOMYSLNY_PRESET_SWIATLA}">
+      <div class="pora" role="group" aria-label="Sezon i godzina światła">
+        <strong>LATO</strong>
+        <button class="dzialanie" data-preset-swiatla="lato-08">8.00</button>
+        <button class="dzialanie" data-preset-swiatla="lato-14">14.00</button>
+        <button class="dzialanie" data-preset-swiatla="lato-20">20.00</button>
+        <strong>ZIMA</strong>
+        <button class="dzialanie" data-preset-swiatla="zima-08">8.00</button>
+        <button class="dzialanie" data-preset-swiatla="zima-14">14.00</button>
+        <button class="dzialanie" data-preset-swiatla="zima-20">20.00</button>
       </div>
       <p class="uwaga" id="slonceInfo"></p>
       <h3>Charakter</h3>
@@ -396,24 +401,20 @@ export function utworzSterowanie(api){
   $('#kolizje').addEventListener('change', () => nawigacja.przelaczKolizje());
 
   /* ---------- światło ---------- */
-  function zastosujCzas(){
-    const d = $('#data').value, g = $('#godzina').value;
-    if(!d || !g) return;
-    const wynik = swiatlo.ustawCzas(new Date(d + 'T' + g + ':00'));
+  function zastosujPresetSwiatla(id){
+    if(!PRESSETY_SWIATLA[id]) id = DOMYSLNY_PRESET_SWIATLA;
+    $('#presetSwiatla').value = id;
+    const wynik = swiatlo.ustawCzas(dataPresetuSwiatla(id));
+    const p = PRESSETY_SWIATLA[id];
     const st = THREE.MathUtils.radToDeg(wynik.wysokosc);
-    $('#slonceInfo').textContent = st > 0
-      ? 'Słońce ' + st.toFixed(1) + '° nad horyzontem.'
-      : 'Słońce pod horyzontem — świecą tylko kule sufitowe.';
+    $('#slonceInfo').textContent = p.sezon + ' · ' + p.godzina + ' · ' + (st > 0
+      ? 'słońce ' + st.toFixed(1) + '° nad horyzontem.'
+      : 'słońce pod horyzontem; pozostaje światło nieba, okien i lamp.');
+    el.querySelectorAll('[data-preset-swiatla]').forEach(b =>
+      b.setAttribute('aria-pressed', String(b.dataset.presetSwiatla === id)));
   }
-  $('#zastosujCzas').addEventListener('click', zastosujCzas);
-  $('#terazCzas').addEventListener('click', () => {
-    const t = new Date();
-    $('#data').value = t.toISOString().slice(0,10);
-    $('#godzina').value = String(t.getHours()).padStart(2,'0') + ':' + String(t.getMinutes()).padStart(2,'0');
-    zastosujCzas();
-  });
-  el.querySelectorAll('[data-godz]').forEach(b => b.addEventListener('click', () => {
-    $('#godzina').value = b.dataset.godz; zastosujCzas();
+  el.querySelectorAll('[data-preset-swiatla]').forEach(b => b.addEventListener('click', () => {
+    zastosujPresetSwiatla(b.dataset.presetSwiatla);
   }));
 
   const suwaki = [['cieplo','cieplo',100], ['rozproszenie','rozproszenie',100],
@@ -563,7 +564,7 @@ export function utworzSterowanie(api){
      drogą co ruch suwaka. Nie ma więc drugiej ścieżki stosowania ustawień,
      która mogłaby się rozjechać z pierwszą. */
   const KLUCZ_UST = 'mieszkanie-webgpu:ustawienia:1';
-  const PROFIL_SWIATLA = 'z3a-1';
+  const PROFIL_SWIATLA = 'sezony-1';
   const PROFIL_AA = 'p25-taau';   // P25: jednorazowo przełącza zapisane SMAA na TAAU
   const PROFIL_RENDER = 'candidate-c-1';
   const kontrolki = () => [...el.querySelectorAll('input, select')];
@@ -590,7 +591,7 @@ export function utworzSterowanie(api){
       Object.assign(d.pola, {jakoscPoziom:'wysoka', antyaliasing:'taau', toneMapping:'aces'});
     // Jednorazowo zastosuj uzgodnione światło; zachowaj pozostałe ustawienia.
     if(d.profilSwiatla !== PROFIL_SWIATLA){
-      Object.assign(d.pola, {data:'2026-09-15', godzina:'16:30', cieplo:'45',
+      Object.assign(d.pola, {presetSwiatla:DOMYSLNY_PRESET_SWIATLA, cieplo:'45',
         rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'30'});
     }
     for(const k of kontrolki()){
@@ -620,9 +621,7 @@ export function utworzSterowanie(api){
     giSel.value=q.get('gi')==='speedball'?'speedball':'ssgi';
     ssrSel.value=q.get('ssr')==='current'?'current':'modern';
     if(['minimalna','srednia','wysoka','photo_raster','photo_path'].includes(q.get('quality'))) jakoscSel.value=q.get('quality');
-    /* Data i godzina nie mają uchwytu 'input' — stosuje je dopiero przycisk,
-       więc po przywróceniu wołamy to wprost. */
-    zastosujCzas();
+    zastosujPresetSwiatla(PRESSETY_SWIATLA[q.get('light')] ? q.get('light') : $('#presetSwiatla').value);
     return true;
   }
 
@@ -642,7 +641,9 @@ export function utworzSterowanie(api){
       'Tryb: ' + (s.tryb ?? nawigacja.tryb) + ' · ' + (s.sposobPatrzenia || '');
   }
   odswiezStan({});
-  zastosujCzas();
+  const presetSwiatlaZUrl = new URLSearchParams(location.search).get('light');
+  zastosujPresetSwiatla(PRESSETY_SWIATLA[presetSwiatlaZUrl]
+    ? presetSwiatlaZUrl : DOMYSLNY_PRESET_SWIATLA);
   /* Przywrócenie na końcu — po podpięciu wszystkich uchwytów, żeby wysłane
      zdarzenia faktycznie zadziałały. */
   const wznowione = wczytajUstawienia();
