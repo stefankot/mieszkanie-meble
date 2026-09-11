@@ -744,7 +744,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
    #joystickRuchu .galka{position:absolute;left:50%;top:50%;width:48px;height:48px;
      margin:-24px;border-radius:50%;background:#fff;border:2px solid #25241f99;
      box-shadow:0 2px 8px #0008;pointer-events:none;will-change:transform}
-   @media (hover:none) and (pointer:coarse){#joystickRuchu{display:block}}
+   #joystickRuchu.dotykowy{display:block}
+   @media (any-pointer:coarse){#joystickRuchu{display:block}}
    @media (max-width:700px){#joystickRuchu{display:block}}
    #joystickRuchu[hidden]{display:none!important}`;
   document.head.append(styl);
@@ -758,6 +759,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   joystickEl.id = 'joystickRuchu';
   joystickEl.setAttribute('role', 'application');
   joystickEl.setAttribute('aria-label', 'Joystick poruszania po mieszkaniu');
+  joystickEl.classList.toggle('dotykowy', (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window);
   joystickEl.innerHTML = '<div class="galka"></div>';
   document.body.append(joystickEl);
   const galkaJoystick = joystickEl.firstElementChild;
