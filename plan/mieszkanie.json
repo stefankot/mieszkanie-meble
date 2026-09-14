@@ -4,7 +4,7 @@
   "coordinateSystem": "RH_Y_UP",
   "svgAxes": "SVG x = scene X; SVG y = scene Z. Wysokość = scene Y. Dodatni obrót wokół Y odpowiada rotate(-rotationDeg) w SVG.",
   "source": "rzut_zp3.svg dostarczony 2026-09-11; górna i środkowa część poprawiona względem lustrzanego renderera, pokój z łóżkiem bez zmian.",
-  "ceilingHeightMm": 2500,
+  "ceilingHeightMm": 2600,
   "outerMm": [
     [
       0,

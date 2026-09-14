@@ -30,3 +30,7 @@ export function wyznaczScianyZaslon(plan){
   }
   return wynik;
 }
+
+export function wysokoscZaslony(plan){
+  return Math.max(260,Number(plan?.APARTMENT?.height)||0);
+}

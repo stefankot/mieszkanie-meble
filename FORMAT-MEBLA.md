@@ -86,7 +86,7 @@ Manifest ma pola `schemaVersion: 1`, `assetId`, `name`, `placement`, `currentVer
 
 Po jednorazowym uruchomieniu synchronizacji w danym wątku i potwierdzeniu położenia zapisuj każdą ukończoną, uzgodnioną iterację bez proszenia użytkownika o komendę „publikuj”. Nie zapisuj luźnych rozważań ani odrzuconych propozycji. Gdy zmiana wymaga decyzji, najpierw pokaż ją użytkownikowi. Nie omijaj ewentualnych okien zgody samego ChatGPT.
 
-Podgląd: `https://stefankot.github.io/mieszkanie-meble/`. Plik `index.html` można pobrać i otworzyć w Chrome; pobiera tę samą bibliotekę. Modele są sprawdzane co 15 sekund w aktywnej karcie; pamięć podręczna GitHuba i połączenie mogą opóźnić udostępnienie zapisu. Nie obiecuj aktualizacji przed faktycznym zapisem w GitHubie. Wersję historyczną można przypiąć w panelu; wybór „Najnowsza” wznawia aktualizacje.
+Podgląd: `https://stefankot.github.io/mieszkanie-meble/`. Plik `index.html` można pobrać i otworzyć w Chrome; pobiera tę samą bibliotekę. Modele są sprawdzane co 15 sekund w aktywnej karcie; pamięć podręczna GitHuba i połączenie mogą opóźnić udostępnienie zapisu. Nie obiecuj aktualizacji przed faktycznym zapisem w GitHubie. Panel pokazuje konkretne wersje wybranego mebla. Wybrana wersja jest przypięta w tej przeglądarce między sesjami; nowszy wpis manifestu jest zgłaszany, ale nie zastępuje jej bez wyboru użytkownika.
 
 ## Renderer i istniejące łóżko
 

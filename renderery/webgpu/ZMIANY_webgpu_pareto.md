@@ -1286,3 +1286,17 @@ Naprawiono regułę `placement`: jawne `confirmed=false` wersji lub dokumentu bl
 [REPO] 39/39 testów przechodzi na Three 0.185.0. Test integracyjny potwierdza kontrolę startową, ponowne pobranie modelu przy force reload, zmianę korzenia sceny, wybór zatwierdzonej wersji i odrzucenie roboczej. Zaktualizowano zastaną asercję planu z v0001 do aktywnego v0013. Składnia i `git diff --check`: PASS. [NO DATA] NO GPU TIMING; funkcja nie zmienia parametrów obrazu. Koszt sieci i budowania występuje tylko podczas jawnego przeładowania albo wykrytej zmiany.
 
 Rollback: cofnięcie tego commitu przywraca automatyczne odświeżanie co 15 s bez panelu wersji. Dane mebli, aktywne wersje manifestów, geometria, materiały i ustawienia renderera nie zostały zmienione.
+
+## P7c — wspólny kontekst mebla i wysokość 260 cm (2026-09-14)
+
+[CURRENT CODE] Wysokość mieszkania wzrosła z 250 do 260 cm w `plan/mieszkanie.json` i adapterze WebGPU. Sufit, ściany oraz generatywne zasłony korzystają z tego samego minimum; tkanina nadal sięga od podłogi do sufitu. Poziome wymiary planu, otwory, położenia i modele mebli pozostały bez zmian.
+
+Panel Widok ma jeden blok „Mebel”. Wybór mebla steruje teraz jego rzeczywistą wersją, kadrowaniem, force reloadem oraz wyłącznie jego drzwiczkami i szufladami. Usunięto osobne sekcje „Kadr”, „Wersja mebla” i globalne „Ruchome części”. Lista nie ma już abstrakcyjnej opcji „Najnowsza z manifestu”: pokazuje konkretne wersje, oznacza najnowszą i blokuje niezatwierdzone.
+
+Wybrana konkretna wersja jest zapisywana per assetId w `localStorage` i wczytywana przed budową modeli przy następnym starcie. Nowa wersja manifestu jest nadal wykrywana przy starcie, lecz nie zastępuje przypiętego projektu bez działania użytkownika. Błędny lub niezatwierdzony zapis jest usuwany i bezpiecznie wraca do zatwierdzonego `currentVersion`.
+
+[RUNTIME] Lokalny Chromium/WebGPU, aktualny bazowy `main` `21f4f86`, widoczna karta. Panel pokazał 16 wersji regału przy łóżku i tylko jego mechanizmy. Zmiana v0015→v0014 została zastosowana bez dodatkowego przycisku; pełne przeładowanie strony odtworzyło v0014 ze statusem complete. Po przywróceniu v0015 i pojawieniu się równoległej v0016 kolejny start zachował v0015 oraz jawnie zgłosił `v0015→v0016`. Brak błędów konsoli. [REPO] 40/40 testów na Three 0.185.0: PASS; obejmują minimum 260 cm, wysokość zasłon, trwałość wersji i filtrowanie mechanizmów. Składnia oraz `git diff --check`: PASS.
+
+[NO DATA] NO GPU TIMING. Zmiana nie modyfikuje parametrów potoku obrazu. Dodatkowy odczyt małego wpisu `localStorage` występuje tylko przy starcie; brak deklarowanego wpływu na FPS.
+
+Rollback: cofnięcie P7c przywraca sufit 250 cm, wcześniejszy układ panelu i automatyczne podążanie za `currentVersion`. Usunięcie klucza `mieszkanie-webgpu:wybrane-wersje-mebli:1` resetuje trwałe wybory bez zmiany danych mebli.

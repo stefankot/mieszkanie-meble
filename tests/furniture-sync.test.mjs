@@ -4,6 +4,7 @@ import {STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
   wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen, singleFlight,
   statusPoZbudowaniu, odrzuconyStan} from '../renderery/webgpu/furniture-sync.js?p7reload1';
 import {uruchomBiblioteke} from '../renderery/webgpu/biblioteka.js';
+import {utworzInterakcje} from '../renderery/webgpu/interakcje.js';
 import {pathToFileURL} from 'node:url';
 
 const approved = {confirmed:true, positionMm:[1258,0,6275], rotationDeg:90};
@@ -78,6 +79,7 @@ test('library checks versions at startup, force reloads the same version and swi
         modelReads++; return documentFor(path.replace('.json',''));
       }});
     assert.equal(manifestReads,1); assert.equal(modelReads,1);
+    assert.deepEqual(JSON.parse(storage.get('mieszkanie-webgpu:wybrane-wersje-mebli:1')),{hero:'v1'});
     assert.deepEqual(library.kontrola.noweWersje,[{id:'hero',poprzednia:'v0',nowa:'v1'}]);
     const first=library.meble.get('hero').korzen;
     await library.odswiez(); assert.equal(modelReads,1);
@@ -86,11 +88,31 @@ test('library checks versions at startup, force reloads the same version and swi
     assert.equal(library.kontrola.powod,'wymuszone');
     assert.equal(library.dostepneWersje('hero').find(v=>v.id==='v3').confirmed,false);
     await library.przypnij('hero','v2'); assert.equal(library.meble.get('hero').wersja,'v2');
+    assert.deepEqual(JSON.parse(storage.get('mieszkanie-webgpu:wybrane-wersje-mebli:1')),{hero:'v2'});
     const approvedRoot=library.meble.get('hero').korzen;
     await assert.rejects(()=>library.przypnij('hero','v3'),/nie ma zatwierdzonego/);
     assert.equal(library.meble.get('hero').korzen,approvedRoot);
     library.stop();
+
+    const restored=await uruchomBiblioteke({THREE,scena:new THREE.Scene(),meble:[['hero','Hero']],okresMs:0,
+      boxGeo:(...size)=>new THREE.BoxGeometry(...size.slice(0,3)),
+      materialBazowy:{white:()=>new THREE.MeshPhysicalMaterial()},
+      pobierzJSON:async path=>path.endsWith('manifest.json')?structuredClone(manifest):documentFor(path.replace('.json',''))});
+    assert.equal(restored.meble.get('hero').wersja,'v2');
+    restored.stop();
   }finally{ globalThis.localStorage=previousStorage; }
+});
+
+test('furniture controls filter mechanisms to the selected furniture', () => {
+  const a={id:'a:door',typ:'hinge',os:{},wartosc:0,cel:0};
+  const b={id:'b:drawer',typ:'slide',os:{},wartosc:0,cel:0};
+  const biblioteka={meble:new Map([
+    ['a',{nazwa:'A',ruchy:[a]}],['b',{nazwa:'B',ruchy:[b]}]
+  ])};
+  const interakcje=utworzInterakcje({biblioteka,zastosujRuch(){}});
+  assert.deepEqual(interakcje.ruchy('a').map(x=>x.ruch.id),['a:door']);
+  assert.equal(interakcje.otworzWszystko(true,'a'),1);
+  assert.equal(a.cel,1); assert.equal(b.cel,0);
 });
 
 test('generation token prevents a stale async version from winning', async () => {

@@ -6,6 +6,8 @@ const json = JSON.parse(fs.readFileSync('plan/mieszkanie.json', 'utf8'));
 const room = id => plan.rooms.find(r => r.id === id);
 const manifest = id => JSON.parse(fs.readFileSync(`meble/${id}/manifest.json`, 'utf8'));
 
+assert.equal(plan.height, 260);
+assert.equal(json.ceilingHeightMm, 2600);
 assert.deepEqual(room('KUCHNIA').polygon, [[612,15],[982,15],[982,239],[612,239]]);
 assert.deepEqual(room('SALON').polygon, [[24,15],[357,15],[357,499],[24,499]]);
 assert.deepEqual(room('POKOJ-LOZKO').polygon, [[24,514],[489,514],[489,741],[24,741]]);
@@ -32,7 +34,7 @@ assert.equal(salonShelf.placement.positionMm[0] + 3074/2, 3570,
 const bed = manifest('lozko');
 const bedShelf = manifest('regal-przy-lozku');
 assert.deepEqual(bed.placement.positionMm, [1258,0,6275]);
-assert.equal(bedShelf.currentVersion, 'v0013');
+assert.equal(bedShelf.currentVersion, 'v0016');
 assert.deepEqual(bedShelf.placement.positionMm, [3408,0,7125]);
 
-console.log('plan-layout: 18 assertions passed');
+console.log('plan-layout: 20 assertions passed');

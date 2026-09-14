@@ -23,9 +23,10 @@ export function utworzInterakcje({biblioteka, zastosujRuch, przyZmianie}){
      obiekty ruchów przy każdej nowej wersji mebla. */
   const animowane = new Map();   // id → {ruch, od, do, start}
 
-  function ruchy(){
+  function ruchy(mebelId=null){
     const lista = [];
     for(const [id, wpis] of biblioteka.meble){
+      if(mebelId && id !== mebelId) continue;
       for(const r of wpis.ruchy || []){
         if(r.legacy || !r.os) continue;      // łóżko: sprzężone siłowniki, inny mechanizm
         lista.push({mebel: id, nazwaMebla: wpis.nazwa, ruch: r});
@@ -58,9 +59,9 @@ export function utworzInterakcje({biblioteka, zastosujRuch, przyZmianie}){
     return zmiana;
   }
 
-  function otworzWszystko(otwarte){
+  function otworzWszystko(otwarte, mebelId=null){
     let ile = 0;
-    for(const {ruch} of ruchy()) if(ustaw(ruch, otwarte ? 1 : 0)) ile++;
+    for(const {ruch} of ruchy(mebelId)) if(ustaw(ruch, otwarte ? 1 : 0)) ile++;
     if(ile) przyZmianie?.();
     return ile;
   }

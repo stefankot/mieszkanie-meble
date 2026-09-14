@@ -87,20 +87,23 @@ export function utworzSterowanie(api){
         <output id="oczy" style="text-align:center">160 cm</output>
         <button class="dzialanie" id="oczWyzej" title="Wyżej o 5 cm · E">+</button>
       </div>
-      <h3>Kadr</h3>
-      <div class="siatka">
-        <select id="mebelWybor"></select>
-        <button class="dzialanie" id="kadrMebel" style="flex:0 0 68px">Kadruj</button>
-      </div>
-      <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div>
-      <h3>Wersja mebla</h3>
-      <select id="mebelWersja" aria-label="Dostępna wersja wybranego mebla"></select>
+      <h3>Mebel</h3>
+      <select id="mebelWybor" aria-label="Wybrany mebel"></select>
       <div class="siatka" style="margin-top:4px">
-        <button class="dzialanie" id="zastosujWersje">Zastosuj wersję</button>
+        <button class="dzialanie" id="kadrMebel">Pokaż mebel</button>
         <button class="dzialanie" id="przeladujMebel" title="Force reload furniture">Przeładuj od nowa</button>
       </div>
-      <button class="dzialanie" id="sprawdzWersje" style="width:100%;margin-top:4px">Sprawdź nowe wersje</button>
+      <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div>
+      <label class="pole" for="mebelWersja">Wersja</label>
+      <select id="mebelWersja" aria-label="Wersja wybranego mebla"></select>
+      <button class="dzialanie" id="sprawdzWersje" style="width:100%;margin-top:4px">Sprawdź wersje mebla</button>
       <p class="uwaga" id="mebelStatus" role="status" aria-live="polite"></p>
+      <div class="siatka" style="margin-top:6px">
+        <button class="dzialanie" id="otworzWsz">Otwórz mebel</button>
+        <button class="dzialanie" id="zamknijWsz">Zamknij mebel</button>
+      </div>
+      <div id="ruchy" style="margin-top:6px;max-height:150px;overflow:auto"></div>
+      <p class="uwaga" id="ruchyInfo"></p>
       <h3>ARCH_PHOTO</h3>
       <select id="trybKamery">
         <option value="interactive">Kamera interaktywna</option>
@@ -113,13 +116,6 @@ export function utworzSterowanie(api){
       <div class="siatka" style="margin-top:4px"><select id="archKadry" aria-label="Zapisane kadry ARCH_PHOTO"></select>
         <button class="dzialanie" id="wczytajKadr" style="flex:0 0 52px">Otwórz</button>
         <button class="dzialanie" id="usunKadr" style="flex:0 0 45px">Usuń</button></div>
-      <h3>Ruchome części</h3>
-      <div class="siatka">
-        <button class="dzialanie" id="otworzWsz">Otwórz wszystko</button>
-        <button class="dzialanie" id="zamknijWsz">Zamknij</button>
-      </div>
-      <div id="ruchy" style="margin-top:6px;max-height:150px;overflow:auto"></div>
-      <p class="uwaga" id="ruchyInfo"></p>
       <h3>Zasłony</h3>
       <div id="zaslonySterowanie"></div>
       <h3>Przejdź</h3>
@@ -301,18 +297,14 @@ export function utworzSterowanie(api){
     pokoje.append(b);
   });
 
-  /* Kadrowanie mebla — lista bierze się z biblioteki, nie z listy zaszytej w kodzie. */
+  /* Jeden kontekst mebla: wersja, kadr, przeładowanie i mechanizmy. */
   const wybor = $('#mebelWybor');
   const wersjaWybor = $('#mebelWersja');
-  const przyciskiWersji = [$('#zastosujWersje'), $('#przeladujMebel'), $('#sprawdzWersje')];
+  const kontrolkiWersji = [wersjaWybor, $('#przeladujMebel'), $('#sprawdzWersje')];
   function odswiezWersje(){
-    const w = biblioteka.meble.get(wybor.value), poprzednia = wersjaWybor.value;
+    const w = biblioteka.meble.get(wybor.value);
     wersjaWybor.innerHTML = '';
     if(!w?.manifest) return;
-    const najnowsza = document.createElement('option');
-    najnowsza.value = '';
-    najnowsza.textContent = `Najnowsza z manifestu (${w.manifest.currentVersion || 'brak'})`;
-    wersjaWybor.append(najnowsza);
     for(const v of biblioteka.dostepneWersje(wybor.value)){
       const o = document.createElement('option');
       o.value = v.id; o.disabled = !v.confirmed;
@@ -320,13 +312,11 @@ export function utworzSterowanie(api){
       o.title = v.summary;
       wersjaWybor.append(o);
     }
-    wersjaWybor.value = w.przypieta || '';
-    if(poprzednia && [...wersjaWybor.options].some(o => o.value === poprzednia && !o.disabled))
-      wersjaWybor.value = poprzednia;
+    wersjaWybor.value = w.wersja || w.przypieta || '';
   }
   function odswiezStanBiblioteki(tekst){
     const k = biblioteka.kontrola, w = biblioteka.meble.get(wybor.value);
-    przyciskiWersji.forEach(b => b.disabled = k.trwa);
+    kontrolkiWersji.forEach(b => b.disabled = k.trwa);
     if(tekst){ $('#mebelStatus').textContent = tekst; return; }
     if(k.trwa){ $('#mebelStatus').textContent = 'Sprawdzanie manifestów i modeli…'; return; }
     const czas = k.ostatnia ? new Date(k.ostatnia).toLocaleTimeString('pl-PL') : 'brak';
@@ -352,20 +342,22 @@ export function utworzSterowanie(api){
     odswiezRuchy?.();
   }
   odswiezMeble();
-  wybor.addEventListener('change', () => { odswiezWersje(); odswiezStanBiblioteki(); });
+  wybor.addEventListener('change', () => {
+    odswiezWersje(); odswiezStanBiblioteki(); odswiezRuchy(); $('#kadrInfo').textContent='';
+  });
   async function wykonajZmianeWersji(fn, komunikat){
-    przyciskiWersji.forEach(b => b.disabled = true);
+    kontrolkiWersji.forEach(b => b.disabled = true);
     $('#mebelStatus').textContent = komunikat;
     try{ await fn(); odswiezMeble(); }
     catch(e){ odswiezStanBiblioteki('Nie zastosowano zmiany: ' + e.message); }
-    finally{ if(!biblioteka.kontrola.trwa) przyciskiWersji.forEach(b => b.disabled = false); }
+    finally{ if(!biblioteka.kontrola.trwa) kontrolkiWersji.forEach(b => b.disabled = false); }
   }
-  $('#zastosujWersje').addEventListener('click', () => wykonajZmianeWersji(
-    () => biblioteka.przypnij(wybor.value, wersjaWybor.value || null), 'Wczytywanie wybranej wersji…'));
+  wersjaWybor.addEventListener('change', () => wykonajZmianeWersji(
+    () => biblioteka.przypnij(wybor.value, wersjaWybor.value), 'Wczytywanie i zapisywanie wybranej wersji…'));
   $('#przeladujMebel').addEventListener('click', () => wykonajZmianeWersji(
     () => biblioteka.wymusPrzeladowanie(wybor.value), 'Wymuszone pobieranie mebla od nowa…'));
   $('#sprawdzWersje').addEventListener('click', () => wykonajZmianeWersji(
-    () => biblioteka.odswiez(), 'Sprawdzanie nowych wersji…'));
+    () => biblioteka.sprawdzWersje(wybor.value), 'Sprawdzanie wersji wybranego mebla…'));
   biblioteka.obserwuj(() => { odswiezMeble(); odswiezStanBiblioteki(); });
   $('#kadrMebel').addEventListener('click', () => {
     const w = biblioteka.meble.get(wybor.value);
@@ -420,11 +412,9 @@ export function utworzSterowanie(api){
   }
   zaslony?.obserwuj(()=>odswiezZaslony.forEach(fn=>fn()));
 
-  /* ---------- RUCHOME CZĘŚCI ----------
-     Lista bierze się z mechanizmów zbudowanych przez bibliotekę, nie z listy
-     wpisanej w kod — nowy mebel z zawiasami pojawi się tu sam. */
+  /* Mechanizmy dotyczą wyłącznie mebla wybranego powyżej. */
   function odswiezRuchy(){
-    const box = $('#ruchy'), lista = api.interakcje?.ruchy?.() || [];
+    const box = $('#ruchy'), lista = api.interakcje?.ruchy?.(wybor.value) || [];
     box.innerHTML = '';
     for(const {ruch, nazwaMebla} of lista){
       const b = document.createElement('button');
@@ -436,11 +426,11 @@ export function utworzSterowanie(api){
       box.append(b);
     }
     $('#ruchyInfo').textContent = lista.length
-      ? lista.length + ' ruchomych części · można też kliknąć wprost w mebel'
+      ? lista.length + ' ruchomych części wybranego mebla · można też kliknąć wprost w model'
       : 'Ten mebel nie ma zadeklarowanych mechanizmów.';
   }
-  $('#otworzWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(true));
-  $('#zamknijWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(false));
+  $('#otworzWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(true, wybor.value));
+  $('#zamknijWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(false, wybor.value));
 
   const pokazMieszkanie = $('#pokazMieszkanie');
   let widoczne = true;
@@ -634,7 +624,7 @@ export function utworzSterowanie(api){
                     pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
                     otwarty: el.open};
       for(const k of kontrolki()){
-        if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant') continue;
+        if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || k.id === 'mebelWersja') continue;
         dane.pola[k.id] = k.type === 'checkbox' ? k.checked : k.value;
       }
       localStorage.setItem(KLUCZ_UST, JSON.stringify(dane));
@@ -654,7 +644,7 @@ export function utworzSterowanie(api){
         rozproszenie:'90', gOkna:'100', gSlonce:'100', gKule:'0'});
     }
     for(const k of kontrolki()){
-      if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || !(k.id in d.pola)) continue;
+      if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || k.id === 'mebelWersja' || !(k.id in d.pola)) continue;
       const v = d.pola[k.id];
       if(k.type === 'checkbox'){
         if(typeof v !== 'boolean') continue;

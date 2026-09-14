@@ -22,7 +22,7 @@ import { realizujMiekkaGeometrie, stanyMiekkiejGeometrii,
          statystykiCacheMiekkiejGeometrii } from './soft-geometry.js';
 import { utworzDraperie } from './draperia.js';
 import { wlaczone } from './flagi.js';
-import { wyznaczScianyZaslon } from './uklad-zaslon.mjs';
+import { wyznaczScianyZaslon, wysokoscZaslony } from './uklad-zaslon.mjs?p7c1';
 
 const DO_PODLOGI = 0;        // tkanina sięga do podłogi
 const FALDY = 9;
@@ -85,7 +85,7 @@ export function utworzZaslony({THREE, scena, plan, przyZmianie}){
   const KLUCZ='mieszkanie-webgpu:zaslony:1';
   let zapis={};
   try{ const d=JSON.parse(localStorage.getItem(KLUCZ)||'null');if(d && typeof d==='object') zapis=d; }catch(e){}
-  const wysTkaniny=plan.APARTMENT.height-DO_PODLOGI;
+  const wysTkaniny=wysokoscZaslony(plan)-DO_PODLOGI;
   for(const uklad of wyznaczScianyZaslon(plan)){
     const grupa=new THREE.Group();
     grupa.name='Zasłony · '+uklad.nazwa;

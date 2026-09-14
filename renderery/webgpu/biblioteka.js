@@ -309,6 +309,16 @@ export async function uruchomBiblioteke(api){
   const okresMs = api.okresMs ?? OKRES_MS;
   const pokolenia = utworzBramkePokolen();
   const KLUCZ_WERSJI = 'mieszkanie-webgpu:znane-wersje-mebli:1';
+  const KLUCZ_WYBORU = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
+  let wybraneWersje = {};
+  try{
+    const zapisane = JSON.parse(globalThis.localStorage?.getItem(KLUCZ_WYBORU) || '{}');
+    if(zapisane && typeof zapisane === 'object' && !Array.isArray(zapisane)) wybraneWersje = zapisane;
+  }catch(e){}
+  function zapiszWybranaWersje(id, wersja){
+    if(wersja) wybraneWersje[id] = wersja; else delete wybraneWersje[id];
+    try{ globalThis.localStorage?.setItem(KLUCZ_WYBORU, JSON.stringify(wybraneWersje)); }catch(e){}
+  }
   function zapiszKontroleWersji(){
     let znane = {};
     try{ znane = JSON.parse(globalThis.localStorage?.getItem(KLUCZ_WERSJI) || '{}'); }catch(e){}
@@ -381,9 +391,12 @@ export async function uruchomBiblioteke(api){
     if(!pokolenia.aktualne(id, pokolenie)) return false;
 
     const wersje = Array.isArray(manifest.versions) ? manifest.versions : [];
-    const wybrana = poprzedni.przypieta
-      ? wersje.find(v => v.id === poprzedni.przypieta)
-      : wersje.find(v => v.id === manifest.currentVersion);
+    let przypieta = poprzedni.przypieta || wybraneWersje[id];
+    let wybrana = przypieta ? wersje.find(v => v.id === przypieta) : null;
+    if(przypieta && (!wybrana || !czyWersjaPotwierdzona(manifest, wybrana))){
+      przypieta = undefined; wybrana = null; zapiszWybranaWersje(id, null);
+    }
+    if(!wybrana) wybrana = wersje.find(v => v.id === manifest.currentVersion);
 
     if(!wybrana){
       const brak = 'Czeka na model i położenie zaakceptowane na SVG.';
@@ -433,7 +446,8 @@ export async function uruchomBiblioteke(api){
                     pominiete: zbudowane.pominiete || [],
                     status, aktywnyStatus: status,
                     postep: zbudowane.postep, zaczepy: zbudowane.zaczepy,
-                    przypieta: poprzedni.przypieta, umiejscowienie});
+                    przypieta: wybrana.id, umiejscowienie});
+      zapiszWybranaWersje(id, wybrana.id);
       return true;
     }catch(e){
       if(!pokolenia.aktualne(id, pokolenie)) return false;
@@ -444,16 +458,26 @@ export async function uruchomBiblioteke(api){
     }
   }
 
-  /* Przypięcie konkretnej wersji mebla; null wraca na „najnowszą". */
+  /* Przypięcie konkretnej wersji jest trwałym wyborem użytkownika. */
   async function przypnij(id, wersja){
     pokolenia.uniewaznij(id);
     const w = stan.get(id) || {};
-    const wpis = wersja ? w.manifest?.versions?.find(v => v.id === wersja) : null;
-    if(wersja && (!wpis || !czyWersjaPotwierdzona(w.manifest, wpis)))
+    const docelowa = wersja || w.manifest?.currentVersion;
+    const wpis = docelowa ? w.manifest?.versions?.find(v => v.id === docelowa) : null;
+    if(!wpis || !czyWersjaPotwierdzona(w.manifest, wpis))
       throw Error('Wybrana wersja nie istnieje albo nie ma zatwierdzonego położenia.');
-    stan.set(id, {...w, przypieta: wersja || undefined});
+    const poprzednia = w.przypieta;
+    stan.set(id, {...w, przypieta: docelowa});
     const zmiana=await zaladujMebel(id, w.nazwa || id, {wymus:true});
-    if(zmiana){ wynik.ruchy=[...stan.values()].flatMap(x=>x.ruchy||[]); przyZmianie?.(wynik); }
+    const po = stan.get(id);
+    if(!zmiana || po?.wersja !== docelowa || po?.status === STATUS_MODELU.REJECTED){
+      stan.set(id, {...po, przypieta: poprzednia});
+      zapiszWybranaWersje(id, poprzednia);
+      powiadom();
+      if(po?.status === STATUS_MODELU.REJECTED) throw Error(po.blad || 'Nie udało się wczytać wybranej wersji.');
+      return false;
+    }
+    wynik.ruchy=[...stan.values()].flatMap(x=>x.ruchy||[]); przyZmianie?.(wynik);
     powiadom();
     return zmiana;
   }
@@ -480,6 +504,7 @@ export async function uruchomBiblioteke(api){
   }
   const odswiez = singleFlight(() => wykonajOdswiezenie());
   wynik.odswiez = odswiez;
+  wynik.sprawdzWersje = singleFlight(id => wykonajOdswiezenie({tylkoId:id || null, powod:'reczne'}));
   const wymusPrzeladowanie = singleFlight(async id => {
     if(odswiez.aktywne) await odswiez.aktywne;
     if(id) pokolenia.uniewaznij(id); else for(const [mebelId] of listaMebli) pokolenia.uniewaznij(mebelId);
