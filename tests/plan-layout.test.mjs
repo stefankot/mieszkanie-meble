@@ -32,6 +32,7 @@ assert.equal(salonShelf.placement.positionMm[0] + 3074/2, 3570,
 const bed = manifest('lozko');
 const bedShelf = manifest('regal-przy-lozku');
 assert.deepEqual(bed.placement.positionMm, [1258,0,6275]);
-assert.deepEqual(bedShelf.placement.positionMm, [3616,0,6718]);
+assert.equal(bedShelf.currentVersion, 'v0013');
+assert.deepEqual(bedShelf.placement.positionMm, [3408,0,7125]);
 
-console.log('plan-layout: 17 assertions passed');
+console.log('plan-layout: 18 assertions passed');

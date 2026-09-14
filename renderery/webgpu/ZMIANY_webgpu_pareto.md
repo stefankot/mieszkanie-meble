@@ -1274,3 +1274,15 @@ Rollback: usunąć pola UV z nowego modelu albo cofnąć ten commit. Nie zmienio
 ## P6 — szczotkowana stal (2026-09-09)
 
 Nieaktywny POC jednego blatu kuchni v0001: MeshPhysicalNodeMaterial r185, 1764 skończone tangenty, anizotropia 0.65 w danych JSON, kierunki 0°/90°. [RUNTIME] Widoczne poszerzenie i zmiana kierunku refleksu. A/B wysoka, buffer 1657×924, ratio1, ACES0.55; 5s rozgrzewki +10s rAF. A p50/p95/p99 66.7/83.4/84.3ms; B 66.7/83.3/84.2ms; events=[]. NO GPU TIMING. Brak deklarowanego przyspieszenia. Domyślny materiał zachowany, model i manifest bez zmian. Szczegóły, warunki oraz rollback w experymenty/P6-stal.md.
+
+## P7b — wersje mebli i wymuszone przeładowanie (2026-09-14)
+
+[CURRENT CODE] Biblioteka pobiera manifesty przy każdym starcie, porównuje `currentVersion` z wersją zapamiętaną w przeglądarce i pokazuje wykryte zmiany. Panel Widok wyświetla wersje wybranego mebla, opisuje bieżącą oraz najnowszą i blokuje wpisy bez zatwierdzonego położenia. „Przeładuj od nowa” ponownie pobiera i buduje ten sam model mimo zgodnego identyfikatora wersji. Dotychczasowy poprawny model pozostaje w scenie do chwili pełnego powodzenia podmiany.
+
+Naprawiono regułę `placement`: jawne `confirmed=false` wersji lub dokumentu blokuje aktywację. Wyjątkiem pozostaje wyłącznie legacy `lozko:bazowa`, gdy transform, pokój i ściana są identyczne z zatwierdzonym manifestem. Zmiana wersji jest stanem bieżącej sesji renderera; nie zapisuje runtime state do furniture.json i nie zmienia manifestu.
+
+[RUNTIME] Lokalny Chromium/WebGPU, źródło danych z aktualnego `main` `f168be9`: kontrola startowa wczytała `regal-przy-lozku v0013` ze statusem complete. Lista pokazała 13 wersji; v0005, v0006 i v0008 były zablokowane jako niezatwierdzone. Zmiana v0013→v0012, force reload v0012, ręczna kontrola manifestów i powrót do v0013 zakończyły się statusem complete. Brak błędów konsoli; dwa ostrzeżenia deprecacji r185 są wcześniejsze i niezwiązane z P7b.
+
+[REPO] 39/39 testów przechodzi na Three 0.185.0. Test integracyjny potwierdza kontrolę startową, ponowne pobranie modelu przy force reload, zmianę korzenia sceny, wybór zatwierdzonej wersji i odrzucenie roboczej. Zaktualizowano zastaną asercję planu z v0001 do aktywnego v0013. Składnia i `git diff --check`: PASS. [NO DATA] NO GPU TIMING; funkcja nie zmienia parametrów obrazu. Koszt sieci i budowania występuje tylko podczas jawnego przeładowania albo wykrytej zmiany.
+
+Rollback: cofnięcie tego commitu przywraca automatyczne odświeżanie co 15 s bez panelu wersji. Dane mebli, aktywne wersje manifestów, geometria, materiały i ustawienia renderera nie zostały zmienione.

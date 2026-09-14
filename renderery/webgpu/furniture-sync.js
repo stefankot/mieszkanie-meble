@@ -41,15 +41,30 @@ function poprawneUmiejscowienie(p){
     && liczba(p.rotationDeg ?? 0, -360, 360);
 }
 
-/* Manifest jest rejestrem zatwierdzenia. Umiejscowienie wersji/modelu może go
-   zastąpić wyłącznie wtedy, gdy samo jest jawnie zatwierdzone. Dzięki temu
-   legacy bed z historycznym placement.confirmed=false dziedziczy zatwierdzone
-   położenie manifestu, a niezatwierdzony nowy wariant nie wchodzi do sceny. */
+const tenSamTransform = (a, b) => ['positionMm','rotationDeg','roomId','wallId']
+  .every(k => JSON.stringify(a?.[k]) === JSON.stringify(b?.[k]));
+
+/* Jawne placement.confirmed=false wersji lub dokumentu blokuje aktywację.
+   Jedyny wyjątek to historyczne łóżko bazowa: może odziedziczyć zgodę manifestu,
+   ale tylko przy identycznym transformie, pokoju i ścianie. */
 export function wybierzPotwierdzoneUmiejscowienie(manifest, wersja, dane){
-  for(const p of [dane?.placement, wersja?.placement, manifest?.placement]){
+  for(const p of [dane?.placement, wersja?.placement]){
+    if(p === undefined) continue;
     if(poprawneUmiejscowienie(p)) return structuredClone(p);
+    const legacyLozko = manifest?.assetId === 'lozko' && wersja?.id === 'bazowa'
+      && wersja?.legacy === true && p?.confirmed === false
+      && poprawneUmiejscowienie(manifest?.placement)
+      && tenSamTransform(p, manifest.placement);
+    if(legacyLozko) return structuredClone(manifest.placement);
+    throw Error('Brak potwierdzonego ustawienia (placement.confirmed=true).');
   }
+  if(poprawneUmiejscowienie(manifest?.placement)) return structuredClone(manifest.placement);
   throw Error('Brak potwierdzonego ustawienia (placement.confirmed=true).');
+}
+
+export function czyWersjaPotwierdzona(manifest, wersja){
+  try{ wybierzPotwierdzoneUmiejscowienie(manifest, wersja); return true; }
+  catch{ return false; }
 }
 
 export function utworzBramkePokolen(){
@@ -63,12 +78,14 @@ export function utworzBramkePokolen(){
 
 export function singleFlight(fn){
   let aktywne = null;
-  return function(...args){
+  function wrapped(...args){
     if(aktywne) return aktywne;
     aktywne = Promise.resolve().then(() => fn.apply(this, args));
     aktywne = aktywne.finally(() => { aktywne = null; });
     return aktywne;
-  };
+  }
+  Object.defineProperty(wrapped, 'aktywne', {get:() => aktywne});
+  return wrapped;
 }
 
 export function statusPoZbudowaniu(pominiete = []){

@@ -93,6 +93,14 @@ export function utworzSterowanie(api){
         <button class="dzialanie" id="kadrMebel" style="flex:0 0 68px">Kadruj</button>
       </div>
       <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div>
+      <h3>Wersja mebla</h3>
+      <select id="mebelWersja" aria-label="Dostępna wersja wybranego mebla"></select>
+      <div class="siatka" style="margin-top:4px">
+        <button class="dzialanie" id="zastosujWersje">Zastosuj wersję</button>
+        <button class="dzialanie" id="przeladujMebel" title="Force reload furniture">Przeładuj od nowa</button>
+      </div>
+      <button class="dzialanie" id="sprawdzWersje" style="width:100%;margin-top:4px">Sprawdź nowe wersje</button>
+      <p class="uwaga" id="mebelStatus" role="status" aria-live="polite"></p>
       <h3>ARCH_PHOTO</h3>
       <select id="trybKamery">
         <option value="interactive">Kamera interaktywna</option>
@@ -295,6 +303,40 @@ export function utworzSterowanie(api){
 
   /* Kadrowanie mebla — lista bierze się z biblioteki, nie z listy zaszytej w kodzie. */
   const wybor = $('#mebelWybor');
+  const wersjaWybor = $('#mebelWersja');
+  const przyciskiWersji = [$('#zastosujWersje'), $('#przeladujMebel'), $('#sprawdzWersje')];
+  function odswiezWersje(){
+    const w = biblioteka.meble.get(wybor.value), poprzednia = wersjaWybor.value;
+    wersjaWybor.innerHTML = '';
+    if(!w?.manifest) return;
+    const najnowsza = document.createElement('option');
+    najnowsza.value = '';
+    najnowsza.textContent = `Najnowsza z manifestu (${w.manifest.currentVersion || 'brak'})`;
+    wersjaWybor.append(najnowsza);
+    for(const v of biblioteka.dostepneWersje(wybor.value)){
+      const o = document.createElement('option');
+      o.value = v.id; o.disabled = !v.confirmed;
+      o.textContent = `${v.id}${v.current ? ' · najnowsza' : ''}${v.selected ? ' · w scenie' : ''}${v.confirmed ? '' : ' · niezatwierdzona'}`;
+      o.title = v.summary;
+      wersjaWybor.append(o);
+    }
+    wersjaWybor.value = w.przypieta || '';
+    if(poprzednia && [...wersjaWybor.options].some(o => o.value === poprzednia && !o.disabled))
+      wersjaWybor.value = poprzednia;
+  }
+  function odswiezStanBiblioteki(tekst){
+    const k = biblioteka.kontrola, w = biblioteka.meble.get(wybor.value);
+    przyciskiWersji.forEach(b => b.disabled = k.trwa);
+    if(tekst){ $('#mebelStatus').textContent = tekst; return; }
+    if(k.trwa){ $('#mebelStatus').textContent = 'Sprawdzanie manifestów i modeli…'; return; }
+    const czas = k.ostatnia ? new Date(k.ostatnia).toLocaleTimeString('pl-PL') : 'brak';
+    const nowe = k.noweWersje?.length
+      ? ' · nowe: ' + k.noweWersje.map(x => `${x.id} ${x.poprzednia}→${x.nowa}`).join(', ') : '';
+    const powod = k.powod === 'wymuszone' ? ' · przeładowano od nowa'
+      : k.powod === 'start' ? ' · kontrola startowa' : '';
+    $('#mebelStatus').textContent = k.blad ? `Błąd kontroli: ${k.blad}`
+      : `Sprawdzono: ${czas} · ${w?.wersja || 'brak wersji'} · ${w?.status || 'brak statusu'}${powod}${nowe}`;
+  }
   function odswiezMeble(){
     const byly = wybor.value;
     wybor.innerHTML = '';
@@ -305,9 +347,26 @@ export function utworzSterowanie(api){
       wybor.append(o);
     }
     if(byly) wybor.value = byly;
+    odswiezWersje();
+    odswiezStanBiblioteki();
     odswiezRuchy?.();
   }
   odswiezMeble();
+  wybor.addEventListener('change', () => { odswiezWersje(); odswiezStanBiblioteki(); });
+  async function wykonajZmianeWersji(fn, komunikat){
+    przyciskiWersji.forEach(b => b.disabled = true);
+    $('#mebelStatus').textContent = komunikat;
+    try{ await fn(); odswiezMeble(); }
+    catch(e){ odswiezStanBiblioteki('Nie zastosowano zmiany: ' + e.message); }
+    finally{ if(!biblioteka.kontrola.trwa) przyciskiWersji.forEach(b => b.disabled = false); }
+  }
+  $('#zastosujWersje').addEventListener('click', () => wykonajZmianeWersji(
+    () => biblioteka.przypnij(wybor.value, wersjaWybor.value || null), 'Wczytywanie wybranej wersji…'));
+  $('#przeladujMebel').addEventListener('click', () => wykonajZmianeWersji(
+    () => biblioteka.wymusPrzeladowanie(wybor.value), 'Wymuszone pobieranie mebla od nowa…'));
+  $('#sprawdzWersje').addEventListener('click', () => wykonajZmianeWersji(
+    () => biblioteka.odswiez(), 'Sprawdzanie nowych wersji…'));
+  biblioteka.obserwuj(() => { odswiezMeble(); odswiezStanBiblioteki(); });
   $('#kadrMebel').addEventListener('click', () => {
     const w = biblioteka.meble.get(wybor.value);
     if(!w || !w.korzen) return;

@@ -27,7 +27,8 @@ import { pobierz, postep } from './siec.js';
 import { semantyczneUV } from './uv-drewna.js';
 import { STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
          wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen,
-         singleFlight, statusPoZbudowaniu, odrzuconyStan } from './furniture-sync.js';
+         czyWersjaPotwierdzona, singleFlight, statusPoZbudowaniu,
+         odrzuconyStan } from './furniture-sync.js?p7reload1';
 import { normalizeFurnitureDocument } from './furniture-schema-v2.js?p8b';
 
 const BAZA = new URLSearchParams(globalThis.location?.search || '').get('furnitureSource')==='local'
@@ -297,9 +298,30 @@ function usun(scena, wpis){
 export async function uruchomBiblioteke(api){
   const {THREE, scena, materialBazowy, boxGeo, materialyMebla, przyZmianie} = api;
   const stan = new Map();
-  const wynik = {meble: stan, ruchy: [], stop, zastosujRuch};
+  const kontrola = {trwa:false, ostatnia:null, powod:null, blad:null, noweWersje:[]};
+  const obserwatorzy = new Set();
+  const powiadom = () => obserwatorzy.forEach(fn => { try{ fn(wynik); }catch(e){} });
+  const wynik = {meble: stan, ruchy: [], stop, zastosujRuch, kontrola,
+    obserwuj(fn){ obserwatorzy.add(fn); return () => obserwatorzy.delete(fn); }};
   let timer = null;
+  const czytajJSON = api.pobierzJSON || pobierzJSON;
+  const listaMebli = api.meble || MEBLE;
+  const okresMs = api.okresMs ?? OKRES_MS;
   const pokolenia = utworzBramkePokolen();
+  const KLUCZ_WERSJI = 'mieszkanie-webgpu:znane-wersje-mebli:1';
+  function zapiszKontroleWersji(){
+    let znane = {};
+    try{ znane = JSON.parse(globalThis.localStorage?.getItem(KLUCZ_WERSJI) || '{}'); }catch(e){}
+    const teraz = {}, nowe = [];
+    for(const [id,w] of stan){
+      const v = w.manifest?.currentVersion;
+      if(!v) continue;
+      teraz[id] = v;
+      if(znane[id] && znane[id] !== v) nowe.push({id, poprzednia:znane[id], nowa:v});
+    }
+    kontrola.noweWersje = nowe;
+    try{ globalThis.localStorage?.setItem(KLUCZ_WERSJI, JSON.stringify({...znane,...teraz})); }catch(e){}
+  }
 
   /* Łóżko bazowe: zaufany moduł JS wydzielony z renderera, nie JSON.
      Format JSON nie odtwarza jego sprzężonych siłowników, więc dopóki nie
@@ -344,12 +366,12 @@ export async function uruchomBiblioteke(api){
     return {korzen, ruchy, postep, zaczepy, pominiete: []};
   }
 
-  async function zaladujMebel(id, nazwa){
+  async function zaladujMebel(id, nazwa, {wymus=false} = {}){
     const pokolenie = pokolenia.rozpocznij(id);
     const poprzedni = stan.get(id) || {};
     let manifest;
     try{
-      manifest = await pobierzJSON('meble/' + id + '/manifest.json');
+      manifest = await czytajJSON('meble/' + id + '/manifest.json');
     }catch(e){
       if(!pokolenia.aktualne(id, pokolenie)) return false;
       // nieudany odczyt nie usuwa poprawnego modelu z widoku
@@ -370,7 +392,7 @@ export async function uruchomBiblioteke(api){
           {nazwa, manifest, wersja:null, korzen:null, ruchy:[], pominiete:[], brak}, brak));
       return false;
     }
-    if(poprzedni.wersja === wybrana.id && poprzedni.korzen){
+    if(!wymus && poprzedni.wersja === wybrana.id && poprzedni.korzen){
       if(poprzedni.status === STATUS_MODELU.REJECTED){
         stan.set(id, {...poprzedni, manifest, status: poprzedni.aktywnyStatus || STATUS_MODELU.COMPLETE,
           blad: undefined, zachowanyPoprzedni: false});
@@ -385,7 +407,7 @@ export async function uruchomBiblioteke(api){
         const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana);
         zbudowane = await zbudujLegacy(wybrana, umiejscowienie);
       }else{
-        dane = await pobierzJSON(wybrana.file);
+        dane = await czytajJSON(wybrana.file);
         if(!pokolenia.aktualne(id, pokolenie)) return false;
         if(dane.assetId !== id || dane.version !== wybrana.id)
           throw Error('Identyfikator albo wersja modelu nie pasuje do katalogu.');
@@ -426,30 +448,53 @@ export async function uruchomBiblioteke(api){
   async function przypnij(id, wersja){
     pokolenia.uniewaznij(id);
     const w = stan.get(id) || {};
-    stan.set(id, {...w, przypieta: wersja || undefined, wersja: null});
-    const zmiana=await zaladujMebel(id, w.nazwa || id);
+    const wpis = wersja ? w.manifest?.versions?.find(v => v.id === wersja) : null;
+    if(wersja && (!wpis || !czyWersjaPotwierdzona(w.manifest, wpis)))
+      throw Error('Wybrana wersja nie istnieje albo nie ma zatwierdzonego położenia.');
+    stan.set(id, {...w, przypieta: wersja || undefined});
+    const zmiana=await zaladujMebel(id, w.nazwa || id, {wymus:true});
     if(zmiana){ wynik.ruchy=[...stan.values()].flatMap(x=>x.ruchy||[]); przyZmianie?.(wynik); }
+    powiadom();
     return zmiana;
   }
   wynik.przypnij = przypnij;
 
-  async function wykonajOdswiezenie(){
+  async function wykonajOdswiezenie({wymus=false, tylkoId=null, powod='okresowe'} = {}){
+    kontrola.trwa = true; kontrola.powod = powod; kontrola.blad = null; powiadom();
     let gotowych = 0;
-    const wyniki = await Promise.all(MEBLE.map(async ([id, nazwa]) => {
-      const r = await zaladujMebel(id, nazwa);
-      postep(`Meble z biblioteki — ${++gotowych} z ${MEBLE.length}…`, .80 + .13*(gotowych/MEBLE.length));
-      return r;
-    }));
-    wynik.ruchy = [...stan.values()].flatMap(w => w.ruchy || []);
-    const zmiana = wyniki.some(Boolean);
-    if(zmiana) przyZmianie?.(wynik);
-    return zmiana;
+    const lista = tylkoId ? listaMebli.filter(([id]) => id === tylkoId) : listaMebli;
+    try{
+      if(!lista.length) throw Error('Nieznany mebel: ' + tylkoId);
+      const wyniki = await Promise.all(lista.map(async ([id, nazwa]) => {
+        const r = await zaladujMebel(id, nazwa, {wymus});
+        postep(`Meble z biblioteki — ${++gotowych} z ${lista.length}…`, .80 + .13*(gotowych/lista.length));
+        return r;
+      }));
+      wynik.ruchy = [...stan.values()].flatMap(w => w.ruchy || []);
+      zapiszKontroleWersji();
+      const zmiana = wyniki.some(Boolean);
+      if(zmiana) przyZmianie?.(wynik);
+      return zmiana;
+    }catch(e){ kontrola.blad = e.message; throw e; }
+    finally{ kontrola.trwa=false; kontrola.ostatnia=Date.now(); powiadom(); }
   }
-  const odswiez = singleFlight(wykonajOdswiezenie);
+  const odswiez = singleFlight(() => wykonajOdswiezenie());
   wynik.odswiez = odswiez;
+  const wymusPrzeladowanie = singleFlight(async id => {
+    if(odswiez.aktywne) await odswiez.aktywne;
+    if(id) pokolenia.uniewaznij(id); else for(const [mebelId] of listaMebli) pokolenia.uniewaznij(mebelId);
+    return wykonajOdswiezenie({wymus:true, tylkoId:id || null, powod:'wymuszone'});
+  });
+  wynik.wymusPrzeladowanie = wymusPrzeladowanie;
+  wynik.dostepneWersje = id => {
+    const w = stan.get(id), manifest = w?.manifest;
+    return (manifest?.versions || []).map(v => ({id:v.id, summary:v.summary || '',
+      current:v.id === manifest.currentVersion, selected:v.id === w.wersja,
+      confirmed:czyWersjaPotwierdzona(manifest,v)}));
+  };
   function stop(){ if(timer){ clearInterval(timer); timer = null; } }
 
-  await odswiez();
-  timer = setInterval(() => { if(!document.hidden) odswiez(); }, OKRES_MS);
+  await wykonajOdswiezenie({powod:'start'});
+  if(okresMs > 0) timer = setInterval(() => { if(!globalThis.document?.hidden) odswiez(); }, okresMs);
   return wynik;
 }
