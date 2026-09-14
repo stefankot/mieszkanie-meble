@@ -1,0 +1,110 @@
+name: Generate regal-przy-lozku v0020
+
+on:
+  push:
+    paths:
+      - '.github/workflows/generate-v0020.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Generate v0020 and activate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          base_path = Path('meble/regal-przy-lozku/wersje/v0018.json')
+          out_path = Path('meble/regal-przy-lozku/wersje/v0020.json')
+          manifest_path = Path('meble/regal-przy-lozku/manifest.json')
+
+          d = json.loads(base_path.read_text())
+          d['version'] = 'v0020'
+          d['summary'] = ('Powrót do położenia kubika z v0018 i dodanie wewnętrznych podziałów wg zatwierdzonej siatki: '
+                          'lewa połowa otwarta, trzecia ćwiartka dzielona poziomo, prawa ćwiartka na cztery poziomy.')
+          d['placement']['confirmed'] = True
+          d['placement']['description'] = ('Ustawienie i obrys odziedziczone z potwierdzonego v0018; '
+                                             'zmienia się wyłącznie wewnętrzny podział koralowego kubika.')
+          d['model']['name'] = 'Regał przy łóżku — L, kobalt + biel + drewno + koralowa półka z podziałami'
+
+          ids = {p.get('id') for p in d['model']['parts']}
+          new_parts = [
+            {
+              'id':'SHORT-WING-CORAL-GRID-V2','type':'box','sizeMm':[18,564,194],
+              'positionMm':[-1182,1100,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Podział pionowy: granica lewej otwartej połowy i trzeciej ćwiartki','bevelMm':0.5
+            },
+            {
+              'id':'SHORT-WING-CORAL-GRID-V3','type':'box','sizeMm':[18,564,194],
+              'positionMm':[-1032,1100,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Podział pionowy: granica trzeciej i prawej ćwiartki','bevelMm':0.5
+            },
+            {
+              'id':'SHORT-WING-CORAL-GRID-Q3-H2','type':'box','sizeMm':[150,18,194],
+              'positionMm':[-1107,1100,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Trzecia ćwiartka: pojedynczy podział poziomy','bevelMm':0.5
+            },
+            {
+              'id':'SHORT-WING-CORAL-GRID-Q4-H1','type':'box','sizeMm':[150,18,194],
+              'positionMm':[-957,950,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Prawa ćwiartka: podział poziomy 1/3 siatki 4×4','bevelMm':0.5
+            },
+            {
+              'id':'SHORT-WING-CORAL-GRID-Q4-H2','type':'box','sizeMm':[150,18,194],
+              'positionMm':[-957,1100,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Prawa ćwiartka: podział poziomy 2/3 siatki 4×4','bevelMm':0.5
+            },
+            {
+              'id':'SHORT-WING-CORAL-GRID-Q4-H3','type':'box','sizeMm':[150,18,194],
+              'positionMm':[-957,1250,1015],'rotationDeg':[0,0,0],
+              'material':'coral-light-matte','label':'Prawa ćwiartka: podział poziomy 3/3 siatki 4×4','bevelMm':0.5
+            }
+          ]
+          for p in new_parts:
+              if p['id'] not in ids:
+                  d['model']['parts'].append(p)
+
+          d['model'].setdefault('notes', []).extend([
+              'v0020 wraca do pionowego położenia koralowego kubika z v0018: y=800..1400 mm.',
+              'Podział wg zatwierdzonego SVG: lewa połowa bez podziałów; trzecia ćwiartka z jednym podziałem poziomym; prawa ćwiartka z trzema podziałami poziomymi tworzącymi cztery rzędy.',
+              'Kubik pozostaje otwarty od strony drzwi pokoju i bez drzwiczek.'
+          ])
+          out_path.write_text(json.dumps(d, ensure_ascii=False, separators=(',',':')))
+
+          m = json.loads(manifest_path.read_text())
+          m['currentVersion'] = 'v0020'
+          m['versions'] = [v for v in m.get('versions', []) if v.get('id') != 'v0020']
+          m['versions'].append({
+              'id':'v0020',
+              'file':'meble/regal-przy-lozku/wersje/v0020.json',
+              'summary':'Powrót do położenia kubika z v0018; dodano podziały wg zatwierdzonego SVG: lewa połowa otwarta, trzecia ćwiartka dzielona poziomo, prawa ćwiartka na cztery poziomy.',
+              'createdAt':'2026-09-14T23:10:00+02:00',
+              'placement':{
+                  'confirmed':True,'roomId':'POKOJ-LOZKO','wallId':'POKOJ-LOZKO-W3',
+                  'positionMm':[3408,0,7125],'rotationDeg':180,
+                  'confirmationSvg':'meble/regal-przy-lozku/plany/v0020-kubik-podzial.svg',
+                  'description':'Ustawienie i obrys jak w potwierdzonym v0018; zaakceptowano wyłącznie nowy wewnętrzny podział kubika.'
+              }
+          })
+          manifest_path.write_text(json.dumps(m, ensure_ascii=False, separators=(',',':')))
+
+          # basic validation
+          assert d['version'] == 'v0020'
+          assert d['placement']['confirmed'] is True
+          assert len({p['id'] for p in d['model']['parts']}) == len(d['model']['parts'])
+          assert m['currentVersion'] == 'v0020'
+          PY
+      - name: Commit generated model
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add meble/regal-przy-lozku/wersje/v0020.json meble/regal-przy-lozku/manifest.json
+          git commit -m "Activate regal-przy-lozku v0020 cubby grid"
+          git push
