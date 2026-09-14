@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1200 -500 11800 8500" role="img" aria-labelledby="title desc">
+<title id="title">Plan mieszkania ZP3 — Regał przy łóżku v0006</title>
+<desc id="desc">Nowy regał L w prawym dolnym narożniku pokoju z łóżkiem. Główne skrzydło 1764×570 mm przy POKOJ-LOZKO-W3; drewniane skrzydło boczne 420×1200 mm przy POKOJ-LOZKO-W2.</desc>
+<defs><marker id="arrowFront" markerWidth="12" markerHeight="12" refX="8" refY="5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L10,5 L0,10 z" fill="#b8003c"/></marker><marker id="arrowDim" markerWidth="9" markerHeight="9" refX="4.5" refY="4.5" orient="auto-start-reverse"><path d="M0,0 L9,4.5 L0,9 z" fill="#333"/></marker></defs>
+<rect x="-1200" y="-500" width="11800" height="8500" fill="#f7f6f0"/>
+<polygon points="0,0 10060,0 10060,5140 5040,5140 5040,7560 0,7560" fill="#888a81"/>
+<polygon points="6120,150 9820,150 9820,2390 6120,2390" fill="#e4edde" stroke="#454b42" stroke-width="14"/>
+<text x="7970" y="1225" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Kuchnia</text>
+<polygon points="5220,150 6000,150 6000,1600 5220,1600" fill="#f0e8dd" stroke="#454b42" stroke-width="14"/>
+<text x="5610" y="830" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">WC</text>
+<polygon points="3690,150 5140,150 5140,2390 3690,2390" fill="#dde9ed" stroke="#454b42" stroke-width="14"/>
+<text x="4415" y="1225" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Łazienka</text>
+<polygon points="240,150 3570,150 3570,4990 240,4990" fill="#ede8d7" stroke="#454b42" stroke-width="14"/>
+<text x="1905" y="2525" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Salon</text>
+<polygon points="6120,2540 9820,2540 9820,4990 6120,4990" fill="#e5e0ec" stroke="#454b42" stroke-width="14"/>
+<text x="7970" y="3720" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Pokój</text>
+<polygon points="5220,1600 6000,1600 6000,4990 3690,4990 3690,2540 5220,2540" fill="#e7e6df" stroke="#454b42" stroke-width="14"/>
+<text x="4845" y="3250" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Przedpokój</text>
+<polygon points="240,5140 4890,5140 4890,7410 240,7410" fill="#e6eada" stroke="#454b42" stroke-width="14"/>
+<text x="2565" y="6230" text-anchor="middle" font-family="sans-serif" font-size="125" font-weight="bold">Pokój z łóżkiem</text>
+<text x="2565" y="6380" text-anchor="middle" font-family="sans-serif" font-size="82">POKOJ-LOZKO</text>
+<rect x="9820" y="1000" width="240" height="1360" fill="#3e92b6"/><rect x="9820" y="2570" width="240" height="1650" fill="#3e92b6"/><rect x="0" y="5510" width="240" height="1380" fill="#3e92b6"/><rect x="0" y="1000" width="240" height="1400" fill="#3e92b6"/><rect x="0" y="3220" width="240" height="980" fill="#3e92b6"/><rect x="0" y="2400" width="240" height="820" fill="#d77b32"/>
+<rect x="4030" y="4990" width="780" height="150" fill="#d77b32"/><rect x="5100" y="4990" width="820" height="150" fill="#d77b32"/><rect x="6000" y="1580" width="120" height="800" fill="#d77b32"/><rect x="6000" y="3430" width="120" height="790" fill="#d77b32"/><rect x="5140" y="1600" width="80" height="790" fill="#d77b32"/><rect x="5220" y="1500" width="780" height="200" fill="#d77b32"/><rect x="3570" y="3410" width="120" height="790" fill="#d77b32"/>
+<rect x="6120" y="970" width="550" height="600" fill="#666"/><rect x="-1000" y="150" width="1000" height="4840" fill="#d9dde0" stroke="#454b42" stroke-width="14"/>
+<g id="regal-przy-lozku-v0006">
+  <path d="M3126 6840 H4470 V6210 H4890 V7410 H3126 Z" fill="#b8003c" fill-opacity="0.52" stroke="#7f002a" stroke-width="28"/>
+  <rect x="4470" y="6210" width="420" height="1200" fill="#c9a878" fill-opacity="0.82" stroke="#7c5d37" stroke-width="20"/>
+  <text x="3660" y="7165" font-family="sans-serif" font-size="95" font-weight="bold" fill="#fff" text-anchor="middle">główne 60+60+60</text>
+  <text x="4680" y="6570" font-family="sans-serif" font-size="78" font-weight="bold" fill="#4d351d" text-anchor="middle" transform="rotate(-90 4680 6570)">drewniane 60+60</text>
+  <line x1="4008" y1="6840" x2="4008" y2="6510" stroke="#b8003c" stroke-width="28" marker-end="url(#arrowFront)"/>
+  <text x="4060" y="6520" font-family="sans-serif" font-size="70" fill="#7f002a">front</text>
+  <line x1="3126" y1="6760" x2="4890" y2="6760" stroke="#333" stroke-width="12" marker-start="url(#arrowDim)" marker-end="url(#arrowDim)"/>
+  <text x="4008" y="6710" font-family="sans-serif" font-size="72" fill="#222" text-anchor="middle">1764 mm</text>
+  <line x1="4970" y1="6210" x2="4970" y2="7410" stroke="#333" stroke-width="12" marker-start="url(#arrowDim)" marker-end="url(#arrowDim)"/>
+  <text x="5035" y="6810" font-family="sans-serif" font-size="72" fill="#222" text-anchor="middle" transform="rotate(-90 5035 6810)">1200 mm</text>
+  <text x="4720" y="6035" font-family="sans-serif" font-size="65" fill="#333">POKOJ-LOZKO-W2</text>
+  <text x="3490" y="7500" font-family="sans-serif" font-size="65" fill="#333">POKOJ-LOZKO-W3</text>
+</g>
+</svg>
