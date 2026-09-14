@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0001.svg",
-    "description": "Pokój z łóżkiem. Obrys 2270 × 1636 mm jest rozpięty między POKOJ-LOZKO-W1 i W3; tylna krawędź jest 200 mm od POKOJ-LOZKO-W4 (ściana z oknem). Lokalny +Z/front jest skierowany do wnętrza pokoju. Ustawienie zaakceptowane 2026-09-08."
+    "confirmationSvg": "meble/lozko/plany/v0002.svg",
+    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Dwa stalowe schodki przy prawej stronie mają 500 mm szerokości, 600 mm wysunięcia w stronę pokoju i 500 mm wysokości całkowitej; to rozszerzenie obrysu zostało zaakceptowane poleceniem aktywacji wersji v0002."
   },
-  "currentVersion": "bazowa",
+  "currentVersion": "v0002",
   "versions": [
     {
       "id": "bazowa",
@@ -41,6 +41,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0001.svg",
         "description": "Pokój z łóżkiem. Obrys 2270 × 1636 mm jest rozpięty między POKOJ-LOZKO-W1 i W3; tylna krawędź jest 200 mm od POKOJ-LOZKO-W4 (ściana z oknem). Lokalny +Z/front jest skierowany do wnętrza pokoju. Ustawienie zaakceptowane 2026-09-08."
+      }
+    },
+    {
+      "id": "v0002",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0002-native.js",
+      "nativeBuilder": "buildLozkoV0002",
+      "runtime": "native-override",
+      "summary": "Pełny natywny model: rama 800 mm od pokoju i 1200 mm przy kaloryferze, zielone płyty, błękitny perforowany SPF, biały materac i klinowe poduchy z grubym splotem, stalowy pas 234 mm na wysokości materaca, 2 stalowe schodki oraz 2 drony. Zachowane perforacje, sprzężony lift i siłowniki.",
+      "createdAt": "2026-09-14T23:21:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0002.svg",
+        "description": "Pozycja korpusu bez zmian. Stalowe schodki 500 × 600 × 500 mm rozszerzają obrys o 600 mm w stronę pokoju przy prawej stronie łóżka; wersja aktywowana na wyraźne polecenie użytkownika."
       }
     }
   ]
