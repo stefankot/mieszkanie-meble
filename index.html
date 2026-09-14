@@ -68,6 +68,41 @@
  })();
 </script>
 <script>
+ /* Naprawa historycznego auto-pinowania wersji mebla. Biblioteka zapisywała
+    automatycznie aktualnie wczytaną wersję jako trwały wybór użytkownika, więc
+    późniejszy currentVersion z manifestu (np. v0019) nie był już wybierany.
+    Przed startem modułów usuwamy tylko nieaktualny pin regału przy łóżku.
+    Ten sam test działa później okresowo, aby przyszłe wersje też pojawiały się
+    bez ręcznego czyszczenia localStorage. */
+ (function(){
+   const KLUCZ = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
+   const ID = 'regal-przy-lozku';
+   const URL_MANIFESTU = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/meble/regal-przy-lozku/manifest.json';
+
+   async function odblokujNajnowsza({przeladuj=false} = {}){
+     try{
+       const manifest = await fetch(URL_MANIFESTU + '?t=' + Date.now(), {cache:'no-store'}).then(r => {
+         if(!r.ok) throw Error('HTTP ' + r.status);
+         return r.json();
+       });
+       const zapisane = JSON.parse(localStorage.getItem(KLUCZ) || '{}');
+       const przypieta = zapisane && typeof zapisane === 'object' ? zapisane[ID] : null;
+       if(przypieta && manifest.currentVersion && przypieta !== manifest.currentVersion){
+         delete zapisane[ID];
+         localStorage.setItem(KLUCZ, JSON.stringify(zapisane));
+         if(przeladuj) location.reload();
+       }
+     }catch(e){
+       console.warn('Kontrola wersji regału:', e);
+     }
+   }
+
+   window.__odblokujNajnowszaWersjeRegalu = odblokujNajnowsza;
+   odblokujNajnowsza();
+   setInterval(() => odblokujNajnowsza({przeladuj:true}), 15000);
+ })();
+</script>
+<script>
  /* Postęp ładowania. Celowo w zwykłym skrypcie, a nie w module: ma działać
     natychmiast i przetrwać sytuację, w której moduł w ogóle się nie wczyta. */
  (function(){
