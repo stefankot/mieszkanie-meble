@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0008.svg",
     "description": "Łóżko pozostaje przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0009",
+  "currentVersion": "v0010",
   "versions": [
     {
       "id": "bazowa",
@@ -191,6 +191,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Pozycja i footprint bez zmian względem v0008. Zmiana dotyczy usunięcia poduch przy oknie oraz przebudowy rytmu tylnych wnęk bez zmiany ich głębokości."
+      }
+    },
+    {
+      "id": "v0010",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0010-native.js",
+      "nativeBuilder": "buildLozkoV0010",
+      "runtime": "native-override",
+      "summary": "Stabilizacja v0009 na sprawdzonej bazie v0008: zachowany projekt bez dwóch poduch przy oknie oraz 7 tylnych wnęk 200, 240, 276, 308, 337, 365, 400 mm, wysokość 750–1200 mm i głębokość 200 mm. Tylne LED-y nie tworzą już osobnego PointLight dla każdej wnęki; używają emisyjnych pasków i jawnego opisu root.userData.lighting dla stałej puli świateł renderera. Eliminuje to również automatyczne raycastowanie wnęk łóżka. Placement i footprint bez zmian.",
+      "createdAt": "2026-09-15T10:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Pozycja i footprint bez zmian względem v0008/v0009. Wersja naprawcza po zawieszaniu renderera przez v0009."
       }
     }
   ]
