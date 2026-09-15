@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0008.svg",
     "description": "Łóżko pozostaje przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0012",
+  "currentVersion": "v0013",
   "versions": [
     {
       "id": "bazowa",
@@ -248,6 +248,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Pozycja i footprint bez zmian względem v0008/v0011. Wersja v0012 jest nową, niemodyfikującą archiwalnej v0008 rewizją opartą bezpośrednio na v0008."
+      }
+    },
+    {
+      "id": "v0013",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0013-native.js",
+      "nativeBuilder": "buildLozkoV0013",
+      "runtime": "native-override",
+      "summary": "Przebudowa układu wnęk na bazie v0008. Front zachowuje dwa rzędy i mocne oświetlenie v0008, ale każdy rząd ma własny rytm pionowy. Rząd 1 (górny) po uwzględnieniu ścianek 18 mm: 532, 558, 155, 537, 380 mm. Rząd 2 (dolny): 476, 300, 419, 171, 304, 474 mm. Górny pas tylnej ściany ma dokładnie 400 mm wysokości (800–1200 mm) i sześć wnęk: 326, 320, 605, 160, 217, 516 mm. Wymiary zachowują proporcje podane przez użytkownika i zostały znormalizowane do pełnych 2270 mm wraz ze ściankami. LED-y pozostają jak w v0008: emissive 12 + PointLight 85 / 520 mm. Dolna wentylowana część tylnej ściany przy grzejniku pozostaje zachowana; usunięte poduchy przy oknie nie wracają.",
+      "createdAt": "2026-09-15T14:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Pozycja i footprint bez zmian względem v0008/v0012. Zmiana dotyczy wyłącznie podziałów pionowych wnęk frontu oraz górnego pasa tylnej ściany; dolna wentylowana strefa tylna pozostaje bez zmian."
       }
     }
   ]
