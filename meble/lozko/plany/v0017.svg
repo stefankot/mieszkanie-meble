@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 4900 5400 2900">
+  <rect x="240" y="5140" width="4650" height="2270" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="2565" y="5070" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-LOZKO</text>
+  <line x1="240" y1="5140" x2="240" y2="7410" stroke="#333" stroke-width="28"/>
+  <text x="300" y="5350" font-family="sans-serif" font-size="70">W4 / okno</text>
+  <rect x="240" y="5510" width="40" height="1380" fill="#7fc5df"/>
+  <line x1="240" y1="5140" x2="4890" y2="5140" stroke="#333" stroke-width="28"/>
+  <text x="3250" y="5230" font-family="sans-serif" font-size="64">W1 / ściana przy schodach</text>
+
+  <!-- korpus: placement bez zmian -->
+  <rect x="640" y="5140" width="1636" height="2270" fill="#D9D1CA" stroke="#111" stroke-width="24"/>
+  <rect x="440" y="5140" width="200" height="2270" fill="#cee7ef" fill-opacity="0.35" stroke="#5d8794" stroke-width="16" stroke-dasharray="35 22"/>
+  <text x="1458" y="6350" font-family="sans-serif" font-size="92" font-weight="700" text-anchor="middle">ŁÓŻKO v0017</text>
+  <text x="1458" y="6480" font-family="sans-serif" font-size="66" text-anchor="middle">body 2270 × 1636 mm · pozycja [1458,0,6275] · 90°</text>
+
+  <!-- schody 600 W × 600 D × 600 H; przesunięte do ściany W1, 0 mm luzu -->
+  <!-- stopień 3 przy łóżku: H=600, D=200 -->
+  <rect x="2276" y="5140" width="200" height="600" fill="#e4e7e9" stroke="#6d7478" stroke-width="18"/>
+  <text x="2376" y="5450" font-family="sans-serif" font-size="48" text-anchor="middle">S3 H600</text>
+
+  <!-- stopień 2: H=400, D=200 -->
+  <rect x="2476" y="5140" width="200" height="600" fill="#d8dde0" stroke="#6d7478" stroke-width="18"/>
+  <text x="2576" y="5450" font-family="sans-serif" font-size="48" text-anchor="middle">S2 H400</text>
+
+  <!-- stopień 1 od pokoju: H=200, D=200 -->
+  <rect x="2676" y="5140" width="200" height="600" fill="#cdd3d6" stroke="#6d7478" stroke-width="18"/>
+  <text x="2776" y="5450" font-family="sans-serif" font-size="48" text-anchor="middle">S1 H200</text>
+
+  <!-- 0 mm luzu od W1 -->
+  <line x1="2960" y1="5140" x2="2960" y2="5740" stroke="#174" stroke-width="12"/>
+  <text x="3050" y="5450" font-family="sans-serif" font-size="62" fill="#174">schody przy samej ścianie W1 · 0 mm luzu</text>
+
+  <!-- całkowita projekcja 600 mm -->
+  <line x1="2276" y1="5865" x2="2876" y2="5865" stroke="#174" stroke-width="12"/>
+  <line x1="2276" y1="5815" x2="2276" y2="5915" stroke="#174" stroke-width="12"/>
+  <line x1="2876" y1="5815" x2="2876" y2="5915" stroke="#174" stroke-width="12"/>
+  <text x="2576" y="5975" font-family="sans-serif" font-size="58" text-anchor="middle" fill="#174">600 mm projekcji = 3 × 200 mm</text>
+
+  <text x="3050" y="6820" font-family="sans-serif" font-size="64">Schodek z polerowanej stali, obwiednia maks. 600 × 600 × 600 mm.</text>
+  <text x="3050" y="6910" font-family="sans-serif" font-size="64">3 stopnie: 200 / 400 / 600 mm wysokości, każdy 200 mm głębokości.</text>
+  <text x="3050" y="7000" font-family="sans-serif" font-size="64">Pozycja automatycznie potwierdzona przy publikacji v0017.</text>
+</svg>
