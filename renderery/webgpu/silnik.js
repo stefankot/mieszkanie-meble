@@ -1040,6 +1040,8 @@ const kGlebia = przebieg.getTextureNode('depth');
 // oszczędność pasma — tak samo jak w oficjalnych przykładach three.js
 przebieg.getTexture('normal').type = THREE.UnsignedByteType;
 przebieg.getTexture('metalrough').type = THREE.UnsignedByteType;
+przebieg.getTexture('metalrough').format = THREE.RGFormat;
+przebieg.getTexture('velocity').format = THREE.RGFormat;
 przebieg.getTexture('diffuseColor').type = THREE.UnsignedByteType;
 
 const normalnaSceny = sample(uv => unpackRGBToNormal(kNormal.sample(uv)));

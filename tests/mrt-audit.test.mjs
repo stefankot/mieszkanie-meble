@@ -7,4 +7,14 @@ test('minimal and medium do not claim unused MRT attachments',()=>{
   assert.ok(a.profiles.srednia.unused.includes('metalrough'));
   assert.equal(a.profiles.wysoka.unused.length,0);
   assert.ok(a.profiles.minimalna.estimatedColorWriteMiB<a.profiles.srednia.estimatedColorWriteMiB);
+  assert.equal(a.currentBytesPerSample,30);
+  assert.equal(a.attachments.metalrough.bytes,2);
+  assert.equal(a.attachments.velocity.bytes,4);
+});
+
+test('renderer configures two-channel formats for vec2 attachments',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  const source=await readFile('renderery/webgpu/silnik.js','utf8');
+  assert.match(source,/getTexture\('metalrough'\)\.format = THREE\.RGFormat/);
+  assert.match(source,/getTexture\('velocity'\)\.format = THREE\.RGFormat/);
 });

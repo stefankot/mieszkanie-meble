@@ -3,8 +3,8 @@ const ATTACHMENTS=Object.freeze({
   diffuseColor:{bytes:4,why:'SSGI albedo'},
   emissive:{bytes:8,why:'selective bloom'},
   normal:{bytes:4,why:'SSGI/SSR edge data'},
-  metalrough:{bytes:2,why:'SSR material data'},
-  velocity:{bytes:8,why:'TAAU/temporal reprojection'}
+  metalrough:{bytes:2,why:'SSR material data · RG8'},
+  velocity:{bytes:4,why:'TAAU/temporal reprojection · RG16F'}
 });
 
 export const MRT_PROFILE_NEEDS=Object.freeze({
@@ -25,5 +25,5 @@ export function audytMrt(width,height,pixelRatio=1){
   }
   return {prototype:'attachment-write estimate; not GPU timing',width,height,pixelRatio,
     currentBytesPerSample:all,attachments:ATTACHMENTS,profiles,
-    decision:'keep shared MRT baseline; rebuilding pass-dependent node graphs on every profile switch is disproportionate'};
+    decision:'shared MRT with two-channel metalrough and velocity; profile-specific graphs remain deferred'};
 }

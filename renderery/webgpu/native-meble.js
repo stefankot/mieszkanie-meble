@@ -1,5 +1,6 @@
 import * as Core from 'three/webgpu';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {przygotujKorzenMebla,zwolnijNieUzywaneZasoby} from './zasoby-mebli.js';
 
 const THREE = {...Core, RoundedBoxGeometry};
 const ROOT = new URL('../../', import.meta.url);
@@ -60,10 +61,6 @@ function markMigrated(key){
   catch(e){}
 }
 
-function disposeOldGeometry(root){
-  root?.traverse?.(o => o.geometry?.dispose?.());
-}
-
 async function buildOverride(lib, wpis, versionEntry, placement, manifest){
   const moduleUrl = new URL(versionEntry.nativeOverrideFile, ROOT);
   moduleUrl.searchParams.set('v', versionEntry.id);
@@ -79,6 +76,7 @@ async function buildOverride(lib, wpis, versionEntry, placement, manifest){
   built.korzen.userData.version = versionEntry.id;
   built.korzen.userData.nativeOverrideVersion = versionEntry.id;
   built.korzen.userData.nativeBuildMs = Math.round(buildMs);
+  przygotujKorzenMebla(built.korzen);
 
   const main = built.ruchy?.find(r => r.id === 'lozko:lift');
   if(main && typeof built.applyDependentState === 'function'){
@@ -97,7 +95,8 @@ async function buildOverride(lib, wpis, versionEntry, placement, manifest){
   if(!scene) throw new Error('Nie znaleziono sceny dla natywnego modelu.');
   if(oldRoot) scene.remove(oldRoot);
   scene.add(built.korzen);
-  disposeOldGeometry(oldRoot);
+  const disposed=zwolnijNieUzywaneZasoby(oldRoot,scene);
+  built.korzen.userData.disposedPreviousResources=disposed;
 
   const next = {
     ...wpis,
