@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0015.svg",
-    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0015 został potwierdzony przy publikacji. Zamiast stalowego klocka są dwa schodki z polerowanej stali, każdy 300 mm szerokości i 200 mm głębokości: 300 mm wysokości od strony pokoju oraz 500 mm przy łóżku; prawa krawędź schodów pozostaje 500 mm od prawej ściany."
+    "confirmationSvg": "meble/lozko/plany/v0016.svg",
+    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0016 został potwierdzony przy publikacji. Schodek z polerowanej stali ma trzy stopnie i mieści się w obwiedni 600 × 600 × 600 mm; jego prawa krawędź pozostaje 500 mm od prawej ściany."
   },
-  "currentVersion": "v0015",
+  "currentVersion": "v0016",
   "versions": [
     {
       "id": "bazowa",
@@ -305,6 +305,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0015.svg",
         "description": "Pozycja potwierdzona przez użytkownika przy publikacji. Korpus pozostaje jak v0014, a schody zajmują world footprint X=2276–2676 mm, Z=5640–5940 mm. Stopień przy łóżku ma H=500 mm, zewnętrzny H=300 mm; oba mają 300 mm szerokości i 200 mm głębokości."
+      }
+    },
+    {
+      "id": "v0016",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0016-native.js",
+      "nativeBuilder": "buildLozkoV0016",
+      "runtime": "native-override",
+      "summary": "Rewizja v0016 na bazie zatwierdzonego układu wnęk v0013. Oświetlenie nie jest już tworzone osobno w każdym kubiku: usunięto bezpośrednie PointLighty i segmentowane paski, a łóżko deklaruje dokładnie trzy ciągłe poziome pasy LED o pełnej szerokości 2270 mm — dwa na froncie pod materacem i jeden w górnym pasie z tyłu. Pasy przechodzą przez pionowe ścianki i korzystają ze stałej puli świateł renderera. Drzwiczki R1.2, R1.4, R2.3 i R2.6 są wpuszczone 20 mm, zamknięte i mają kolor ramy #D9D1CA. Materac i pozostałe poduchy mają #FFA084. Schodek z polerowanej stali odpowiada referencji: trzy stopnie 200/400/600 mm wysokości, każdy 200 mm głębokości, w maksymalnej obwiedni 600 × 600 × 600 mm.",
+      "createdAt": "2026-09-15T16:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0016.svg",
+        "description": "Pozycja potwierdzona przy publikacji zgodnie z poleceniem użytkownika. Korpus pozostaje w pozycji v0015. Trzystopniowe schody zajmują world footprint X=2276–2876 mm, Z=5640–6240 mm; obwiednia 600 × 600 × 600 mm, prawa krawędź 500 mm od prawej ściany."
       }
     }
   ]
