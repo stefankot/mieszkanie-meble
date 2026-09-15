@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
   wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen, singleFlight,
   statusPoZbudowaniu, odrzuconyStan} from '../renderery/webgpu/furniture-sync.js?p7reload1';
@@ -113,6 +114,12 @@ test('furniture controls filter mechanisms to the selected furniture', () => {
   assert.deepEqual(interakcje.ruchy('a').map(x=>x.ruch.id),['a:door']);
   assert.equal(interakcje.otworzWszystko(true,'a'),1);
   assert.equal(a.cel,1); assert.equal(b.cel,0);
+});
+
+test('native furniture startup preserves the version selected by the user', () => {
+  const source=fs.readFileSync('renderery/webgpu/native-meble.js','utf8');
+  assert.match(source,/syncNativeBed\(\);/);
+  assert.doesNotMatch(source,/forceCurrent|przypnij\(ID,\s*manifest\.currentVersion\)/);
 });
 
 test('generation token prevents a stale async version from winning', async () => {

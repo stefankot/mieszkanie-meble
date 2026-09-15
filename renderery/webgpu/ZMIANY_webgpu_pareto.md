@@ -1300,3 +1300,9 @@ Wybrana konkretna wersja jest zapisywana per assetId w `localStorage` i wczytywa
 [NO DATA] NO GPU TIMING. Zmiana nie modyfikuje parametrów potoku obrazu. Dodatkowy odczyt małego wpisu `localStorage` występuje tylko przy starcie; brak deklarowanego wpływu na FPS.
 
 Rollback: cofnięcie P7c przywraca sufit 250 cm, wcześniejszy układ panelu i automatyczne podążanie za `currentVersion`. Usunięcie klucza `mieszkanie-webgpu:wybrane-wersje-mebli:1` resetuje trwałe wybory bez zmiany danych mebli.
+
+## P7d — trwały wybór natywnej wersji łóżka (2026-09-15)
+
+[CURRENT CODE] Nowy adapter `native-meble.js` uruchamiał się z `forceCurrent:true` i przez `biblioteka.przypnij()` zastępował zapamiętaną wersję łóżka wartością `manifest.currentVersion`. Usunięto ten wyjątek: adapter buduje teraz natywny model dla wersji już wybranej przez bibliotekę. Import adaptera ograniczono do przeglądarki, aby jego timer nie blokował testów Node. Zaktualizowano cache-bust importu oraz nieaktualne oczekiwanie wersji regału w teście planu. Test regresji blokuje ponowne wymuszanie wersji bieżącej podczas startu.
+
+Oczekiwany efekt wizualny: po ponownym otwarciu strony łóżko zachowuje wybraną wersję zamiast samoczynnie przechodzić na najnowszą. Oczekiwany efekt wydajności: brak; **NO GPU TIMING**. Rollback: revert P7d. Publikacja objęta stałą zgodą użytkownika.

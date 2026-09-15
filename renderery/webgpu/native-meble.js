@@ -5,7 +5,6 @@ const THREE = {...Core, RoundedBoxGeometry};
 const ROOT = new URL('../../', import.meta.url);
 const ID = 'lozko';
 const PIN_KEY = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
-let forcedCurrentOnce = false;
 let running = false;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -86,22 +85,13 @@ async function buildOverride(lib, wpis, versionEntry, placement){
   window.__silnik?.oznaczZmiane?.();
 }
 
-async function syncNativeBed({forceCurrent=false} = {}){
+async function syncNativeBed(){
   if(running) return;
   running = true;
   try{
     const lib = await waitForLibrary();
     const manifest = await fetchManifest();
     let wpis = lib.meble.get(ID);
-
-    if(forceCurrent && !forcedCurrentOnce){
-      forcedCurrentOnce = true;
-      if(manifest.currentVersion && wpis?.wersja !== manifest.currentVersion){
-        try{ await lib.przypnij(ID, manifest.currentVersion); }
-        catch(e){ console.warn('Przełączenie łóżka na currentVersion:', e); }
-        wpis = lib.meble.get(ID);
-      }
-    }
 
     const selectedId = wpis?.wersja || manifest.currentVersion;
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
@@ -119,7 +109,7 @@ async function syncNativeBed({forceCurrent=false} = {}){
   }
 }
 
-syncNativeBed({forceCurrent:true});
+syncNativeBed();
 setInterval(() => {
   if(window.__silnik) window.__silnik.aktywujNatywneMeble = syncNativeBed;
   syncNativeBed();
