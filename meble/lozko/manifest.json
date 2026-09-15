@@ -6,12 +6,12 @@
     "confirmed": true,
     "roomId": "POKOJ-LOZKO",
     "wallId": "POKOJ-LOZKO-W4",
-    "positionMm": [1258, 0, 6275],
+    "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0005.svg",
-    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki pozostają usunięte. Wnęki pozostają cofnięte 200 mm; dawny górny pas 74 mm został przeniesiony na dół jako cokół cofnięty o 100 mm. Stalowy pas 234 mm pozostaje po lewym końcu przy SPF."
+    "confirmationSvg": "meble/lozko/plany/v0008.svg",
+    "description": "Łóżko przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest teraz 400 mm od W4, a tylne wnęki o głębokości 200 mm wykorzystują połowę tego luzu, więc ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0007",
+  "currentVersion": "v0008",
   "versions": [
     {
       "id": "bazowa",
@@ -155,6 +155,24 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0005.svg",
         "description": "Pozycja i footprint pozostają jak w v0006. Cokół jest cofnięty wewnątrz obrysu o 100 mm, a zmiany oświetlenia i miękkiej geometrii poduch nie zmieniają obrysu."
+      }
+    },
+    {
+      "id": "v0008",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0008-native.js",
+      "nativeBuilder": "buildLozkoV0008",
+      "runtime": "native-override",
+      "summary": "Korekta v0007: korpus przesunięty o 200 mm w stronę centrum pokoju do [1458,0,6275], a grzejnik skompensowany lokalnie tak, by pozostał przy ścianie. Na tylnej ścianie dodano 8 wnęk od podstawy materaca 750 mm do wysokości 1200 mm, o głębokości 200 mm i progresywnych szerokościach opartych na rytmie Fibonacciego: 100, 155, 209, 256, 296, 330, 362, 400 mm od SPF do strony poduszek. Każda wnęka ma mocne oświetlenie 3000 K jak front. Na froncie usunięto płytę dna z całej strefy 100-mm cofnięcia cokołu, pozostawiając widoczną podłogę bez listwy. Pozostałe elementy v0007 bez zmian.",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Jawnie zaakceptowane przesunięcie o 200 mm w stronę centrum pokoju. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4."
       }
     }
   ]
