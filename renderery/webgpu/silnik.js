@@ -34,7 +34,7 @@ import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js?p7c1';
 import { uruchomBiblioteke } from './biblioteka.js?p7c1';
 import { utworzNawigacje } from './nawigacja.js?shift-arrows-v1';
-import { utworzSterowanie } from './sterowanie.js?shift-arrows-v1';
+import { utworzSterowanie } from './sterowanie.js?panel-v2';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
 import { skrzywFormatki } from './niedoskonalosci.js';

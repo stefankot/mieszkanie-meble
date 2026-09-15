@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pl"><meta charset="utf-8"><title>Panel navigation regression</title>
+<h1>Panel navigation regression</h1><pre id="result">Running…</pre><div id="fixture"></div>
+<script type="module">
+import {utworzNawigacjePanelu} from '../renderery/webgpu/panel-navigation.js';
+const result = document.querySelector('#result'), host = document.querySelector('#fixture');
+const data = new Map(), storage = {getItem:k=>data.get(k), setItem:(k,v)=>data.set(k,v)};
+const passed = [];
+const check = (name, condition) => {if(!condition) throw Error(name); passed.push(name);};
+function create(store = storage){
+  host.innerHTML = `<div id="test-panel">
+    <button data-panel-mode="simple">Prosty</button><button data-panel-mode="dev">DEV</button>
+    <div role="tablist">${['meble','widok','swiatlo','jakosc','dev'].map(id=>`<button role="tab" data-z="${id}">${id}</button>`).join('')}</div>
+    <div class="panel-tresc">${['meble','widok','swiatlo','jakosc','dev','pomoc'].map(id=>`<section data-s="${id}"></section>`).join('')}</div>
+    <select id="quality"><option selected value="wysoka">Wysoka</option><option class="dev-only" value="photo_path">Test</option></select>
+    <input id="exposure" value="0.91"><select id="version"><option selected>v0017</option></select>
+    <span id="panelTrybOpis"></span><button data-z="pomoc">Pomoc</button></div>`;
+  const el = host.firstElementChild;
+  utworzNawigacjePanelu(el, store);
+  return el;
+}
+try{
+  let el=create();
+  check('First use opens furniture in simple mode', el.dataset.activeTab==='meble' && el.dataset.panelMode==='simple');
+  check('Developer tab is hidden and not focusable', el.querySelector('[data-z=dev]').hidden && el.querySelector('[data-z=dev]').tabIndex===-1);
+  check('Unselected experimental profiles are unavailable in simple mode', el.querySelector('option.dev-only').hidden && el.querySelector('option.dev-only').disabled);
+  el.querySelector('[data-panel-mode=dev]').click();
+  check('Developer mode enables experimental profiles', !el.querySelector('option.dev-only').hidden && !el.querySelector('option.dev-only').disabled);
+  el.querySelector('[data-z=dev]').click();
+  check('Developer tools are reachable', !el.querySelector('[data-s=dev]').hidden);
+  el.querySelector('[data-panel-mode=simple]').click();
+  check('Leaving developer tools returns to a visible panel', el.dataset.activeTab==='meble' && !el.querySelector('[data-s=meble]').hidden);
+  check('View switches preserve rendering and selected version', el.querySelector('#quality').value==='wysoka' && el.querySelector('#exposure').value==='0.91' && el.querySelector('#version').value==='v0017');
+  let leaked = false;
+  const onKey=()=>{leaked=true;}; window.addEventListener('keydown',onKey);
+  el.querySelector('[data-z=meble]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',code:'ArrowRight',bubbles:true,cancelable:true}));
+  window.removeEventListener('keydown',onKey);
+  check('Arrow key selects the next tab without reaching camera shortcuts', el.dataset.activeTab==='widok' && !leaked);
+  check('Keyboard focus follows selection', document.activeElement===el.querySelector('[data-z=widok]'));
+  el.querySelector('[data-z=jakosc]').dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true}));
+  check('Keyboard skips hidden developer tab',el.dataset.activeTab==='meble');
+  el.querySelector('[data-panel-mode=dev]').click(); el.querySelector('[data-z=swiatlo]').click();
+  el=create();
+  check('Mode and active tab survive rebuilding the panel',el.dataset.panelMode==='dev' && el.dataset.activeTab==='swiatlo');
+  el.querySelector('[data-z=pomoc]').click();
+  check('Help keeps the main tablist keyboard reachable',!el.querySelector('[data-s=pomoc]').hidden && el.querySelector('[data-z=meble]').tabIndex===0);
+  el=create({getItem:()=>'{broken',setItem:()=>{throw Error('blocked storage');}});
+  check('Malformed or blocked storage does not break controls',el.dataset.activeTab==='meble');
+  const ids=[...el.querySelectorAll('[id]')].map(e=>e.id);
+  check('No duplicate IDs', new Set(ids).size===ids.length);
+  result.textContent=`PASS ${passed.length}/${passed.length}\n`+passed.join('\n');
+}catch(error){result.textContent='FAIL: '+error.message+'\nPassed: '+passed.join('\n');}
+</script></html>

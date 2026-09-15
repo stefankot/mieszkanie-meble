@@ -1,132 +1,91 @@
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 
-/* ============================================================
-   PANEL STEROWANIA
-   ------------------------------------------------------------
-   Odbudowa panelu z wersji WebGL: te same zakładki (Widok / Światło /
-   Jakość / Pomoc), te same nazwy i te same wartości domyślne — ciepło 62 %,
-   rozproszenie 82 %, wzmocnienia 100 %, krycie 100 %.
+import { utworzNawigacjePanelu } from './panel-navigation.js?panel-v2';
+import { STYL_PANELU } from './panel-style.js?panel-v2';
 
-   Kontrolki, których ten silnik jeszcze nie potrafi obsłużyć (liczba próbek,
-   rozdzielczość tekstur, głębia ostrości, profil tkaniny, własne lampy),
-   są wypisane w zakładce Pomoc jako brakujące. Nie ma tu atrap: suwak, który
-   nic nie robi, jest gorszy niż jego brak.
-   ============================================================ */
-
-const STYL = `
- #sterowanie{position:fixed;left:12px;top:12px;z-index:25;width:266px;
-   font:12px/1.45 system-ui,sans-serif;color:#25241f}
- #sterowanie>summary{cursor:pointer;list-style:none;background:#25241f;color:#f8f7f1;
-   border-radius:9px;padding:7px 11px;font-weight:600;user-select:none}
- #sterowanie>summary::-webkit-details-marker{display:none}
- #sterowanie[open]>summary{border-radius:9px 9px 0 0}
- #sterowanie .panel{background:#f8f7f1f2;border:1px solid #bdbbac;border-top:0;
-   border-radius:0 0 9px 9px;padding:9px;max-height:74vh;overflow:auto}
- #sterowanie .zakladki{display:flex;gap:4px;margin-bottom:8px}
- #sterowanie .zakladki button{flex:1;padding:4px 2px;border:1px solid #bdbbac;border-radius:6px;
-   background:#fffdf6;font:inherit;cursor:pointer}
- #sterowanie .zakladki button[aria-selected=true]{background:#25241f;color:#f8f7f1;border-color:#25241f}
- #sterowanie h3{margin:10px 0 5px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:#6f6d5f}
- #sterowanie h3:first-child{margin-top:0}
- #sterowanie .siatka{display:flex;gap:4px;flex-wrap:wrap}
- #sterowanie .siatka>*{flex:1 1 0;min-width:56px}
- #sterowanie button.dzialanie,#sterowanie select,#sterowanie input[type=date],#sterowanie input[type=time],#sterowanie input[type=text]{
-   font:inherit;padding:4px 6px;border:1px solid #bdbbac;border-radius:6px;background:#fffdf6;
-   color:#25241f;cursor:pointer;width:100%}
- #sterowanie button.dzialanie[aria-pressed=true]{background:#25241f;color:#f8f7f1;border-color:#25241f}
- #sterowanie .pora{display:grid;grid-template-columns:42px repeat(3,1fr);gap:4px;align-items:center}
- #sterowanie .pora>strong{font-size:10px;letter-spacing:.04em;color:#6f6d5f}
- #sterowanie .suwak{margin:6px 0}
- #sterowanie .suwak .naglowek{display:flex;justify-content:space-between;font-size:11px;color:#4a4a42}
- #sterowanie input[type=range]{width:100%;margin:2px 0 0}
- #sterowanie label.pole{display:flex;align-items:center;gap:6px;margin:6px 0}
- #sterowanie .strzalki{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
- #sterowanie p.uwaga{margin:6px 0 0;color:#6f6d5f}
- #sterowanie kbd{background:#eceadd;border:1px solid #c9c7b6;border-radius:4px;padding:0 4px}
- #sterowanie dl{margin:0}
- #sterowanie dl>div{display:flex;gap:8px;margin:3px 0}
- #sterowanie dt{flex:0 0 96px;color:#4a4a42}
- #sterowanie dd{margin:0;flex:1}
- #sterowanie .brak{color:#8a5a3a}
- #sterowanie #informacje{margin-top:10px;border-top:1px solid #bdbbac;padding-top:7px}
- #sterowanie #informacje>summary{cursor:pointer;font-weight:600}
- #sterowanie #hud{margin-top:6px;overflow-wrap:anywhere}`;
+/* Panel według zadań. Tryb DEV zmienia tylko widoczność kontrolek. */
 
 export function utworzSterowanie(api){
   const {THREE, renderer, camera, controls, nawigacja, plan, biblioteka, swiatlo, krycie, zielen, zaslony, archPhoto} = api;
 
   const styl = document.createElement('style');
-  styl.textContent = STYL;
+  styl.textContent = STYL_PANELU;
   document.head.append(styl);
 
   const el = document.createElement('details');
   el.id = 'sterowanie'; el.open = true;
-  el.innerHTML = `<summary>Sterowanie</summary><div class="panel">
-    <div class="zakladki" role="tablist">
-      <button role="tab" data-z="widok"  aria-selected="true">Widok</button>
-      <button role="tab" data-z="swiatlo" aria-selected="false">Światło</button>
-      <button role="tab" data-z="jakosc" aria-selected="false">Jakość</button>
-      <button role="tab" data-z="dev" aria-selected="false">DEV</button>
-      <button role="tab" data-z="pomoc"  aria-selected="false">?</button>
+  el.dataset.panelMode = 'simple';
+  el.innerHTML = `<summary class="panel-tytul"><span><strong>Mieszkanie</strong><small>Studio 3D</small></span><span class="panel-zwin" aria-hidden="true">⌃</span><span class="sr-only">Zwiń lub rozwiń panel</span></summary>
+  <div class="panel">
+    <div class="panel-naglowek">
+      <div class="tryby-panelu" role="group" aria-label="Zakres panelu">
+        <button type="button" data-panel-mode="simple" aria-pressed="true">Prosty</button>
+        <button type="button" data-panel-mode="dev" aria-pressed="false">DEV</button>
+      </div>
+      <div class="zakladki" role="tablist" aria-label="Sterowanie mieszkaniem">
+        <button role="tab" data-z="meble" aria-selected="true">Meble</button>
+        <button role="tab" data-z="widok" aria-selected="false">Spacer</button>
+        <button role="tab" data-z="swiatlo" aria-selected="false">Światło</button>
+        <button role="tab" data-z="jakosc" aria-selected="false">Obraz</button>
+        <button role="tab" data-z="dev" aria-selected="false" class="dev-only">Laboratorium</button>
+      </div>
     </div>
-    <section data-s="widok">
-      <h3>Tryb kamery</h3>
+    <div class="panel-tresc">
+    <section data-s="meble">
+      <div class="sekcja-wstep"><h2>Twój mebel</h2><p>Obejrzyj projekt i wypróbuj jego mechanizmy.</p></div>
+      <div class="karta"><label class="pole" for="mebelWybor">Wybrany projekt</label>
+
+      <select id="mebelWybor" aria-label="Wybrany mebel"></select>
+
+      <p id="mebelPodsumowanie" class="podsumowanie"></p>
+      <button class="dzialanie glowna" id="kadrMebel">Pokaż mebel <span aria-hidden="true">↗</span></button>
+      <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div></div>
+      <div class="karta"><h3>Otwieranie</h3><div class="siatka">
+        <button class="dzialanie" id="otworzWsz">Otwórz mebel</button>
+        <button class="dzialanie" id="zamknijWsz">Zamknij mebel</button>
+      </div>
+<details class="grupa" id="czesciMebla"><summary>Poszczególne części <span id="liczbaRuchow" class="licznik"></span></summary><div id="ruchy"></div></details>
+      <p class="uwaga" id="ruchyInfo"></p>
+</div>
+      <details class="grupa"><summary>Wersje projektu</summary><div class="wnetrze"><label class="pole" for="mebelWersja">Wersja</label>
+      <select id="mebelWersja" aria-label="Wersja wybranego mebla"></select>
+      <button class="dzialanie" id="sprawdzWersje" >Sprawdź nowe wersje</button>
+      <p class="uwaga" id="mebelStatus" role="status" aria-live="polite"></p>
+
+      <button class="dzialanie tekstowa dev-only" id="przeladujMebel">Pobierz model ponownie</button></div></details>
+    </section>
+    <section data-s="widok" hidden>
+      <div class="sekcja-wstep"><h2>Rozejrzyj się</h2><p>Kliknij podłogę, aby podejść. Przeciągnij, aby się rozejrzeć.</p></div>
+      <div class="karta"><h3>Przejdź do pomieszczenia</h3><div id="pokoje" class="pokoje"></div></div>
+      <div class="karta"><h3>Widok kamery</h3>
       <div class="siatka">
         <button class="dzialanie" data-tryb="spacer">Spacer</button>
         <button class="dzialanie" data-tryb="orbita">Rozglądanie</button>
         <button class="dzialanie" data-tryb="ptak" title="B — widok z góry / powrót">Z góry</button>
       </div>
-      <div class="strzalki" style="margin-top:6px">
-        <button class="dzialanie" data-krok="lewo"  title="A">←</button>
-        <button class="dzialanie" data-krok="przod" title="W">↑</button>
-        <button class="dzialanie" data-krok="tyl"   title="S">↓</button>
-        <button class="dzialanie" data-krok="prawo" title="D">→</button>
+
+      <details class="grupa"><summary>Ruch i wysokość</summary><div class="wnetrze">      <div class="strzalki" style="margin-top:6px">
+        <button class="dzialanie" data-krok="lewo" aria-label="Obróć kamerę w lewo"  title="A">←</button>
+        <button class="dzialanie" data-krok="przod" aria-label="Idź do przodu" title="W">↑</button>
+        <button class="dzialanie" data-krok="tyl" aria-label="Idź do tyłu"   title="S">↓</button>
+        <button class="dzialanie" data-krok="prawo" aria-label="Obróć kamerę w prawo" title="D">→</button>
       </div>
       <div class="siatka" style="margin-top:6px;align-items:center">
-        <button class="dzialanie" id="oczNizej" title="Niżej o 5 cm · Q">−</button>
+        <button class="dzialanie" id="oczNizej" aria-label="Obniż kamerę o 5 cm" title="Niżej o 5 cm · Q">−</button>
         <output id="oczy" style="text-align:center">160 cm</output>
-        <button class="dzialanie" id="oczWyzej" title="Wyżej o 5 cm · E">+</button>
+        <button class="dzialanie" id="oczWyzej" aria-label="Podnieś kamerę o 5 cm" title="Wyżej o 5 cm · E">+</button>
       </div>
-      <h3>Mebel</h3>
-      <select id="mebelWybor" aria-label="Wybrany mebel"></select>
-      <div class="siatka" style="margin-top:4px">
-        <button class="dzialanie" id="kadrMebel">Pokaż mebel</button>
-        <button class="dzialanie" id="przeladujMebel" title="Force reload furniture">Przeładuj od nowa</button>
-      </div>
-      <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div>
-      <label class="pole" for="mebelWersja">Wersja</label>
-      <select id="mebelWersja" aria-label="Wersja wybranego mebla"></select>
-      <button class="dzialanie" id="sprawdzWersje" style="width:100%;margin-top:4px">Sprawdź wersje mebla</button>
-      <p class="uwaga" id="mebelStatus" role="status" aria-live="polite"></p>
-      <div class="siatka" style="margin-top:6px">
-        <button class="dzialanie" id="otworzWsz">Otwórz mebel</button>
-        <button class="dzialanie" id="zamknijWsz">Zamknij mebel</button>
-      </div>
-      <div id="ruchy" style="margin-top:6px;max-height:150px;overflow:auto"></div>
-      <p class="uwaga" id="ruchyInfo"></p>
-      <h3>ARCH_PHOTO</h3>
-      <select id="trybKamery">
-        <option value="interactive">Kamera interaktywna</option>
-        <option value="arch_photo">ARCH_PHOTO — pozioma</option>
-      </select>
-      <div class="suwak"><div class="naglowek"><label for="lensShiftY">Lens shift Y</label><output id="lensShiftYVal">8%</output></div>
-        <input id="lensShiftY" type="range" min="-20" max="20" value="8"></div>
-      <div class="siatka"><input id="nazwaKadru" type="text" maxlength="48" value="Kadr 1" aria-label="Nazwa zapisanego kadru">
-        <button class="dzialanie" id="zapiszKadr" style="flex:0 0 58px">Zapisz</button></div>
-      <div class="siatka" style="margin-top:4px"><select id="archKadry" aria-label="Zapisane kadry ARCH_PHOTO"></select>
-        <button class="dzialanie" id="wczytajKadr" style="flex:0 0 52px">Otwórz</button>
-        <button class="dzialanie" id="usunKadr" style="flex:0 0 45px">Usuń</button></div>
-      <h3>Zasłony</h3>
-      <div id="zaslonySterowanie"></div>
-      <h3>Przejdź</h3>
-      <div class="siatka" id="pokoje"></div>
-      <h3>Mieszkanie</h3>
+<p class="uwaga">Shift + ↑ ↓: wysokość · Shift + ← →: ruch bokiem</p></div></details></div>
+      <details class="grupa dev-only"><summary>Widoczność i kolizje</summary><div class="wnetrze">
       <button class="dzialanie" id="pokazMieszkanie" aria-pressed="true" title="P">Pokazuj mieszkanie</button>
       <div class="suwak"><div class="naglowek"><label for="krycie">Krycie</label><output id="krycieVal">100%</output></div>
         <input id="krycie" type="range" min="0" max="100" step="1" value="100"></div>
       <label class="pole"><input type="checkbox" id="kolizje" checked>Kolizje ze ścianami <kbd>K</kbd></label>
+</div></details>
     </section>
     <section data-s="swiatlo" hidden>
+      <div class="sekcja-wstep"><h2>Światło i nastrój</h2><p>Sprawdź wnętrze o różnych porach dnia.</p></div>
+      <div class="karta">
       <h3>Pora dnia</h3>
       <input type="hidden" id="presetSwiatla" value="${DOMYSLNY_PRESET_SWIATLA}">
       <div class="pora" role="group" aria-label="Sezon i godzina światła">
@@ -145,7 +104,9 @@ export function utworzSterowanie(api){
         <input id="cieplo" type="range" min="0" max="100" value="45"></div>
       <div class="suwak"><div class="naglowek"><label for="rozproszenie">Rozproszenie</label><output id="rozproszenieVal">90%</output></div>
         <input id="rozproszenie" type="range" min="0" max="100" value="90"></div>
-      <h3>Wzmocnienia</h3>
+</div>
+      <details class="grupa"><summary>Zasłony</summary><div class="wnetrze" id="zaslonySterowanie"></div></details>
+      <details class="grupa dev-only"><summary>Źródła światła i otoczenie</summary><div class="wnetrze">
       <div class="suwak"><div class="naglowek"><label for="gOkna">Okna</label><output id="gOknaVal">100%</output></div>
         <input id="gOkna" type="range" min="0" max="200" step="5" value="100"></div>
       <div class="suwak"><div class="naglowek"><label for="gSlonce">Słońce</label><output id="gSlonceVal">100%</output></div>
@@ -154,37 +115,56 @@ export function utworzSterowanie(api){
         <input id="gKule" type="range" min="0" max="200" step="5" value="0"></div>
       <label class="pole"><input type="checkbox" id="animacjaTla" checked>Animacja tła (wiatr w koronach)</label>
       <label class="pole"><input type="checkbox" id="cienLisci">Cień liści na ścianach (komorebi)</label>
+</div></details>
     </section>
     <section data-s="jakosc" hidden>
+      <div class="sekcja-wstep"><h2>Jakość obrazu</h2><p>Dobierz szczegółowość do płynności na swoim komputerze.</p></div>
+      <div class="karta">
+      <label class="pole" for="jakoscPoziom">Priorytet renderowania</label><select id="jakoscPoziom">
+        <option value="minimalna">Płynność</option>
+        <option value="srednia">Zrównoważona</option>
+        <option value="wysoka" selected>Wysoka jakość — zalecana</option>
+        <option value="photo_raster">Zdjęcie — nieruchomy kadr</option>
+        <option value="photo_path" class="dev-only">PHOTO_PATH — integration TEST</option>
+      </select>
+<p class="uwaga" id="jakoscProsta" role="status" aria-live="polite"></p></div>
+      <div class="karta"><h3>Jasność</h3>
       <div class="suwak"><div class="naglowek"><label for="ekspozycja">Ekspozycja</label><output id="ekspozycjaVal">0,72</output></div>
         <input id="ekspozycja" type="range" min="0.35" max="2.2" step="0.01" value="0.72"></div>
-      <h3>Jakość obrazu</h3>
-      <select id="jakoscPoziom">
-        <option value="minimalna">Minimalna — płynność</option>
-        <option value="srednia">Średnia</option>
-        <option value="wysoka" selected>Wysoka — domyślna</option>
-        <option value="photo_raster">PHOTO_RASTER — statyczny kadr</option>
-        <option value="photo_path">PHOTO_PATH — integration TEST</option>
+</div>
+      <details class="grupa"><summary>Kadry i perspektywa</summary><div class="wnetrze">
+      <label class="pole" for="trybKamery">Perspektywa</label><select id="trybKamery">
+        <option value="interactive">Kamera interaktywna</option>
+        <option value="arch_photo">Proste piony — fotografia wnętrz</option>
       </select>
-      <select id="antyaliasing" title="Porównanie wygładzania">
+      <div class="suwak"><div class="naglowek"><label for="lensShiftY">Przesunięcie kadru</label><output id="lensShiftYVal">8%</output></div>
+        <input id="lensShiftY" type="range" min="-20" max="20" value="8"></div>
+      <div class="siatka"><input id="nazwaKadru" type="text" maxlength="48" value="Kadr 1" aria-label="Nazwa zapisanego kadru">
+        <button class="dzialanie" id="zapiszKadr" style="flex:0 0 58px">Zapisz</button></div>
+      <div class="siatka" style="margin-top:4px"><select id="archKadry" aria-label="Zapisane kadry ARCH_PHOTO"></select>
+        <button class="dzialanie" id="wczytajKadr" style="flex:0 0 52px">Otwórz</button>
+        <button class="dzialanie tekstowa niebezpieczna" id="usunKadr" style="flex:0 0 45px">Usuń</button></div>
+</div></details>
+      <div class="dev-only"><p class="uwaga" id="jakoscOpis"></p>
+      <details class="grupa"><summary>Ustawienia renderera</summary><div class="wnetrze"><label class="pole" for="antyaliasing">Wygładzanie krawędzi</label><select id="antyaliasing" title="Porównanie wygładzania">
         <option value="taau" selected>TAA — domyślne (wysoka, ostre)</option>
         <option value="smaa">SMAA (P18)</option>
       </select>
-      <select id="toneMapping" title="Porównanie tone mappingu">
+      <label class="pole" for="toneMapping">Mapowanie kolorów</label><select id="toneMapping" title="Porównanie tone mappingu">
         <option value="aces" selected>ACES — baseline</option>
         <option value="neutral">Neutral</option>
         <option value="agx">AgX</option>
       </select>
-      <select id="worldGI" title="Porównanie światła pośredniego">
+      <label class="pole" for="worldGI">Światło pośrednie</label><select id="worldGI" title="Porównanie światła pośredniego">
         <option value="ssgi" selected>SSGI — baseline</option>
         <option value="speedball">SSGI + Speedball 0.7.0 — TEST (wysoka)</option>
       </select>
-      <select id="ssrWariant" title="Porównanie odbić ekranowych">
+      <label class="pole" for="ssrWariant">Odbicia</label><select id="ssrWariant" title="Porównanie odbić ekranowych">
         <option value="current">SSR current — fallback</option>
         <option value="modern" selected>Stochastic SSR r185 — domyślne</option>
       </select>
       <p class="uwaga" id="worldGIInfo"></p>
-      <p class="uwaga" id="jakoscOpis"></p>
+
       <p class="uwaga" id="photoRasterInfo"></p>
       <p class="uwaga" id="photoPathInfo"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
@@ -193,9 +173,12 @@ export function utworzSterowanie(api){
         Krawędzie są wygładzane w każdej klatce.</p>
       <h3>Parametry obrazu</h3>
       <div id="suwakiJakosci"><p class="uwaga">Suwaki pojawią się po zbudowaniu potoku efektów.</p></div>
+</div></details></div>
     </section>
     <section data-s="dev" hidden>
-      <h3>P7–P18 / P8 — presety</h3>
+      <div class="sekcja-wstep"><h2>Laboratorium</h2><p>Porównuj warianty i mierz wydajność. Presety przeładowują scenę.</p></div>
+      <div class="karta">
+      <h3>Presety eksperymentalne</h3>
       <select id="devPreset" aria-label="Preset testowy funkcji">
         <option value="baseline">Baseline — wyłącz warianty</option>
         <option value="candidate-a">Kandydat A — TRAA + ACES</option>
@@ -221,8 +204,16 @@ export function utworzSterowanie(api){
       <p class="uwaga" id="devOpis"></p>
       <a id="devUrl" href="#" style="display:block;margin-top:6px;overflow-wrap:anywhere">Adres presetu</a>
       <p class="uwaga">P7 i P9 są aktywne stale. P11 pozostaje audytem MRT bez zmiany architektury.</p>
+</div>
+      <details class="grupa" id="informacje"><summary>Wydajność i diagnostyka</summary>
+      <button class="dzialanie" id="pomiarWydajnosci" type="button">Porównaj płynność — 20 s</button>
+      <p class="uwaga">Wysoka jakość: 10 s ze skalą obrazu 1,25, potem 10 s ze skalą 1,0 (z uwzględnieniem limitu ekranu). Ustawienia GI i SSR są takie same. Rozglądaj się w tym samym miejscu; zachowaj rozmiar okna.</p>
+      <p id="wynikWydajnosci" style="white-space:pre-line"></p>
+    </details>
     </section>
     <section data-s="pomoc" hidden>
+      <div class="sekcja-wstep"><h2>Pomoc i skróty</h2><p>Sterowanie klawiaturą, myszą i gładzikiem.</p></div>
+      <div class="karta">
       <p class="uwaga" id="navigationRegressionInfo"></p>
       <h3>Skróty</h3>
       <dl>
@@ -240,16 +231,10 @@ export function utworzSterowanie(api){
         <div><dt>Klik</dt><dd>Podejdź w to miejsce</dd></div>
         <div><dt><kbd>K</kbd> / <kbd>Esc</kbd></dt><dd>Kolizje / wyjście</dd></div>
       </dl>
-      <h3>Jeszcze nie przeniesione</h3>
-      <p class="brak" id="brakujace"></p>
-      <h3>Stan</h3>
-      <p class="uwaga" id="stanPanelu"></p>
-    </section>
-    <details id="informacje"><summary>Informacje</summary>
-      <button class="dzialanie" id="pomiarWydajnosci" type="button">Porównaj płynność — 20 s</button>
-      <p class="uwaga">Wysoka jakość: 10 s ze skalą obrazu 1,25, potem 10 s ze skalą 1,0 (z uwzględnieniem limitu ekranu). Ustawienia GI i SSR są takie same. Rozglądaj się w tym samym miejscu; zachowaj rozmiar okna.</p>
-      <p id="wynikWydajnosci" style="white-space:pre-line"></p>
-    </details></div>`;
+<div class="dev-only"><h3>Stan renderera</h3><p class="uwaga" id="stanPanelu"></p><p class="brak" id="brakujace"></p></div></div>
+    </section></div>
+    <div class="panel-stopka"><span id="panelTrybOpis">Codzienne sterowanie</span><button type="button" data-z="pomoc" aria-pressed="false">Pomoc i skróty <span aria-hidden="true">?</span></button></div>
+  </div>`;
   document.body.append(el);
   const hud = document.getElementById('hud');
   if(hud){ el.querySelector('#informacje').append(hud); hud.hidden = false; }
@@ -263,11 +248,8 @@ export function utworzSterowanie(api){
     });
   });
 
-  /* ---------- zakładki ---------- */
-  el.querySelectorAll('.zakladki button').forEach(b => b.addEventListener('click', () => {
-    el.querySelectorAll('.zakladki button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
-    el.querySelectorAll('section').forEach(x => { x.hidden = x.dataset.s !== b.dataset.z; });
-  }));
+  /* Nawigacja panelu nie wysyła zdarzeń do ustawień sceny. */
+  const panelNav = utworzNawigacjePanelu(el);
 
   /* ---------- widok ---------- */
   el.querySelectorAll('[data-tryb]').forEach(b =>
@@ -294,7 +276,10 @@ export function utworzSterowanie(api){
   nawigacja.pokoje.forEach((p, i) => {
     const b = document.createElement('button');
     b.className = 'dzialanie'; b.textContent = p.name; b.title = p.dimensions + ' · ' + (i+1);
-    b.style.flex = '1 1 44%';
+    const numer = document.createElement('span'); numer.className = 'numer-pokoju'; numer.textContent = String(i+1);
+    const opis = document.createElement('span'); opis.textContent = p.name;
+    const metraz = document.createElement('small'); metraz.textContent = p.dimensions.split(' · ').pop();
+    opis.append(metraz); b.replaceChildren(numer, opis); b.setAttribute('aria-label', p.name + ' · ' + p.dimensions);
     b.addEventListener('click', () => nawigacja.doPokoju(i));
     pokoje.append(b);
   });
@@ -306,7 +291,7 @@ export function utworzSterowanie(api){
   function odswiezWersje(){
     const w = biblioteka.meble.get(wybor.value);
     wersjaWybor.innerHTML = '';
-    if(!w?.manifest) return;
+    if(!w?.manifest){ $('#mebelPodsumowanie').textContent = 'Wybierz dostępny projekt'; return; }
     for(const v of biblioteka.dostepneWersje(wybor.value)){
       const o = document.createElement('option');
       o.value = v.id; o.disabled = !v.confirmed;
@@ -315,6 +300,7 @@ export function utworzSterowanie(api){
       wersjaWybor.append(o);
     }
     wersjaWybor.value = w.wersja || w.przypieta || '';
+    $('#mebelPodsumowanie').textContent = w.wersja ? 'W scenie · ' + w.wersja : 'Projekt w scenie';
   }
   function odswiezStanBiblioteki(tekst){
     const k = biblioteka.kontrola, w = biblioteka.meble.get(wybor.value);
@@ -377,6 +363,7 @@ export function utworzSterowanie(api){
     const poprzedni=archKadry.value;archKadry.innerHTML='';
     for(const k of archPhoto.kadry){const o=document.createElement('option');o.value=o.textContent=k.name;archKadry.append(o);}
     if(poprzedni)archKadry.value=poprzedni;
+    $('#wczytajKadr').disabled = $('#usunKadr').disabled = !archPhoto.kadry.length;
     if(!archKadry.options.length){const o=document.createElement('option');o.textContent='Brak zapisanych kadrów';o.value='';archKadry.append(o);}
   }
   trybKamery.addEventListener('change',()=>{
@@ -427,6 +414,9 @@ export function utworzSterowanie(api){
       b.addEventListener('click', () => { api.interakcje.przelacz(ruch); });
       box.append(b);
     }
+    $('#liczbaRuchow').textContent = String(lista.length);
+    $('#czesciMebla').hidden = !lista.length;
+    $('#otworzWsz').disabled = $('#zamknijWsz').disabled = !lista.length;
     $('#ruchyInfo').textContent = lista.length
       ? lista.length + ' ruchomych części wybranego mebla · można też kliknąć wprost w model'
       : 'Ten mebel nie ma zadeklarowanych mechanizmów.';
@@ -516,20 +506,21 @@ export function utworzSterowanie(api){
     location.search = q.toString();
   });
   function opiszJakosc(){
+    $('#jakoscProsta').textContent = ({minimalna:'Mniej efektów, większa płynność podczas zwiedzania.', srednia:'Kompromis między szczegółowością a płynnością.', wysoka:'Pełne oświetlenie i odbicia. Po zatrzymaniu obraz stopniowo się wygładza.', photo_raster:'Zatrzymaj kamerę i poczekaj na dopracowanie nieruchomego kadru.', photo_path:'Aktywny eksperymentalny profil. Szczegóły są dostępne w trybie DEV.'})[jakoscSel.value] || '';
     const j = window.__silnik.jakosc;
     const p = j?.POZIOMY?.[jakoscSel.value];
     $('#jakoscOpis').textContent = p
         ? p.opis + (['photo_raster','photo_path'].includes(jakoscSel.value)
         ? ' · TAAU 64 próbek, pełna rozdzielczość'
         : aaSel.value==='taau' && jakoscSel.value==='wysoka'
-        ? ' · TAA (TRAA) w pełnej rozdzielczości + wyostrzanie RCAS' : ' · SMAA')
+        ? ' · TAA (TRAA), skala 90% + wyostrzanie RCAS' : ' · SMAA')
         + (giSel.value==='speedball' ? ' · Speedball GI TEST' : ' · current SSGI')
         + (ssrSel.value==='modern' ? ' · stochastic SSR' : ' · current SSR fallback')
         + ' · przełączenie wymaga rekompilacji shaderów, potrwa chwilę'
       : '';
   }
   jakoscSel.addEventListener('change', () => {
-    $('#jakoscOpis').textContent = 'Przełączanie…';
+    $('#jakoscProsta').textContent = $('#jakoscOpis').textContent = 'Przygotowywanie obrazu…';
     /* Oddajemy klatkę, żeby komunikat zdążył się pojawić przed rekompilacją,
        która blokuje wątek. */
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -599,11 +590,7 @@ export function utworzSterowanie(api){
   odswiezDev();
 
   /* ---------- pomoc ---------- */
-  $('#brakujace').textContent =
-    'Liczba próbek (1/32/128), rozdzielczość tekstur (2K/4K/8K), poziomy SSGI, '
-  + 'profil tkaniny, głębia ostrości, wycieczka, własne lampy, otwieranie ruchomych '
-  + 'części mebli. Warstwy wykończenia powierzchni (mikrorelief, plamy, relief) '
-  + 'czekają na przepisanie z onBeforeCompile na graf TSL.';
+  $('#brakujace').textContent = '';
 
   /* ---------- PAMIĘĆ USTAWIEŃ MIĘDZY SESJAMI ----------
      Zapisujemy WSZYSTKIE kontrolki panelu, przechodząc po nich generycznie —
@@ -623,7 +610,7 @@ export function utworzSterowanie(api){
   function zapiszUstawienia(){
     try{
       const dane = {profilSwiatla: PROFIL_SWIATLA, profilAA: PROFIL_AA, profilRender: PROFIL_RENDER,
-                    pola: {}, zakladka: el.querySelector('.zakladki button[aria-selected=true]')?.dataset.z,
+                    pola: {}, zakladka: el.dataset.activeTab,
                     otwarty: el.open};
       for(const k of kontrolki()){
         if(!k.id || k.id === 'worldGI' || k.id === 'ssrWariant' || k.id === 'mebelWersja') continue;
@@ -658,10 +645,6 @@ export function utworzSterowanie(api){
         k.value = v;
         k.dispatchEvent(new Event(k.tagName === 'SELECT' ? 'change' : 'input', {bubbles: true}));
       }
-    }
-    if(d.zakladka){
-      const b = el.querySelector(`.zakladki button[data-z="${d.zakladka}"]`);
-      if(b) b.click();
     }
     if(typeof d.otwarty === 'boolean') el.open = d.otwarty;
     const aaZUrl=new URLSearchParams(location.search).get('aa');
@@ -698,6 +681,7 @@ export function utworzSterowanie(api){
   /* Przywrócenie na końcu — po podpięciu wszystkich uchwytów, żeby wysłane
      zdarzenia faktycznie zadziałały. */
   const wznowione = wczytajUstawienia();
+  panelNav.syncOptions();
   zapiszUstawienia();
   odswiezRuchy();
   return {odswiezStan, odswiezMeble, odswiezRuchy, zapiszUstawienia, wznowione};
