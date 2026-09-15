@@ -11,7 +11,7 @@ export const DESIGN_PATCH = Object.freeze({
     cctApproxK: 3000,
     emissiveIntensity: 12,
     rectAreaIntensity: 170,
-    note: 'Three actual RectAreaLights live in the native bed root. No per-cubby PointLights and no dependency on a post-swap renderer LED refresh.'
+    note: 'Three emissive strips use the renderer fixed RectAreaLight pool refreshed after a native model swap.'
   },
   stairs: {
     material: 'polished stainless steel',
@@ -64,7 +64,7 @@ function ledMaterial(THREE){
   return m;
 }
 
-function addContinuousStrip({THREE,root,material,id,position,target}){
+function addContinuousStrip({THREE,root,material,id,position}){
   // Widoczny, ciągły profil o pełnej szerokości łóżka. Geometria przechodzi
   // przez pionowe ścianki — dokładnie jeden profil na poziom, nie per kubik.
   const strip=addMesh(
@@ -73,17 +73,7 @@ function addContinuousStrip({THREE,root,material,id,position,target}){
   );
   strip.castShadow=strip.receiveShadow=false;
 
-  // Rzeczywiste światło: jeden RectAreaLight na cały poziom. Trzy poziomy =
-  // dokładnie trzy źródła niezależnie od liczby wnęk.
-  const light=new THREE.RectAreaLight(0xffc582,170,227,3.5);
-  light.name=`${id}_RectAreaLight`;
-  light.position.set(...position);
-  const helper=new THREE.Object3D();
-  helper.position.set(...position);
-  helper.lookAt(new THREE.Vector3(...target));
-  light.quaternion.copy(helper.quaternion);
-  root.add(light);
-  return {strip,light};
+  return strip;
 }
 
 export function buildLozkoV0017({THREE,placement={positionMm:[1458,0,6275],rotationDeg:90}}){
@@ -93,25 +83,23 @@ export function buildLozkoV0017({THREE,placement={positionMm:[1458,0,6275],rotat
   root.userData.nativeOverrideVersion=VERSION;
 
   // -----------------------------------------------------------------------
-  // 1. OŚWIETLENIE — v0016 miała poprawny opis 3 pasów, ale natywny adapter
-  //    podmienia korzeń już po jednorazowym odświeżeniu LED renderera. Opis
-  //    root.userData.lighting nie tworzył więc faktycznych świateł po swapie.
-  //    v0017 montuje trzy rzeczywiste RectAreaLight bezpośrednio w modelu.
+  // 1. OŚWIETLENIE — v0016 dostarcza opis trzech pasów dla stałej puli
+  //    renderera. Adapter odświeża ją po podmianie korzenia; tutaj dokładamy
+  //    wyłącznie widoczne, emisyjne profile.
   // -----------------------------------------------------------------------
-  root.userData.lighting={units:'mm',coordinateSystem:'model-local',recesses:[]};
   const matLed=ledMaterial(THREE);
-  const direct=[];
-  direct.push(addContinuousStrip({
+  const strips=[];
+  strips.push(addContinuousStrip({
     THREE,root,material:matLed,id:'lozko_led_front_dolny_ciagly',
-    position:[0,38.1,73.8], target:[0,22.1,33.8]
+    position:[0,38.1,73.8]
   }));
-  direct.push(addContinuousStrip({
+  strips.push(addContinuousStrip({
     THREE,root,material:matLed,id:'lozko_led_front_gorny_ciagly',
-    position:[0,69.8,73.8], target:[0,53.8,33.8]
+    position:[0,69.8,73.8]
   }));
-  direct.push(addContinuousStrip({
+  strips.push(addContinuousStrip({
     THREE,root,material:matLed,id:'lozko_led_tyl_gorny_ciagly',
-    position:[0,117.2,-88], target:[0,101.2,-128]
+    position:[0,117.2,-88]
   }));
 
   // -----------------------------------------------------------------------
@@ -162,11 +150,13 @@ export function buildLozkoV0017({THREE,placement={positionMm:[1458,0,6275],rotat
     lighting:{
       directPerCubbyLights:0,
       continuousStripCount:3,
-      embeddedRectAreaLightCount:3,
+      embeddedRectAreaLightCount:0,
       stripWidthMm:2270,
       emissiveIntensity:12,
       rectAreaIntensity:170,
-      rendererAutoNicheLightingDisabled:true
+      rendererPoolSize:6,
+      rendererLighting:'fixed-pool',
+      rendererRefreshAfterSwap:true
     },
     stairs:{
       envelope:[60,60,60], steps:3, treadDepth:20, rise:20, width:60,

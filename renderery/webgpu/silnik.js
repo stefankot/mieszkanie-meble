@@ -922,6 +922,7 @@ const biblioteka = await uruchomBiblioteke({
     sterowanie?.odswiezMeble();
   }
 });
+window.__silnik.odswiezLedy = () => odswiezLedy(biblioteka);
 const v2Poc=new URLSearchParams(location.search).get('furnitureV2');
 if(v2Poc){
   const [assetId,version]=v2Poc.split(':');

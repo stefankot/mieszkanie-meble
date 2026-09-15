@@ -13,6 +13,12 @@ const ROW2_MM = Object.freeze([476, 300, 419, 171, 304, 474]);
 const TOP_MM  = Object.freeze([326, 320, 605, 160, 217, 516]);
 const DIV_MM = 18;
 const BED_W_MM = 2270;
+const LED = Object.freeze({
+  cctApproxK: 3000,
+  emissiveIntensity: 12,
+  rendererLighting: 'fixed pool via root.userData.lighting',
+  directPointLights: 0
+});
 
 export const DESIGN_PATCH = Object.freeze({
   baseVersion: 'v0008',
@@ -31,7 +37,7 @@ export const DESIGN_PATCH = Object.freeze({
     clearHeightMm: 299,
     plinthHeightMm: 74,
     plinthSetbackMm: 100,
-    lighting: 'v0008 strong LED: emissive 12 + PointLight 85 / 520 mm'
+    lighting: {...LED, count: 11}
   },
   rearUpperNiches: {
     fromYmm: 800,
@@ -41,7 +47,12 @@ export const DESIGN_PATCH = Object.freeze({
     dividerMm: 18,
     clearWidthsMmFromSPF: [...TOP_MM],
     clearHeightMm: 364,
-    lighting: 'v0008 strong LED: emissive 12 + PointLight 85 / 520 mm'
+    lighting: {...LED, count: 6}
+  },
+  lightingParity: {
+    frontAndRearUseSameEmissiveIntensity: 12,
+    frontAndRearUseSameRendererPool: true,
+    directPointLightsRemoved: true
   }
 });
 
@@ -87,7 +98,7 @@ function assertRow(widthsMm){
 }
 function sum(a){ return a.reduce((x,y)=>x+y,0); }
 
-function buildVerticalRow({THREE,parent,boardMat,ledMat,widthsMm,bottomY,height,frontZ,backInnerZ,depth,prefix}){
+function buildVerticalRow({THREE,parent,boardMat,ledMat,recesses,widthsMm,bottomY,height,frontZ,backInnerZ,depth,prefix}){
   const W=BED_W_MM/10;
   const T=DIV_MM/10;
   const widths=widthsMm.map(v=>v/10);
@@ -121,11 +132,16 @@ function buildVerticalRow({THREE,parent,boardMat,ledMat,widthsMm,bottomY,height,
     const ledW=Math.max(2,c.width-1.8);
     addMesh(THREE,parent,new THREE.BoxGeometry(ledW,.65,.8),ledMat,
       c.cx,ledY,backInnerZ+.45,`${prefix}_led_pasek_${id}`);
-    const light=new THREE.PointLight(0xffd39f,85,52,1.35);
-    light.name=`${prefix}_led_swiatlo_${id}`;
-    light.position.set(c.cx,ledY-2.0,backInnerZ+4.5);
-    light.castShadow=false;
-    parent.add(light);
+    recesses.push({
+      id:`wneka_${prefix}_${id}`,
+      ledStrips:[{
+        id:`led_${prefix}_${id}`,
+        positionMm:[Math.round(c.cx*10),Math.round(ledY*10),Math.round((backInnerZ+.45)*10)],
+        targetMm:[Math.round(c.cx*10),Math.round((ledY-12)*10),Math.round((frontZ-2)*10)],
+        widthMm:Math.round(ledW*10),
+        heightMm:22
+      }]
+    });
   }
   return cells;
 }
@@ -150,6 +166,7 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
 
   const boardMat=whiteBoardMaterial(THREE);
   const ledMat=strongLedMaterial(THREE);
+  const recesses=[];
 
   // -------------------------------------------------------------------------
   // FRONT — zachowujemy konstrukcyjną wysokość wnęk z v0008 (do spodu decku
@@ -196,11 +213,11 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
   const lowerBottom=PLINTH_H+T;
   const upperBottom=PLINTH_H+2*T+CLEAR_H;
   const lowerCells=buildVerticalRow({
-    THREE,parent:front,boardMat,ledMat,widthsMm:ROW2_MM,
+    THREE,parent:front,boardMat,ledMat,recesses,widthsMm:ROW2_MM,
     bottomY:lowerBottom,height:CLEAR_H,frontZ:FRONT_FACE_Z,backInnerZ:BACK_INNER_Z,depth:DEPTH,prefix:'front_rzad2'
   });
   const upperCells=buildVerticalRow({
-    THREE,parent:front,boardMat,ledMat,widthsMm:ROW1_MM,
+    THREE,parent:front,boardMat,ledMat,recesses,widthsMm:ROW1_MM,
     bottomY:upperBottom,height:CLEAR_H,frontZ:FRONT_FACE_Z,backInnerZ:BACK_INNER_Z,depth:DEPTH,prefix:'front_rzad1'
   });
 
@@ -213,7 +230,7 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
     clearHeightMm:Math.round(CLEAR_H*10),
     depthMm:200,
     dividerMm:18,
-    led:'v0008 emissive12 + PointLight85/520mm'
+    led:{...LED,count:upperCells.length+lowerCells.length}
   };
 
   // -------------------------------------------------------------------------
@@ -248,7 +265,7 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
     0,REAR_TO_Y-T/2,REAR_CENTER_Z,'wneki_tyl_gora');
 
   const topCells=buildVerticalRow({
-    THREE,parent:rear,boardMat,ledMat,widthsMm:TOP_MM,
+    THREE,parent:rear,boardMat,ledMat,recesses,widthsMm:TOP_MM,
     bottomY:REAR_FROM_Y+T,height:REAR_CLEAR_H,
     frontZ:REAR_OPEN_Z,backInnerZ:REAR_BACK_INNER_Z,depth:DEPTH,prefix:'tyl_gora'
   });
@@ -261,7 +278,15 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
     clearHeightMm:364,
     depthMm:200,
     dividerMm:18,
-    led:'v0008 emissive12 + PointLight85/520mm'
+    led:{...LED,count:topCells.length}
+  };
+
+  // Emisyjne paski pozostają częścią modelu, a maksymalnie sześć rzeczywistych
+  // RectAreaLightów przydziela wspólna pula renderera do najbliższych wnęk.
+  root.userData.lighting={
+    units:'mm',
+    coordinateSystem:'model-local',
+    recesses
   };
 
   root.userData.design={
@@ -269,6 +294,7 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
     baseVersion:'v0008',
     frontNiches:{...DESIGN_PATCH.frontNiches},
     rearUpperNiches:{...DESIGN_PATCH.rearUpperNiches},
+    lightingParity:{...DESIGN_PATCH.lightingParity},
     cushions:{
       ...(root.userData.design?.cushions||{}),
       removed:[...DESIGN_PATCH.removedCushions],
@@ -282,14 +308,17 @@ export function buildLozkoV0013({THREE,placement={positionMm:[1458,0,6275],rotat
     frontNiches:{
       row1ClearWidthsMm:[...ROW1_MM], row2ClearWidthsMm:[...ROW2_MM],
       row1Position:'upper', row2Position:'lower', clearHeightMm:299,
-      depthMm:200, dividerMm:18, ledCount:upperCells.length+lowerCells.length
+      depthMm:200, dividerMm:18, ledCount:upperCells.length+lowerCells.length,
+      directPointLights:0, rendererLighting:'fixed-pool'
     },
     rearUpperNiches:{
       clearWidthsMm:[...TOP_MM], fromYmm:800, toYmm:1200,
-      clearHeightMm:364, depthMm:200, dividerMm:18, ledCount:topCells.length
+      clearHeightMm:364, depthMm:200, dividerMm:18, ledCount:topCells.length,
+      directPointLights:0, rendererLighting:'fixed-pool'
     },
     removedCushions:[...DESIGN_PATCH.removedCushions],
-    retainedCushions:[...DESIGN_PATCH.retainedCushions]
+    retainedCushions:[...DESIGN_PATCH.retainedCushions],
+    lightingParity:true
   };
 
   return built;

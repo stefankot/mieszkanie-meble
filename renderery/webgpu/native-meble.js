@@ -116,6 +116,7 @@ async function buildOverride(lib, wpis, versionEntry, placement, manifest){
 
   window.__silnik?.nawigacja?.przeliczMeble?.();
   window.__silnik?.sterowanie?.odswiezMeble?.();
+  window.__silnik?.odswiezLedy?.();
   window.__silnik?.oznaczZmiane?.();
 }
 
