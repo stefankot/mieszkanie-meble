@@ -10,6 +10,7 @@ const V0011_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0010-do-v0011:1';
 const V0012_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0011-do-v0012:1';
 const V0013_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0012-do-v0013:1';
 const V0014_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0013-do-v0014:1';
+const V0015_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:1';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -144,6 +145,10 @@ async function syncNativeBed(){
     if((selectedId === 'v0010' || selectedId === 'v0011' || selectedId === 'v0012' || selectedId === 'v0013') && manifest.currentVersion === 'v0014' && !migrated(V0014_MIGRATION_KEY)){
       selectedId = 'v0014';
       migrationKey = V0014_MIGRATION_KEY;
+    }
+    if((selectedId === 'v0010' || selectedId === 'v0011' || selectedId === 'v0012' || selectedId === 'v0013' || selectedId === 'v0014') && manifest.currentVersion === 'v0015' && !migrated(V0015_MIGRATION_KEY)){
+      selectedId = 'v0015';
+      migrationKey = V0015_MIGRATION_KEY;
     }
 
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
