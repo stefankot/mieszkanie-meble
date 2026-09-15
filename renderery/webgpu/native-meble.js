@@ -15,6 +15,7 @@ const V0015_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:1';
 // cache wybranej wersji biblioteki został zsynchronizowany. W efekcie v0015
 // mogła pojawić się na moment, po czym okresowe odświeżenie przywracało v0014.
 const V0015_STABLE_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:2';
+const V0016_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0015-do-v0016:1';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -164,6 +165,16 @@ async function syncNativeBed(){
       if(moznaMigrowac){
         selectedId = 'v0015';
         migrationKey = V0015_STABLE_MIGRATION_KEY;
+      }
+    }
+
+    // v0016 jest publikowana jako kolejna zaakceptowana rewizja. Przechodzimy
+    // przez biblioteka.przypnij(), aby nie wrócił wcześniejszy wyścig stanu.
+    if(manifest.currentVersion === 'v0016' && !migrated(V0016_MIGRATION_KEY)){
+      const moznaMigrowac = ['v0010','v0011','v0012','v0013','v0014','v0015','v0016'].includes(selectedId);
+      if(moznaMigrowac){
+        selectedId = 'v0016';
+        migrationKey = V0016_MIGRATION_KEY;
       }
     }
 
