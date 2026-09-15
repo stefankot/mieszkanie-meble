@@ -9,9 +9,9 @@
     "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
     "confirmationSvg": "meble/lozko/plany/v0005.svg",
-    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki pozostają usunięte. Frontowa kratka v0005 została zastąpiona wnękami cofniętymi o 200 mm, więc zewnętrzny obrys podłogowy nie rośnie; stalowy pas 234 mm pozostaje po lewym końcu przy SPF."
+    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki pozostają usunięte. Wnęki pozostają cofnięte 200 mm; dawny górny pas 74 mm został przeniesiony na dół jako cokół cofnięty o 100 mm. Stalowy pas 234 mm pozostaje po lewym końcu przy SPF."
   },
-  "currentVersion": "v0006",
+  "currentVersion": "v0007",
   "versions": [
     {
       "id": "bazowa",
@@ -136,6 +136,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0005.svg",
         "description": "Pozycja i obrys zewnętrzny pozostają jak w v0005. Wnęki są cofnięte 200 mm w korpus, więc nie zwiększają footprintu. Zmiana opublikowana na wyraźne polecenie użytkownika."
+      }
+    },
+    {
+      "id": "v0007",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0007-native.js",
+      "nativeBuilder": "buildLozkoV0007",
+      "runtime": "native-override",
+      "summary": "Korekta v0006: oświetlenie wszystkich 20 wnęk wyraźnie wzmocnione (mocniejsza emisja paska + PointLight 3000 K). Górny pełny pas 74 mm usunięty i przeniesiony na dół jako cokół cofnięty o 100 mm; przy zachowaniu spodu platformy na 726 mm daje to dwa rzędy wnęk po 299 mm światła, szerokość ok. 207 mm i głębokość 200 mm. Poduchy ponownie przechodzą przez ten sam renderer miękkich brył co wersja v1/P26: promień 22 mm, wypchanie 18 mm, lamówka, zagniecenia, szum i docisk, przy zachowaniu ID poducha_okno_1, poducha_okno_2, poducha_bok_1, poducha_bok_2. Pozostałe elementy v0006 bez zmian.",
+      "createdAt": "2026-09-15T09:28:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0005.svg",
+        "description": "Pozycja i footprint pozostają jak w v0006. Cokół jest cofnięty wewnątrz obrysu o 100 mm, a zmiany oświetlenia i miękkiej geometrii poduch nie zmieniają obrysu."
       }
     }
   ]
