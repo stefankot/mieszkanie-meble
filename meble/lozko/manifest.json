@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0002.svg",
     "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Dwa stalowe schodki przy prawej stronie mają 500 mm szerokości, 600 mm wysunięcia w stronę pokoju i 500 mm wysokości całkowitej; to rozszerzenie obrysu zostało zaakceptowane poleceniem aktywacji wersji v0002."
   },
-  "currentVersion": "v0002",
+  "currentVersion": "v0003",
   "versions": [
     {
       "id": "bazowa",
@@ -60,6 +60,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0002.svg",
         "description": "Pozycja korpusu bez zmian. Stalowe schodki 500 × 600 × 500 mm rozszerzają obrys o 600 mm w stronę pokoju przy prawej stronie łóżka; wersja aktywowana na wyraźne polecenie użytkownika."
+      }
+    },
+    {
+      "id": "v0003",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0003-native.js",
+      "nativeBuilder": "buildLozkoV0003",
+      "runtime": "native-override",
+      "summary": "Korekta v0002: płyta SPF 1600 × 1800 mm w BABY BLUE® #cee7ef, siatka 6 × 6, krok 220 mm, marginesy 250/350 mm, 36 otworów Ø20 mm. Przywrócona zamknięta geometria klinowych poduch i wcześniejsze ID: poducha_okno_1, poducha_okno_2, poducha_bok_1, poducha_bok_2. Pozostała geometria i mechanizmy v0002 bez zmian.",
+      "createdAt": "2026-09-15T08:12:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0002.svg",
+        "description": "Pozycja i obrys podłogowy bez zmian względem v0002; korekta dotyczy SPF i geometrii poduch."
       }
     }
   ]
