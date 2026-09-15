@@ -9,9 +9,9 @@
     "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
     "confirmationSvg": "meble/lozko/plany/v0002.svg",
-    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Dwa stalowe schodki przy prawej stronie mają 500 mm szerokości, 600 mm wysunięcia w stronę pokoju i 500 mm wysokości całkowitej; to rozszerzenie obrysu zostało zaakceptowane poleceniem aktywacji wersji v0002."
+    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Dwa stalowe schodki przy prawej stronie mają 500 mm szerokości, 600 mm wysunięcia w stronę pokoju i 500 mm wysokości całkowitej. Boazeria frontowa wystaje 20 mm, ale pozostaje wewnątrz wcześniej zaakceptowanego obrysu całkowitego ze schodkami."
   },
-  "currentVersion": "v0003",
+  "currentVersion": "v0004",
   "versions": [
     {
       "id": "bazowa",
@@ -79,6 +79,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0002.svg",
         "description": "Pozycja i obrys podłogowy bez zmian względem v0002; korekta dotyczy SPF i geometrii poduch."
+      }
+    },
+    {
+      "id": "v0004",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0004-native.js",
+      "nativeBuilder": "buildLozkoV0004",
+      "runtime": "native-override",
+      "summary": "Korekta v0003: wysokość mieszkania 2600 mm; perforowana płyta BABY BLUE 1600 × 1800 mm dosunięta do sufitu (800–2600 mm) i przedłużona na dole pełnym pasem 50 mm do poziomu platformy 750 mm. Na froncie łóżka dodana zielona boazeria o projekcji 20 mm i listwach 18 mm: dwa rzędy po 373 mm światła, poziomo pięć pól po 400 mm i końcowe pole 144 mm przy stronie SPF. Poduchy, mechanizmy, schodki, stalowy pas i drony bez zmian.",
+      "createdAt": "2026-09-15T08:12:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0002.svg",
+        "description": "Pozycja i całkowity obrys ze schodkami bez zmian. Boazeria frontowa wystaje 20 mm w stronę pokoju, ale pozostaje wewnątrz już zaakceptowanego obrysu schodków."
       }
     }
   ]
