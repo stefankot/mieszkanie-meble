@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 4900 5200 2800">
+  <rect x="240" y="5140" width="4650" height="2270" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="2565" y="5070" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-LOZKO</text>
+  <line x1="240" y1="5140" x2="240" y2="7410" stroke="#333" stroke-width="28"/>
+  <text x="300" y="5350" font-family="sans-serif" font-size="70">W4 / okno</text>
+  <rect x="240" y="5510" width="40" height="1380" fill="#7fc5df"/>
+
+  <!-- body po przesunięciu +200 mm w world X -->
+  <rect x="640" y="5140" width="1636" height="2270" fill="#ffffff" stroke="#111" stroke-width="24"/>
+  <!-- tylne wnęki 200 mm głębokości: wykorzystują przestrzeń za korpusem -->
+  <rect x="440" y="5140" width="200" height="2270" fill="#cee7ef" fill-opacity="0.35" stroke="#5d8794" stroke-width="16" stroke-dasharray="35 22"/>
+  <text x="1458" y="6240" font-family="sans-serif" font-size="92" font-weight="700" text-anchor="middle">ŁÓŻKO v0008</text>
+  <text x="1458" y="6370" font-family="sans-serif" font-size="66" text-anchor="middle">body 2270 × 1636 mm · pozycja [1458,0,6275] · 90°</text>
+  <text x="540" y="7030" font-family="sans-serif" font-size="58" text-anchor="middle">wnęki tylne 200 mm</text>
+
+  <!-- dystanse -->
+  <line x1="240" y1="7200" x2="440" y2="7200" stroke="#a33" stroke-width="12"/>
+  <line x1="240" y1="7145" x2="240" y2="7255" stroke="#a33" stroke-width="12"/>
+  <line x1="440" y1="7145" x2="440" y2="7255" stroke="#a33" stroke-width="12"/>
+  <text x="340" y="7110" font-family="sans-serif" font-size="62" text-anchor="middle" fill="#a33">200 mm</text>
+
+  <line x1="440" y1="7350" x2="640" y2="7350" stroke="#2b6" stroke-width="12"/>
+  <text x="540" y="7310" font-family="sans-serif" font-size="62" text-anchor="middle" fill="#174">200 mm głębokości wnęk</text>
+
+  <line x1="640" y1="5000" x2="840" y2="5000" stroke="#174" stroke-width="14"/>
+  <path d="M840 5000 l-35 -22 v44 z" fill="#174"/>
+  <text x="740" y="4950" font-family="sans-serif" font-size="62" text-anchor="middle" fill="#174">przesunięcie +200 mm do centrum pokoju</text>
+
+  <text x="2700" y="6900" font-family="sans-serif" font-size="64">Po przesunięciu korpusu tylne wnęki zajmują dawną strefę 200 mm,</text>
+  <text x="2700" y="6990" font-family="sans-serif" font-size="64">a ich plecy nadal pozostają 200 mm od W4.</text>
+</svg>
