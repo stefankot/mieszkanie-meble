@@ -268,6 +268,25 @@
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Pozycja i footprint bez zmian względem v0008/v0012. Zmiana dotyczy wyłącznie podziałów pionowych wnęk frontu oraz górnego pasa tylnej ściany; dolna wentylowana strefa tylna pozostaje bez zmian."
       }
+    },
+    {
+      "id": "v0014",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0014-native.js",
+      "nativeBuilder": "buildLozkoV0014",
+      "runtime": "native-override",
+      "summary": "Kandydat na bazie v0013. Dodane białe drzwiczki wpuszczone 20 mm w światło wnęk: R1.2, R1.3 oraz R2.2, R2.3, R2.6. Drzwiczki są bezuchwytowe/push-to-open i mają działające zawiasy 105°. Dodany polerowany stalowy klocek 400 × 400 × 200 mm przed frontem łóżka: 400 mm wzdłuż łóżka, 200 mm w stronę pokoju, tylną krawędzią styka się z łóżkiem, a jego prawa krawędź jest 500 mm od projektowej prawej ściany. Klocek zmienia footprint, dlatego wersja wymaga akceptacji nowego planu v0014.svg przed aktywacją.",
+      "createdAt": "2026-09-15T14:35:00+02:00",
+      "placement": {
+        "confirmed": false,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0014.svg",
+        "description": "Korpus łóżka pozostaje w pozycji v0013. Nowy stalowy klocek rozszerza footprint o 200 mm przed frontem na odcinku 400 mm; w planie jego world footprint to X=2276–2476 mm, Z=5640–6040 mm, czyli 500 mm od prawej ściany/końca łóżka po stronie projektowego +X. Oczekuje na akceptację planu."
+      }
     }
   ]
 }
