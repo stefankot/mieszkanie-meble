@@ -1216,7 +1216,7 @@ function gradacja(zrodlo){
 function wyjscieDla(poziom){
   const photo=poziom==='photo';
   const temporal=photo || (trybAA==='taau' && poziom==='pelny');
-  const klucz=poziom+':'+(photo?'photo-raster':temporal?'taau':'smaa');
+  const klucz=poziom+':'+(photo?'photo-raster':temporal?'traa':'smaa');
   if(zbudowane.has(klucz)) return zbudowane.get(klucz);
   let kompozyt;
   if(poziom === 'pelny' || photo){
@@ -1430,9 +1430,9 @@ const POZIOMY = {
     opis: 'światło pośrednie i okluzja, bez odbić i cieni kontaktowych'
   },
   wysoka: {
-    potok: 'pelny', ssgiSkala: .5, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
+    potok: 'pelny', ssgiSkala: .5, szklo: true, pixelRatio: .9, cienMapa: 2048, rozmycieCienia: 32,
     ledPodPolka: true, cienZieleni: true, dopracowanie: true,
-    opis: 'pełny potok: odbicia, cienie kontaktowe i refrakcja szkła'
+    opis: 'pełny potok w 90% rozdzielczości z TRAA: odbicia, cienie kontaktowe i refrakcja szkła'
   },
   photo_raster: {
     potok: 'photo', ssgiSkala: 1, szklo: true, pixelRatio: 1, cienMapa: 2048, rozmycieCienia: 32,
@@ -1455,8 +1455,7 @@ function ustawPoziomJakosci(nazwa){
   worldGI.ustawProfil(nazwa);
 
   const temporal=trybAA==='taau' && nazwa==='wysoka';
-  /* P35: wejście TAAU 100% (było 75% — rozmycie przy skalowaniu w górę); ?bez=taaupelne wraca do 75%. */
-  przebieg.setResolutionScale(temporal && !wlaczone('taaupelne') ? .75 : 1);
+  przebieg.setResolutionScale(1);
   resetujHistorieTAAU('profile-switch');
   stanPhotoRaster.active=['photo_raster','photo_path'].includes(nazwa);
   stanPhotoRaster.samples=0; stanPhotoRaster.moving=false; stanPhotoRaster.heavy=false;
@@ -1468,7 +1467,10 @@ function ustawPoziomJakosci(nazwa){
   potok.outputNode = wyjscieDla(j.potok);
   potok.needsUpdate = true;
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, j.pixelRatio));
+  // 90% wymiaru to 81% pikseli. W tym projekcie TRAA w buforze 90% okazało
+  // się szybsze i ostrzejsze od TAAU rekonstruującego 90%; ?bez=skala90 daje A/B 100%.
+  const pixelRatio=nazwa==='wysoka' && !wlaczone('skala90') ? 1 : j.pixelRatio;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatio));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   slonce.shadow.mapSize.set(j.cienMapa, j.cienMapa);
@@ -1504,7 +1506,7 @@ function ustawAA(nazwa){
   return trybAA;
 }
 window.__silnik.aa={ustaw:ustawAA,get tryb(){return trybAA;},resets:0,lastReset:null,
-  opis:'TAAU r185: wysoka używa wejścia 75%; PHOTO_RASTER akumuluje 64 pełne klatki'};
+  opis:'TRAA r185: wysoka używa bufora 90%; PHOTO_RASTER akumuluje 64 pełne klatki'};
 if(new URLSearchParams(location.search).get('navtest')==='1'){
   const wynik=runNavigationRegression({nav:nawigacja,camera,controls,canvas:renderer.domElement,THREE});
   window.__silnik.navigationRegression=wynik;
