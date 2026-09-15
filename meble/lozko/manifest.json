@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0008.svg",
     "description": "Łóżko pozostaje przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0011",
+  "currentVersion": "v0012",
   "versions": [
     {
       "id": "bazowa",
@@ -229,6 +229,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Pozycja i footprint bez zmian względem v0010. Zmiana dotyczy wyłącznie rytmu pionowych przegród frontu i tyłu oraz ujednolicenia jasności LED nad i pod materacem."
+      }
+    },
+    {
+      "id": "v0012",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0012-native.js",
+      "nativeBuilder": "buildLozkoV0012",
+      "runtime": "native-override",
+      "summary": "Powrót do geometrii i oświetlenia v0008 jako bazy: front pod materacem pozostaje dokładnie jak w v0008 — 10 równych kolumn × 2 rzędy, mocne paski LED i PointLight 85. Nad materacem jest 5 wnęk o regularnym rytmie: pierwsza od strony SPF ma 600 mm, pozostałe cztery po 390,5 mm; przegrody 18 mm, wysokość 750–1200 mm, głębokość 200 mm. Górne LED-y używają dokładnie recepty v0008: emissive 12 + PointLight 85 / 520 mm. Nadal usunięte są dwie poduchy wzdłuż okna; pozostają poduchy boczne. Placement i footprint bez zmian.",
+      "createdAt": "2026-09-15T11:15:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Pozycja i footprint bez zmian względem v0008/v0011. Wersja v0012 jest nową, niemodyfikującą archiwalnej v0008 rewizją opartą bezpośrednio na v0008."
       }
     }
   ]
