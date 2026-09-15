@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0016.svg",
-    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0016 został potwierdzony przy publikacji. Schodek z polerowanej stali ma trzy stopnie i mieści się w obwiedni 600 × 600 × 600 mm; jego prawa krawędź pozostaje 500 mm od prawej ściany."
+    "confirmationSvg": "meble/lozko/plany/v0017.svg",
+    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0017 został automatycznie potwierdzony przy publikacji. Trzystopniowy schodek 600 × 600 × 600 mm zachowuje geometrię v0016, ale został przesunięty poprzecznie o 500 mm i przylega teraz bezpośrednio do ściany W1 (0 mm luzu)."
   },
-  "currentVersion": "v0016",
+  "currentVersion": "v0017",
   "versions": [
     {
       "id": "bazowa",
@@ -324,6 +324,24 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0016.svg",
         "description": "Pozycja potwierdzona przy publikacji zgodnie z poleceniem użytkownika. Korpus pozostaje w pozycji v0015. Trzystopniowe schody zajmują world footprint X=2276–2876 mm, Z=5640–6240 mm; obwiednia 600 × 600 × 600 mm, prawa krawędź 500 mm od prawej ściany."
+      }
+    },
+    {
+      "id": "v0017",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0017-native.js",
+      "nativeBuilder": "buildLozkoV0017",
+      "runtime": "native-override",
+      "summary": "Naprawa v0016. Trzy ciągłe poziome pasy LED są teraz faktycznymi elementami natywnego modelu: trzy emisyjne profile 2270 mm i dokładnie trzy RectAreaLight, bez PointLightów per wnęka i bez zależności od późniejszego odświeżenia systemu LED renderera. Zachowane kolory #D9D1CA i #FFA084 oraz drzwiczki R1.2, R1.4, R2.3 i R2.6. Trzystopniowy stalowy schodek 600 × 600 × 600 mm zachowuje geometrię v0016, ale został przesunięty przy samą ścianę W1 (0 mm luzu).",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0017.svg",
+        "description": "Pozycja automatycznie potwierdzona przy publikacji zgodnie z preferencją użytkownika. Korpus bez zmian. Schody zajmują world footprint X=2276–2876 mm, Z=5140–5740 mm i przylegają bezpośrednio do W1."
       }
     }
   ]
