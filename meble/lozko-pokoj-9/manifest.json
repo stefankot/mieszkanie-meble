@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "assetId": "lozko-pokoj-9",
+  "name": "Łóżko w małym pokoju",
+  "placement": {
+    "confirmed": true,
+    "roomId": "POKOJ-9",
+    "wallId": "POKOJ-9-W2",
+    "positionMm": [8602, 0, 3855],
+    "rotationDeg": -90,
+    "confirmationSvg": "meble/lozko-pokoj-9/plany/v0001.svg",
+    "description": "Kopia łóżka v0017 ustawiona pod oknem na ścianie POKOJ-9-W2. Tył korpusu pozostaje 400 mm od ściany okiennej, tylne wnęki dochodzą do 200 mm od ściany. Łóżko jest przesunięte w stronę POKOJ-9-W3 tak, aby schody 600 × 600 mm przylegały do tej ściany bez luzu."
+  },
+  "currentVersion": "v0001",
+  "versions": [
+    {
+      "id": "v0001",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko-pokoj-9/wersje/v0001-native.js",
+      "nativeBuilder": "buildLozkoPokoj9V0001",
+      "runtime": "native-override",
+      "summary": "Kopia aktywnego łóżka v0017 do pokoju 9,07 m² obok kuchni, z nowym assetId lozko-pokoj-9. Zachowane są: geometria wnęk, drzwiczki, kolory #D9D1CA i #FFA084, trzy ciągłe pasy LED oraz stalowe schody 600 × 600 × 600 mm. Proxy grzejnika starego pokoju nie jest kopiowane. Schody stoją przy POKOJ-9-W3, a tył łóżka jest skierowany do okna na POKOJ-9-W2.",
+      "createdAt": "2026-09-15T23:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-9",
+        "wallId": "POKOJ-9-W2",
+        "positionMm": [8602, 0, 3855],
+        "rotationDeg": -90,
+        "confirmationSvg": "meble/lozko-pokoj-9/plany/v0001.svg",
+        "description": "Pozycja potwierdzona automatycznie zgodnie z ustalonym trybem pracy. Korpus mieści się w pokoju; schody przylegają do W3, a dojście od strony drzwi przy W4 pozostaje wolne."
+      }
+    }
+  ]
+}
