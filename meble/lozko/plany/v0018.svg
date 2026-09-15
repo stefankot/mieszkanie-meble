@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 4900 5400 2900">
+  <rect x="240" y="5140" width="4650" height="2270" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="2565" y="5070" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-LOZKO</text>
+  <line x1="240" y1="5140" x2="240" y2="7410" stroke="#333" stroke-width="28"/>
+  <text x="300" y="5350" font-family="sans-serif" font-size="70">W4 / okno</text>
+  <rect x="240" y="5510" width="40" height="1380" fill="#7fc5df"/>
+
+  <!-- korpus bez zmiany placementu -->
+  <rect x="640" y="5140" width="1636" height="2270" fill="#D9D1CA" stroke="#111" stroke-width="24"/>
+  <rect x="440" y="5140" width="200" height="2270" fill="#cee7ef" fill-opacity="0.28" stroke="#5d8794" stroke-width="16" stroke-dasharray="35 22"/>
+  <text x="1458" y="6350" font-family="sans-serif" font-size="92" font-weight="700" text-anchor="middle">ŁÓŻKO v0018 · ODBICIE L/R</text>
+  <text x="1458" y="6480" font-family="sans-serif" font-size="60" text-anchor="middle">pozycja [1458,0,6275] · 90° · korpus bez zmiany</text>
+
+  <!-- po odbiciu schody przechodzą na przeciwną stronę, przy W3 -->
+  <rect x="2276" y="6810" width="600" height="600" fill="#dfe3e5" stroke="#6d7478" stroke-width="18"/>
+  <line x1="2476" y1="6810" x2="2476" y2="7410" stroke="#8d9498" stroke-width="10"/>
+  <line x1="2676" y1="6810" x2="2676" y2="7410" stroke="#8d9498" stroke-width="10"/>
+  <text x="2576" y="7130" font-family="sans-serif" font-size="54" text-anchor="middle">3 stopnie</text>
+  <text x="2576" y="7210" font-family="sans-serif" font-size="44" text-anchor="middle">600 × 600 × 600</text>
+  <text x="2576" y="7300" font-family="sans-serif" font-size="42" text-anchor="middle">0 mm od W3</text>
+
+  <text x="3050" y="6700" font-family="sans-serif" font-size="58">Cały układ lewo–prawo odbity względem lokalnej osi X.</text>
+  <text x="3050" y="6790" font-family="sans-serif" font-size="58">Poduszki i płyta perforowana zamieniły strony.</text>
+  <text x="3050" y="6880" font-family="sans-serif" font-size="58">Pozycja zatwierdzona automatycznie.</text>
+</svg>
