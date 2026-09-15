@@ -8,10 +8,10 @@
     "wallId": "POKOJ-9-W2",
     "positionMm": [8602, 0, 3855],
     "rotationDeg": -90,
-    "confirmationSvg": "meble/lozko-pokoj-9/plany/v0001.svg",
-    "description": "Kopia łóżka v0017 ustawiona pod oknem na ścianie POKOJ-9-W2. Tył korpusu pozostaje 400 mm od ściany okiennej, tylne wnęki dochodzą do 200 mm od ściany. Łóżko jest przesunięte w stronę POKOJ-9-W3 tak, aby schody 600 × 600 mm przylegały do tej ściany bez luzu."
+    "confirmationSvg": "meble/lozko-pokoj-9/plany/v0002.svg",
+    "description": "Kopia łóżka ustawiona pod oknem na ścianie POKOJ-9-W2. W v0002 układ został odbity lewo–prawo identycznie jak oryginalne lozko/v0018: poduszki i płyta perforowana zamieniły strony, a elementy boczne odbito razem z nimi."
   },
-  "currentVersion": "v0001",
+  "currentVersion": "v0002",
   "versions": [
     {
       "id": "v0001",
@@ -30,6 +30,25 @@
         "rotationDeg": -90,
         "confirmationSvg": "meble/lozko-pokoj-9/plany/v0001.svg",
         "description": "Pozycja potwierdzona automatycznie zgodnie z ustalonym trybem pracy. Korpus mieści się w pokoju; schody przylegają do W3, a dojście od strony drzwi przy W4 pozostaje wolne."
+      }
+    },
+    {
+      "id": "v0002",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko-pokoj-9/wersje/v0002-native.js",
+      "nativeBuilder": "buildLozkoPokoj9V0002",
+      "runtime": "native-override",
+      "summary": "Odbita poziomo kopia lozko/v0018. Poduszki i płyta perforowana zamieniły strony dokładnie tak samo jak w oryginalnym łóżku; zachowane są wnęki, drzwiczki, kolory, trzy ciągłe LED-y, mechanizmy i schody. Proxy grzejnika starego pokoju pozostaje usunięty.",
+      "createdAt": "2026-09-15T23:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-9",
+        "wallId": "POKOJ-9-W2",
+        "positionMm": [8602, 0, 3855],
+        "rotationDeg": -90,
+        "confirmationSvg": "meble/lozko-pokoj-9/plany/v0002.svg",
+        "description": "Pozycja zatwierdzona automatycznie. Korpus bez zmiany. Po odbiciu schody zajmują world footprint X=7184–7784 mm, Z=2720–3320 mm; po tej stronie pokoju pozostaje 180 mm do W1."
       }
     }
   ]
