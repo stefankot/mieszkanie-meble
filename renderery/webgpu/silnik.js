@@ -1656,7 +1656,14 @@ async function klatka(){
     await renderer.renderAsync(scene, camera);
   }
   nawigacja.rysujZnacznik();
-  pomiar.poKlatce(performance.now() - startCPU);
+  const stanDopracowania=window.__silnik.dopracuj?.();
+  const fazaPomiaru = !potokGotowy ? 'rozruch'
+    : stanDopracowania?.klatkiRuchu >= 3 ? 'ruch'
+    : stanDopracowania?.photoRaster?.active
+      && stanDopracowania.photoRaster.samples < stanDopracowania.photoRaster.target ? 'photo-raster'
+    : aktywny && stanDopracowania?.stopien < 2 ? 'dopracowanie'
+    : aktywny ? 'ustalony' : 'bezczynnosc';
+  pomiar.poKlatce(performance.now() - startCPU,{faza:fazaPomiaru});
   klatki++; window.__silnik.klatki = klatki;
   if((klatki & 31) === 0) aktualizujDiagnostykeGI();
   zmierzKlatke(performance.now());
