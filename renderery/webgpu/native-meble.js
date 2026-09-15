@@ -6,6 +6,7 @@ const ROOT = new URL('../../', import.meta.url);
 const ID = 'lozko';
 const PIN_KEY = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
 const BROKEN_NATIVE_VERSIONS = new Set(['v0009']);
+const V0011_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0010-do-v0011:1';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -37,6 +38,16 @@ function pinVersion(version){
     safe[ID] = version;
     localStorage.setItem(PIN_KEY, JSON.stringify(safe));
   }catch(e){}
+}
+
+function migratedV0011(){
+  try{ return localStorage.getItem(V0011_MIGRATION_KEY) === '1'; }
+  catch(e){ return true; }
+}
+
+function markV0011Migrated(){
+  try{ localStorage.setItem(V0011_MIGRATION_KEY, '1'); }
+  catch(e){}
 }
 
 function disposeOldGeometry(root){
@@ -102,6 +113,7 @@ async function syncNativeBed(){
   if(running) return;
   running = true;
   let attemptedVersion = null;
+  let migrateV0011 = false;
   try{
     const lib = await waitForLibrary();
     const manifest = await fetchManifest();
@@ -115,6 +127,15 @@ async function syncNativeBed(){
       selectedId = manifest.currentVersion;
     }
 
+    // Jednorazowa migracja bieżącej sesji/profilu z v0010 do v0011. P7d nadal
+    // zachowuje ręcznie wybrane starsze wersje: po pierwszej udanej migracji
+    // znacznik blokuje ponowne wymuszanie v0011, więc użytkownik może później
+    // świadomie wrócić do v0010 z selektora wersji.
+    if(selectedId === 'v0010' && manifest.currentVersion === 'v0011' && !migratedV0011()){
+      selectedId = 'v0011';
+      migrateV0011 = true;
+    }
+
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
     if(!versionEntry?.nativeOverrideFile) return;
     if(wpis?.korzen?.userData?.nativeOverrideVersion === selectedId) return;
@@ -125,6 +146,7 @@ async function syncNativeBed(){
     const placement = versionEntry.placement || manifest.placement;
     if(!placement?.confirmed) throw new Error(`Wersja ${selectedId} nie ma potwierdzonego placement.`);
     await buildOverride(lib, wpis, versionEntry, placement, manifest);
+    if(migrateV0011) markV0011Migrated();
     failedVersion = null;
     failedAt = 0;
   }catch(e){
