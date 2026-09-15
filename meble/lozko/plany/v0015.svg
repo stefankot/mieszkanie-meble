@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 4900 5200 2800">
+  <rect x="240" y="5140" width="4650" height="2270" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="2565" y="5070" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-LOZKO</text>
+  <line x1="240" y1="5140" x2="240" y2="7410" stroke="#333" stroke-width="28"/>
+  <text x="300" y="5350" font-family="sans-serif" font-size="70">W4 / okno</text>
+  <rect x="240" y="5510" width="40" height="1380" fill="#7fc5df"/>
+
+  <!-- korpus: placement jak v0008+ -->
+  <rect x="640" y="5140" width="1636" height="2270" fill="#D9D1CA" stroke="#111" stroke-width="24"/>
+  <rect x="440" y="5140" width="200" height="2270" fill="#cee7ef" fill-opacity="0.35" stroke="#5d8794" stroke-width="16" stroke-dasharray="35 22"/>
+  <text x="1458" y="6240" font-family="sans-serif" font-size="92" font-weight="700" text-anchor="middle">ŁÓŻKO v0015</text>
+  <text x="1458" y="6370" font-family="sans-serif" font-size="66" text-anchor="middle">body 2270 × 1636 mm · pozycja [1458,0,6275] · 90°</text>
+
+  <!-- stopień 2: przy łóżku, 300 W × 200 D × 500 H -->
+  <rect x="2276" y="5640" width="200" height="300" fill="#dfe3e5" stroke="#6d7478" stroke-width="18"/>
+  <text x="2376" y="5795" font-family="sans-serif" font-size="48" text-anchor="middle">STOPIEŃ 2</text>
+  <text x="2376" y="5855" font-family="sans-serif" font-size="42" text-anchor="middle">H=500</text>
+
+  <!-- stopień 1: od środka pokoju, 300 W × 200 D × 300 H -->
+  <rect x="2476" y="5640" width="200" height="300" fill="#cfd4d7" stroke="#6d7478" stroke-width="18"/>
+  <text x="2576" y="5795" font-family="sans-serif" font-size="48" text-anchor="middle">STOPIEŃ 1</text>
+  <text x="2576" y="5855" font-family="sans-serif" font-size="42" text-anchor="middle">H=300</text>
+
+  <!-- 500 mm od prawej ściany / końca po stronie projektowego +X -->
+  <line x1="2740" y1="5140" x2="2740" y2="5640" stroke="#a33" stroke-width="12"/>
+  <line x1="2685" y1="5140" x2="2795" y2="5140" stroke="#a33" stroke-width="12"/>
+  <line x1="2685" y1="5640" x2="2795" y2="5640" stroke="#a33" stroke-width="12"/>
+  <text x="2830" y="5420" font-family="sans-serif" font-size="62" fill="#a33">500 mm od prawej ściany</text>
+
+  <!-- całkowita projekcja schodów 400 mm -->
+  <line x1="2276" y1="6060" x2="2676" y2="6060" stroke="#174" stroke-width="12"/>
+  <line x1="2276" y1="6010" x2="2276" y2="6110" stroke="#174" stroke-width="12"/>
+  <line x1="2676" y1="6010" x2="2676" y2="6110" stroke="#174" stroke-width="12"/>
+  <text x="2476" y="6170" font-family="sans-serif" font-size="58" text-anchor="middle" fill="#174">400 mm projekcji = 2 × 200 mm</text>
+
+  <text x="2900" y="6820" font-family="sans-serif" font-size="64">Schody z polerowanej stali, szerokość 300 mm.</text>
+  <text x="2900" y="6910" font-family="sans-serif" font-size="64">Stopień 2 przy łóżku: 200D × 300W × 500H mm.</text>
+  <text x="2900" y="7000" font-family="sans-serif" font-size="64">Stopień 1 od pokoju: 200D × 300W × 300H mm.</text>
+  <text x="2900" y="7090" font-family="sans-serif" font-size="64">Pozycja zaakceptowana przez użytkownika przy publikacji v0015.</text>
+</svg>
