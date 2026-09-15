@@ -1,4 +1,4 @@
-if(typeof window !== 'undefined') import('./native-meble.js?v=11');
+if(typeof window !== 'undefined') import('./native-meble.js?v=12');
 
 /* ============================================================
    INTERAKCJE MEBLI — otwieranie drzwi, szuflad i klap
