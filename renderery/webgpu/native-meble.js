@@ -16,6 +16,7 @@ const V0015_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:1';
 // mogła pojawić się na moment, po czym okresowe odświeżenie przywracało v0014.
 const V0015_STABLE_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:2';
 const V0016_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0015-do-v0016:1';
+const V0017_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0016-do-v0017:1';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -175,6 +176,17 @@ async function syncNativeBed(){
       if(moznaMigrowac){
         selectedId = 'v0016';
         migrationKey = V0016_MIGRATION_KEY;
+      }
+    }
+
+    // v0017: naprawa oświetlenia i przesunięcie schodów do ściany. Jak przy
+    // poprzednich publikacjach przechodzimy przez przypnij(), żeby utrwalić
+    // wersję w wewnętrznym stanie biblioteki i localStorage.
+    if(manifest.currentVersion === 'v0017' && !migrated(V0017_MIGRATION_KEY)){
+      const moznaMigrowac = ['v0010','v0011','v0012','v0013','v0014','v0015','v0016','v0017'].includes(selectedId);
+      if(moznaMigrowac){
+        selectedId = 'v0017';
+        migrationKey = V0017_MIGRATION_KEY;
       }
     }
 
