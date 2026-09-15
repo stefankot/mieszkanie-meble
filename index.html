@@ -47,8 +47,6 @@
 </div>
 
 <script>
- /* P33: wersja three.js wybierana parametrem ?three=185|186 — importmap wstawiany przed
-    pierwszym modułem, więc A/B nie wymaga dwóch kopii strony. */
  (function(){
    const w = new URLSearchParams(location.search).get('three') === '186' ? '0.186.0' : '0.185.0';
    const cdn = 'https://cdn.jsdelivr.net/npm/';
@@ -68,10 +66,8 @@
  })();
 </script>
 <script>
- /* Naprawa historycznego auto-pinowania wersji mebla. Jeżeli zapisany pin jest
-    starszy od currentVersion manifestu, usuwamy go przed startem modułów.
-    Dotyczy regału oraz obu łóżek, żeby nowe zatwierdzone rewizje pojawiały się
-    bez ręcznego czyszczenia localStorage. */
+ /* Jeżeli zapisany pin jest starszy od currentVersion manifestu, usuwamy go
+    przed startem modułów. Dotyczy regału oraz obu łóżek. */
  (function(){
    const KLUCZ = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
    const IDS = ['regal-przy-lozku','lozko','lozko-pokoj-9'];
@@ -108,19 +104,11 @@
  })();
 </script>
 <script>
- /* Postęp ładowania. Celowo w zwykłym skrypcie, a nie w module: ma działać
-    natychmiast i przetrwać sytuację, w której moduł w ogóle się nie wczyta. */
  (function(){
    const start = performance.now();
    const el = id => document.getElementById(id);
    let ostatniUlamek = 0, zakonczone = false, bylRaport = false;
 
-   /* Zanim pierwszy moduł zdąży cokolwiek zgłosić, przeglądarka pobiera
-      i parsuje three.js (0,8 MB) oraz inicjalizuje WebGPU. Ten odcinek nie miał
-      żadnego raportu i pasek stał na zerze — wyglądało to na zawieszenie.
-      Do czasu pierwszego prawdziwego etapu pasek pełznie sam, żeby było widać,
-      że strona żyje. Pełznięcie nigdy nie przekracza 10 %, więc nie kłamie
-      o faktycznym postępie. */
    const pelzanie = setInterval(() => {
      if(zakonczone || bylRaport) return clearInterval(pelzanie);
      const t = (performance.now() - start) / 1000;
@@ -134,8 +122,6 @@
      if(zakonczone) return;
      const s = (performance.now() - start) / 1000;
      el('czas').textContent = s.toFixed(1).replace('.', ',') + ' s';
-     /* Po 25 s bez końca mówimy wprost, że to już za długo — zamiast kazać
-        użytkownikowi zgadywać, czy strona żyje. */
      if(s > 25 && !el('ladowanie').classList.contains('zablad'))
        el('etap').textContent = 'To trwa dłużej niż zwykle — pobieranie z sieci może być zablokowane.';
    }, 100);
@@ -169,8 +155,6 @@
      }
    };
    el('ponow').addEventListener('click', () => location.reload());
-   /* Ostatni etap — kompilacja shaderów — potrafi trwać kilkanaście sekund
-      i nie da się go podzielić na kroki, więc uprzedzamy o tym wprost. */
    window.__postep.dlugi = (nazwa) => window.__postep.etap(nazwa);
  })();
 
@@ -186,6 +170,7 @@
    window.__postep?.blad('Nie udało się uruchomić sceny: ' + t);
  });
 </script>
-<script type="module" src="./renderery/webgpu/silnik.js?mirror-beds-v1"></script>
+<script type="module" src="./renderery/webgpu/silnik.js?mirror-beds-v2"></script>
+<script type="module" src="./renderery/webgpu/bed-version-migrations.js?v=1"></script>
 </body>
 </html>
