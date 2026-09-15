@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0017.svg",
-    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0017 został automatycznie potwierdzony przy publikacji. Trzystopniowy schodek 600 × 600 × 600 mm zachowuje geometrię v0016, ale został przesunięty poprzecznie o 500 mm i przylega teraz bezpośrednio do ściany W1 (0 mm luzu)."
+    "confirmationSvg": "meble/lozko/plany/v0018.svg",
+    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. W v0018 cały układ lewo–prawo został odbity względem lokalnej osi X: poduszki i płyta perforowana zamieniły strony, a elementy logicznie przypisane do boków zostały odbite razem z nimi. Schody są teraz po stronie W3."
   },
-  "currentVersion": "v0017",
+  "currentVersion": "v0018",
   "versions": [
     {
       "id": "bazowa",
@@ -342,6 +342,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0017.svg",
         "description": "Pozycja automatycznie potwierdzona przy publikacji zgodnie z preferencją użytkownika. Korpus bez zmian. Schody zajmują world footprint X=2276–2876 mm, Z=5140–5740 mm i przylegają bezpośrednio do W1."
+      }
+    },
+    {
+      "id": "v0018",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0018-native.js",
+      "nativeBuilder": "buildLozkoV0018",
+      "runtime": "native-override",
+      "summary": "Odbicie poziome całego układu v0017 względem lokalnej osi X. Poduszki i płyta perforowana zamieniły strony; razem z nimi odbite są wszystkie elementy logicznie przypisane do boków, w tym stalowy schodek. Pozycja korpusu, kolory #D9D1CA i #FFA084, wnęki, drzwiczki, trzy ciągłe LED-y i mechanizmy pozostają zachowane.",
+      "createdAt": "2026-09-15T23:35:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0018.svg",
+        "description": "Pozycja zatwierdzona automatycznie. Korpus pozostaje bez zmian. Po odbiciu schody zajmują world footprint X=2276–2876 mm, Z=6810–7410 mm i przylegają do W3."
       }
     }
   ]
