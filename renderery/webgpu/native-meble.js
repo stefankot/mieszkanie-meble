@@ -5,7 +5,11 @@ const THREE = {...Core, RoundedBoxGeometry};
 const ROOT = new URL('../../', import.meta.url);
 const ID = 'lozko';
 const PIN_KEY = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
+const BROKEN_NATIVE_VERSIONS = new Set(['v0009']);
+const RETRY_AFTER_MS = 30000;
 let running = false;
+let failedVersion = null;
+let failedAt = 0;
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -35,7 +39,11 @@ function pinVersion(version){
   }catch(e){}
 }
 
-async function buildOverride(lib, wpis, versionEntry, placement){
+function disposeOldGeometry(root){
+  root?.traverse?.(o => o.geometry?.dispose?.());
+}
+
+async function buildOverride(lib, wpis, versionEntry, placement, manifest){
   const moduleUrl = new URL(versionEntry.nativeOverrideFile, ROOT);
   moduleUrl.searchParams.set('v', versionEntry.id);
   const mod = await import(moduleUrl.href);
@@ -43,10 +51,13 @@ async function buildOverride(lib, wpis, versionEntry, placement){
   const builder = mod[builderName] || mod.default?.[builderName];
   if(typeof builder !== 'function') throw new Error(`Brak buildera ${builderName}.`);
 
+  const started = performance.now();
   const built = builder({THREE, placement});
+  const buildMs = performance.now() - started;
   if(!built?.korzen) throw new Error('Natywny model nie zwrócił korzenia.');
   built.korzen.userData.version = versionEntry.id;
   built.korzen.userData.nativeOverrideVersion = versionEntry.id;
+  built.korzen.userData.nativeBuildMs = Math.round(buildMs);
 
   const main = built.ruchy?.find(r => r.id === 'lozko:lift');
   if(main && typeof built.applyDependentState === 'function'){
@@ -65,9 +76,11 @@ async function buildOverride(lib, wpis, versionEntry, placement){
   if(!scene) throw new Error('Nie znaleziono sceny dla natywnego modelu.');
   if(oldRoot) scene.remove(oldRoot);
   scene.add(built.korzen);
+  disposeOldGeometry(oldRoot);
 
   const next = {
     ...wpis,
+    manifest: manifest || wpis?.manifest,
     wersja: versionEntry.id,
     opis: versionEntry.summary || wpis?.opis,
     korzen: built.korzen,
@@ -88,20 +101,34 @@ async function buildOverride(lib, wpis, versionEntry, placement){
 async function syncNativeBed(){
   if(running) return;
   running = true;
+  let attemptedVersion = null;
   try{
     const lib = await waitForLibrary();
     const manifest = await fetchManifest();
-    let wpis = lib.meble.get(ID);
+    const wpis = lib.meble.get(ID);
 
-    const selectedId = wpis?.wersja || manifest.currentVersion;
+    let selectedId = wpis?.wersja || manifest.currentVersion;
+    if(BROKEN_NATIVE_VERSIONS.has(selectedId) && manifest.currentVersion && manifest.currentVersion !== selectedId){
+      // v0009 potrafiła blokować główny wątek. Nie pozostawiamy użytkownika na
+      // trwałym pinie do wersji oznaczonej jako uszkodzona — przechodzimy do
+      // aktualnej poprawki bez czekania na 15-s okres biblioteki.
+      selectedId = manifest.currentVersion;
+    }
+
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
     if(!versionEntry?.nativeOverrideFile) return;
     if(wpis?.korzen?.userData?.nativeOverrideVersion === selectedId) return;
 
+    attemptedVersion = selectedId;
+    if(failedVersion === selectedId && Date.now() - failedAt < RETRY_AFTER_MS) return;
+
     const placement = versionEntry.placement || manifest.placement;
     if(!placement?.confirmed) throw new Error(`Wersja ${selectedId} nie ma potwierdzonego placement.`);
-    await buildOverride(lib, wpis, versionEntry, placement);
+    await buildOverride(lib, wpis, versionEntry, placement, manifest);
+    failedVersion = null;
+    failedAt = 0;
   }catch(e){
+    if(attemptedVersion){ failedVersion = attemptedVersion; failedAt = Date.now(); }
     console.error('Natywny model łóżka:', e);
     window.__silnik?.usterki?.push?.('Natywny model łóżka: ' + (e?.message || e));
   }finally{
