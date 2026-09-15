@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0002.svg",
-    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Dwa stalowe schodki przy prawej stronie mają 500 mm szerokości, 600 mm wysunięcia w stronę pokoju i 500 mm wysokości całkowitej. Boazeria frontowa wystaje 20 mm, ale pozostaje wewnątrz wcześniej zaakceptowanego obrysu całkowitego ze schodkami."
+    "confirmationSvg": "meble/lozko/plany/v0005.svg",
+    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki usunięte. Frontowa kratka wystaje 30 mm w stronę pokoju; stalowy pas 234 mm przeniesiony na przeciwny, lewy koniec przy SPF."
   },
-  "currentVersion": "v0004",
+  "currentVersion": "v0005",
   "versions": [
     {
       "id": "bazowa",
@@ -98,6 +98,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0002.svg",
         "description": "Pozycja i całkowity obrys ze schodkami bez zmian. Boazeria frontowa wystaje 20 mm w stronę pokoju, ale pozostaje wewnątrz już zaakceptowanego obrysu schodków."
+      }
+    },
+    {
+      "id": "v0005",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0005-native.js",
+      "nativeBuilder": "buildLozkoV0005",
+      "runtime": "native-override",
+      "summary": "Korekta v0004: usunięte schodki; stalowy pas/schowek 234 mm przeniesiony na przeciwny, lewy koniec przy SPF, a materac i platforma przesunięte na prawą stronę. Kolor płyt łóżka zmieniony na #BCC6C2. Frontowa boazeria zastąpiona drobną kratką: listwy 18 mm, projekcja 30 mm, 4 rzędy po 177,5 mm światła oraz 20 kolumn — 19 pól po 95 mm i końcowe 87 mm przy SPF. Zachowane BABY BLUE, poduchy, perforacje, sprzężony lift, siłowniki i drony.",
+      "createdAt": "2026-09-15T09:28:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0005.svg",
+        "description": "Pozycja korpusu bez zmian. Schodki usunięte, więc obrys został zmniejszony. Kratka frontowa zwiększa lokalną głębokość tylko o 30 mm; stalowa część jest teraz po stronie SPF. Zmiana opublikowana na wyraźne polecenie użytkownika."
       }
     }
   ]
