@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5900 2350 4200 2850">
+  <rect x="6120" y="2540" width="3700" height="2450" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="7970" y="2460" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-9 · 9,07 m²</text>
+
+  <line x1="9820" y1="2540" x2="9820" y2="4990" stroke="#333" stroke-width="28"/>
+  <rect x="9780" y="2570" width="80" height="1650" fill="#7fc5df"/>
+  <text x="9680" y="3370" font-family="sans-serif" font-size="62" text-anchor="end">W2 / okno</text>
+
+  <rect x="6000" y="3430" width="120" height="790" fill="#d8c3a5"/>
+  <text x="6260" y="3860" font-family="sans-serif" font-size="50">drzwi</text>
+
+  <!-- korpus bez zmiany placementu -->
+  <rect x="7784" y="2720" width="1636" height="2270" fill="#D9D1CA" stroke="#111" stroke-width="24"/>
+  <text x="8602" y="3790" font-family="sans-serif" font-size="84" font-weight="700" text-anchor="middle">ŁÓŻKO POKÓJ 9 · ODBICIE L/R</text>
+  <text x="8602" y="3910" font-family="sans-serif" font-size="58" text-anchor="middle">assetId: lozko-pokoj-9 · v0002</text>
+  <text x="8602" y="4010" font-family="sans-serif" font-size="54" text-anchor="middle">pozycja [8602,0,3855] · obrót −90°</text>
+
+  <!-- tylne wnęki jak wcześniej, od strony okna -->
+  <rect x="9420" y="2720" width="200" height="2270" fill="#cee7ef" fill-opacity="0.28" stroke="#5d8794" stroke-width="14" stroke-dasharray="30 20"/>
+
+  <!-- po odbiciu schody przechodzą na przeciwną stronę korpusu -->
+  <rect x="7184" y="2720" width="600" height="600" fill="#dfe3e5" stroke="#6d7478" stroke-width="18"/>
+  <line x1="7384" y1="2720" x2="7384" y2="3320" stroke="#8d9498" stroke-width="10"/>
+  <line x1="7584" y1="2720" x2="7584" y2="3320" stroke="#8d9498" stroke-width="10"/>
+  <text x="7484" y="3040" font-family="sans-serif" font-size="54" text-anchor="middle">3 stopnie</text>
+  <text x="7484" y="3120" font-family="sans-serif" font-size="44" text-anchor="middle">600 × 600 × 600</text>
+  <text x="7484" y="3210" font-family="sans-serif" font-size="42" text-anchor="middle">180 mm od W1</text>
+
+  <text x="6180" y="5140" font-family="sans-serif" font-size="52">Odbicie identyczne jak lozko/v0018: poduszki ↔ płyta perforowana.</text>
+  <text x="6180" y="5210" font-family="sans-serif" font-size="52">Pozycja zatwierdzona automatycznie.</text>
+</svg>
