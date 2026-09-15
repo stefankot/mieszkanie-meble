@@ -68,38 +68,43 @@
  })();
 </script>
 <script>
- /* Naprawa historycznego auto-pinowania wersji mebla. Biblioteka zapisywała
-    automatycznie aktualnie wczytaną wersję jako trwały wybór użytkownika, więc
-    późniejszy currentVersion z manifestu (np. v0019) nie był już wybierany.
-    Przed startem modułów usuwamy tylko nieaktualny pin regału przy łóżku.
-    Ten sam test działa później okresowo, aby przyszłe wersje też pojawiały się
+ /* Naprawa historycznego auto-pinowania wersji mebla. Jeżeli zapisany pin jest
+    starszy od currentVersion manifestu, usuwamy go przed startem modułów.
+    Dotyczy regału oraz obu łóżek, żeby nowe zatwierdzone rewizje pojawiały się
     bez ręcznego czyszczenia localStorage. */
  (function(){
    const KLUCZ = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
-   const ID = 'regal-przy-lozku';
-   const URL_MANIFESTU = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/meble/regal-przy-lozku/manifest.json';
+   const IDS = ['regal-przy-lozku','lozko','lozko-pokoj-9'];
+   const BASE = 'https://raw.githubusercontent.com/stefankot/mieszkanie-meble/main/meble/';
 
-   async function odblokujNajnowsza({przeladuj=false} = {}){
+   async function odblokujNajnowsze({przeladuj=false} = {}){
      try{
-       const manifest = await fetch(URL_MANIFESTU + '?t=' + Date.now(), {cache:'no-store'}).then(r => {
-         if(!r.ok) throw Error('HTTP ' + r.status);
-         return r.json();
-       });
        const zapisane = JSON.parse(localStorage.getItem(KLUCZ) || '{}');
-       const przypieta = zapisane && typeof zapisane === 'object' ? zapisane[ID] : null;
-       if(przypieta && manifest.currentVersion && przypieta !== manifest.currentVersion){
-         delete zapisane[ID];
+       if(!zapisane || typeof zapisane !== 'object') return;
+       let zmiana = false;
+       for(const id of IDS){
+         const manifest = await fetch(BASE + id + '/manifest.json?t=' + Date.now(), {cache:'no-store'}).then(r => {
+           if(!r.ok) throw Error(id + ': HTTP ' + r.status);
+           return r.json();
+         });
+         const przypieta = zapisane[id];
+         if(przypieta && manifest.currentVersion && przypieta !== manifest.currentVersion){
+           delete zapisane[id];
+           zmiana = true;
+         }
+       }
+       if(zmiana){
          localStorage.setItem(KLUCZ, JSON.stringify(zapisane));
          if(przeladuj) location.reload();
        }
      }catch(e){
-       console.warn('Kontrola wersji regału:', e);
+       console.warn('Kontrola wersji mebli:', e);
      }
    }
 
-   window.__odblokujNajnowszaWersjeRegalu = odblokujNajnowsza;
-   odblokujNajnowsza();
-   setInterval(() => odblokujNajnowsza({przeladuj:true}), 15000);
+   window.__odblokujNajnowszeWersjeMebli = odblokujNajnowsze;
+   odblokujNajnowsze();
+   setInterval(() => odblokujNajnowsze({przeladuj:true}), 15000);
  })();
 </script>
 <script>
@@ -181,6 +186,6 @@
    window.__postep?.blad('Nie udało się uruchomić sceny: ' + t);
  });
 </script>
-<script type="module" src="./renderery/webgpu/silnik.js?shift-arrows-v1"></script>
+<script type="module" src="./renderery/webgpu/silnik.js?mirror-beds-v1"></script>
 </body>
 </html>
