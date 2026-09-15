@@ -7,6 +7,7 @@ const ID = 'lozko';
 const PIN_KEY = 'mieszkanie-webgpu:wybrane-wersje-mebli:1';
 const BROKEN_NATIVE_VERSIONS = new Set(['v0009']);
 const V0011_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0010-do-v0011:1';
+const V0012_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0011-do-v0012:1';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -40,13 +41,13 @@ function pinVersion(version){
   }catch(e){}
 }
 
-function migratedV0011(){
-  try{ return localStorage.getItem(V0011_MIGRATION_KEY) === '1'; }
+function migrated(key){
+  try{ return localStorage.getItem(key) === '1'; }
   catch(e){ return true; }
 }
 
-function markV0011Migrated(){
-  try{ localStorage.setItem(V0011_MIGRATION_KEY, '1'); }
+function markMigrated(key){
+  try{ localStorage.setItem(key, '1'); }
   catch(e){}
 }
 
@@ -113,7 +114,7 @@ async function syncNativeBed(){
   if(running) return;
   running = true;
   let attemptedVersion = null;
-  let migrateV0011 = false;
+  let migrationKey = null;
   try{
     const lib = await waitForLibrary();
     const manifest = await fetchManifest();
@@ -121,19 +122,18 @@ async function syncNativeBed(){
 
     let selectedId = wpis?.wersja || manifest.currentVersion;
     if(BROKEN_NATIVE_VERSIONS.has(selectedId) && manifest.currentVersion && manifest.currentVersion !== selectedId){
-      // v0009 potrafiła blokować główny wątek. Nie pozostawiamy użytkownika na
-      // trwałym pinie do wersji oznaczonej jako uszkodzona — przechodzimy do
-      // aktualnej poprawki bez czekania na 15-s okres biblioteki.
       selectedId = manifest.currentVersion;
     }
 
-    // Jednorazowa migracja bieżącej sesji/profilu z v0010 do v0011. P7d nadal
-    // zachowuje ręcznie wybrane starsze wersje: po pierwszej udanej migracji
-    // znacznik blokuje ponowne wymuszanie v0011, więc użytkownik może później
-    // świadomie wrócić do v0010 z selektora wersji.
-    if(selectedId === 'v0010' && manifest.currentVersion === 'v0011' && !migratedV0011()){
+    // Zachowujemy ręczne wybory wersji, ale bieżący profil użytkownika dostaje
+    // jednorazowo kolejne jawnie opublikowane rewizje projektu.
+    if(selectedId === 'v0010' && manifest.currentVersion === 'v0011' && !migrated(V0011_MIGRATION_KEY)){
       selectedId = 'v0011';
-      migrateV0011 = true;
+      migrationKey = V0011_MIGRATION_KEY;
+    }
+    if((selectedId === 'v0010' || selectedId === 'v0011') && manifest.currentVersion === 'v0012' && !migrated(V0012_MIGRATION_KEY)){
+      selectedId = 'v0012';
+      migrationKey = V0012_MIGRATION_KEY;
     }
 
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
@@ -146,7 +146,7 @@ async function syncNativeBed(){
     const placement = versionEntry.placement || manifest.placement;
     if(!placement?.confirmed) throw new Error(`Wersja ${selectedId} nie ma potwierdzonego placement.`);
     await buildOverride(lib, wpis, versionEntry, placement, manifest);
-    if(migrateV0011) markV0011Migrated();
+    if(migrationKey) markMigrated(migrationKey);
     failedVersion = null;
     failedAt = 0;
   }catch(e){
