@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {NAV_KEY_MAP,classifyTrackpadGesture} from '../renderery/webgpu/navigation-regression.js';
+import {NAV_KEY_MAP,SHIFT_NAV_KEY_MAP,navigationActionForKey,classifyTrackpadGesture} from '../renderery/webgpu/navigation-regression.js';
 import {DEFAULT_EYE_HEIGHT_CM} from '../renderery/webgpu/navigation-config.mjs';
 
 assert.equal(classifyTrackpadGesture({ctrlKey:false}),'two-finger-look');
@@ -10,5 +10,11 @@ assert.equal(NAV_KEY_MAP.KeyS,NAV_KEY_MAP.ArrowDown);
 assert.equal(NAV_KEY_MAP.KeyD,NAV_KEY_MAP.ArrowRight);
 assert.equal(NAV_KEY_MAP.ArrowLeft,'obrotLewo');
 assert.equal(NAV_KEY_MAP.ArrowRight,'obrotPrawo');
+assert.equal(SHIFT_NAV_KEY_MAP.ArrowLeft,'bokLewo');
+assert.equal(SHIFT_NAV_KEY_MAP.ArrowRight,'bokPrawo');
+assert.equal(navigationActionForKey({code:'ArrowUp',shiftKey:true}),'kameraGora');
+assert.equal(navigationActionForKey({code:'ArrowDown',shiftKey:true}),'kameraDol');
+assert.equal(navigationActionForKey({code:'ArrowLeft',shiftKey:true}),'bokLewo');
+assert.equal(navigationActionForKey({code:'ArrowRight',shiftKey:false}),'obrotPrawo');
 assert.equal(DEFAULT_EYE_HEIGHT_CM,167);
-console.log('navigation-regression: 9 assertions passed');
+console.log('navigation-regression: 15 assertions passed');

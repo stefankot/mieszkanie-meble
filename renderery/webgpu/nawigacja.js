@@ -1,5 +1,5 @@
 import { utworzKadrowanie } from './kadrowanie.js?eye-167-v1';
-import { NAV_KEY_MAP, classifyTrackpadGesture } from './navigation-regression.js?turn-v2';
+import { NAV_KEY_MAP, SHIFT_NAV_KEY_MAP, navigationActionForKey, classifyTrackpadGesture } from './navigation-regression.js?shift-arrows-v1';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 
 /* ============================================================
@@ -12,7 +12,8 @@ import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
    · JEDEN klik podchodzi w wskazane miejsce — nie dwuklik,
    · na poprawnym celu na podłodze ostre NIEBIESKIE kółko,
    · przeciąganie rozgląda kamerę i nigdy nie wywołuje podejścia,
-   · ←/→ oraz A/D obracają kamerę; Q/E zmieniają wysokość,
+   · ←/→ oraz A/D obracają kamerę; Shift+←/→ idzie bokiem,
+     Shift+↑/↓ oraz Q/E zmieniają wysokość,
    · domyślna wysokość oczu 167 cm,
    · Point & Go trwa ~1 s i zachowuje kierunek patrzenia, zatrzymując się
      80 cm przed celem; przejście do pomieszczenia trwa 2,5 s i na końcu
@@ -182,6 +183,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     dt = Math.min(dt, .05);
     const kr = dt * 60;                  // demo liczy na klatkę 60 Hz
     const osPrzod = (klaw.przod ? 1 : 0) - (klaw.tyl ? 1 : 0) - joystick.y;
+    const osBok = (klaw.bokPrawo ? 1 : 0) - (klaw.bokLewo ? 1 : 0);
     const osObrot = (klaw.obrotPrawo ? 1 : 0) - (klaw.obrotLewo ? 1 : 0) + joystick.x;
     if(Math.abs(osObrot) > .04){
       eulerPom.setFromQuaternion(camera.quaternion);
@@ -192,15 +194,19 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     }
     camera.updateMatrix();
 
-    const idzie = Math.abs(osPrzod) > .04;
+    const idzie = Math.abs(osPrzod) > .04 || Math.abs(osBok) > .04;
     if(idzie){
       kierunek.set(0, 0, 0);
       kolumna.setFromMatrixColumn(camera.matrix, 2);
       kolumna.y = 0; kolumna.normalize();
       kolumna.multiplyScalar(-osPrzod);
       kierunek.add(kolumna);
+      kolumna.setFromMatrixColumn(camera.matrix, 0);
+      kolumna.y = 0; kolumna.normalize();
+      kolumna.multiplyScalar(osBok);
+      kierunek.add(kolumna);
       if(kierunek.length() > 0){
-        const sila = Math.min(1, Math.abs(osPrzod));
+        const sila = Math.min(1, Math.hypot(osPrzod, osBok));
         kierunek.normalize().multiplyScalar(sila);
         const m = kuca ? .5 : (klaw.bieg ? 2 : 1);
         biezacaSzybkosc = Math.min(biezacaSzybkosc + RUCH.acceleration*m*kr, RUCH.maxSpeed*m);
@@ -688,7 +694,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   });
 
   /* ---------- klawiatura ---------- */
-  /* Strzałki odpowiadają WSAD: góra/dół idą, lewo/prawo obracają kamerę. */
+  /* Bez modyfikatora góra/dół idą, a lewo/prawo obracają kamerę.
+     Shift zmienia strzałki na regulację wysokości i ruch boczny. */
   /* Brief: sterowanie musi działać po użyciu panelu — ale wpisywanie daty nie
      może jednocześnie poruszać kamerą. */
   const wPolu = () => {
@@ -697,12 +704,16 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   };
   addEventListener('keydown', e => {
     if(e.metaKey || e.ctrlKey || e.altKey || wPolu()) return;
-    if(NAV_KEY_MAP[e.code]){
+    const akcjaNawigacji = navigationActionForKey(e);
+    if(akcjaNawigacji){
       if(tryb === TRYBY.PTAK) return;
       e.preventDefault();
       if(animacja){ animacja=null; synchronizuj(); }
       zdarzenia.keyboard++;
-      klaw[NAV_KEY_MAP[e.code]] = true; return;
+      if(akcjaNawigacji === 'kameraGora') zmienWysokoscOczu(+5);
+      else if(akcjaNawigacji === 'kameraDol') zmienWysokoscOczu(-5);
+      else klaw[akcjaNawigacji] = true;
+      return;
     }
     if(e.repeat) return;
     switch(e.code){
@@ -724,6 +735,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   });
   addEventListener('keyup', e => {
     if(NAV_KEY_MAP[e.code]) klaw[NAV_KEY_MAP[e.code]] = false;
+    if(SHIFT_NAV_KEY_MAP[e.code]) klaw[SHIFT_NAV_KEY_MAP[e.code]] = false;
     if(e.code === 'ShiftLeft' || e.code === 'ShiftRight') klaw.bieg = false;
     if(e.code === 'KeyC') kuca = false;
   });
