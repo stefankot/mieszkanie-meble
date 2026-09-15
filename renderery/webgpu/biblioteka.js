@@ -53,6 +53,14 @@ const wektor = (v, n = 3, min = -30000, max = 30000) =>
 const identyfikator = v => typeof v === 'string' && /^[a-zA-Z0-9_.-]{1,80}$/.test(v);
 const mm = x => x / 10;         // milimetry biblioteki → centymetry sceny
 
+export function sygnaturaManifestu(manifest){
+  return JSON.stringify({
+    currentVersion:manifest?.currentVersion||null,
+    versions:(manifest?.versions||[]).map(v=>[v.id,v.file||null,v.sha256||null,
+      v.nativeOverrideFile||null,v.nativeBuilder||null,v.placement?.confirmed??null])
+  });
+}
+
 /* ------------------------------------------------------------
    REJESTR TYPÓW CZĘŚCI
    Każdy wpis dostaje (p, ctx) i zwraca Object3D albo rzuca wyjątek.
@@ -406,11 +414,12 @@ export async function uruchomBiblioteke(api){
       return false;
     }
     if(!wymus && poprzedni.wersja === wybrana.id && poprzedni.korzen){
+      const manifestChanged=sygnaturaManifestu(poprzedni.manifest)!==sygnaturaManifestu(manifest);
       if(poprzedni.status === STATUS_MODELU.REJECTED){
         stan.set(id, {...poprzedni, manifest, status: poprzedni.aktywnyStatus || STATUS_MODELU.COMPLETE,
           blad: undefined, zachowanyPoprzedni: false});
-      }
-      return false;
+      }else stan.set(id,{...poprzedni,manifest});
+      return manifestChanged;
     }
 
     try{

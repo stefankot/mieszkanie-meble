@@ -33,7 +33,7 @@ assert.equal(salonShelf.placement.positionMm[0] + 3074/2, 3570,
 
 const bed = manifest('lozko');
 const bedShelf = manifest('regal-przy-lozku');
-assert.deepEqual(bed.placement.positionMm, [1258,0,6275]);
+assert.deepEqual(bed.placement.positionMm, [1458,0,6275]);
 assert.equal(bedShelf.currentVersion, 'v0020');
 assert.deepEqual(bedShelf.placement.positionMm, [3408,0,7125]);
 

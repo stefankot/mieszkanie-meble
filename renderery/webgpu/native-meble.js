@@ -126,8 +126,8 @@ async function syncNativeBed(){
   let migrationKey = null;
   try{
     const lib = await waitForLibrary();
-    const manifest = await fetchManifest();
     let wpis = lib.meble.get(ID);
+    const manifest = wpis?.manifest || await fetchManifest();
 
     let selectedId = wpis?.wersja || manifest.currentVersion;
     if(BROKEN_NATIVE_VERSIONS.has(selectedId) && manifest.currentVersion && manifest.currentVersion !== selectedId){
@@ -221,8 +221,5 @@ async function syncNativeBed(){
   }
 }
 
+if(window.__silnik) window.__silnik.aktywujNatywneMeble = syncNativeBed;
 syncNativeBed();
-setInterval(() => {
-  if(window.__silnik) window.__silnik.aktywujNatywneMeble = syncNativeBed;
-  syncNativeBed();
-}, 2000);

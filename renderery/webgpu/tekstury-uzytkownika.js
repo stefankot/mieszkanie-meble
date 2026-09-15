@@ -13,6 +13,7 @@ const RAMA_LOZKA = new Set(['dno', 'front', 'SO', 'prawa_sciana', 'przegroda_sb'
                             'skosny_zaglowek', 'platforma_pod_materacem', 'klapa_schowka_bocznego']);
 
 export async function wczytajTeksturyUzytkownika(THREE, TEX){
+  const started=performance.now();
   const loader = new THREE.TextureLoader();
   const wczytaj = async plik => {
     const t = await loader.loadAsync(BAZA + plik);
@@ -167,5 +168,7 @@ export async function wczytajTeksturyUzytkownika(THREE, TEX){
     });
   }
 
-  return {stalNierdzewna, nalozTkanine, ramaLozka, wykonczenia, ustawSrodowisko, materialPlytek, CM};
+  return {stalNierdzewna, nalozTkanine, ramaLozka, wykonczenia, ustawSrodowisko, materialPlytek, CM,
+    diagnostics:{loadAndNormalMs:Math.round(performance.now()-started),sourceSizePx:1024,normalSizePx:512,
+      sourceTextures:3,generatedNormals:3}};
 }

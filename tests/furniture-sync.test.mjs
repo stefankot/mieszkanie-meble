@@ -120,6 +120,8 @@ test('native furniture startup preserves the version selected by the user', () =
   const source=fs.readFileSync('renderery/webgpu/native-meble.js','utf8');
   assert.match(source,/syncNativeBed\(\);/);
   assert.doesNotMatch(source,/forceCurrent|przypnij\(ID,\s*manifest\.currentVersion\)/);
+  assert.doesNotMatch(source,/setInterval/);
+  assert.match(source,/wpis\?\.manifest \|\| await fetchManifest\(\)/);
 });
 
 test('generation token prevents a stale async version from winning', async () => {

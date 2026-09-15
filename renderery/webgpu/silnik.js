@@ -82,6 +82,9 @@ const TEX = utworzTekstury(THREE);
 const { boxGeo, board, boardMaterial, pegMaterial, fabricMaterial, setUV,
         canvasTex, cloneTex, grayCanvas, fbmMaker, heightToNormal,
         drawSky, drawBoardHeight, mattressMat, cushionMat, rng } = TEX;
+const obietnicaTeksturUzytkownika=wlaczone('tekstury10a')
+  ? wczytajTeksturyUzytkownika(THREE,TEX).then(value=>({value}),error=>({error}))
+  : Promise.resolve({value:null});
 const PLAN = utworzPlan(THREE);
 const { APARTMENT, wallGeometry, wallPositions } = PLAN;
 
@@ -775,8 +778,10 @@ async function wczytajSrodowiskoPozniej(){
 /* ---------- P29 (10a): TEKSTURY UŻYTKOWNIKA ---------- */
 let TU = null;
 if(wlaczone('tekstury10a')){
+  const wynikTU=await obietnicaTeksturUzytkownika;
   try{
-    TU = await wczytajTeksturyUzytkownika(THREE, TEX);
+    if(wynikTU.error) throw wynikTU.error;
+    TU = wynikTU.value;
     scene.add(TU.wykonczenia(PLAN));
   }catch(e){ usterki.push('Tekstury użytkownika: ' + e.message); }
 }
@@ -920,6 +925,7 @@ const biblioteka = await uruchomBiblioteke({
     odswiezLedy(b);
     nawigacja?.przeliczMeble();
     sterowanie?.odswiezMeble();
+    queueMicrotask(()=>window.__silnik.aktywujNatywneMeble?.());
   }
 });
 window.__silnik.odswiezLedy = () => odswiezLedy(biblioteka);
