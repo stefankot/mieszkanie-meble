@@ -11,7 +11,7 @@
     "confirmationSvg": "meble/lozko/plany/v0008.svg",
     "description": "Łóżko pozostaje przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0010",
+  "currentVersion": "v0011",
   "versions": [
     {
       "id": "bazowa",
@@ -210,6 +210,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Pozycja i footprint bez zmian względem v0008/v0009. Wersja naprawcza po zawieszaniu renderera przez v0009."
+      }
+    },
+    {
+      "id": "v0011",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0011-native.js",
+      "nativeBuilder": "buildLozkoV0011",
+      "runtime": "native-override",
+      "summary": "Korekta v0010: tylny ciąg nad materacem i pionowe podziały frontu pod materacem używają teraz tego samego malejącego rytmu Fibonacci/golden-ratio od 600 do 100 mm: 600, 475, 364, 268, 189, 130, 100 mm. Osiem przegród po 18 mm + 2126 mm światła daje dokładnie 2270 mm szerokości. Front ma 7 kolumn × 2 rzędy, tył 7 kolumn × 1 rząd. Wszystkie paski LED nad i pod materacem mają identyczną emisję 12 i wspólny jawny root.userData.lighting; usunięto bezpośrednie PointLighty z frontu, więc obie strefy korzystają z tej samej stałej puli świateł renderera bez powrotu problemu wydajności v0009. Placement i footprint bez zmian.",
+      "createdAt": "2026-09-15T10:55:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Pozycja i footprint bez zmian względem v0010. Zmiana dotyczy wyłącznie rytmu pionowych przegród frontu i tyłu oraz ujednolicenia jasności LED nad i pod materacem."
       }
     }
   ]
