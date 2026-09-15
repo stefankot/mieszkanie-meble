@@ -11,6 +11,10 @@ const V0012_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0011-do-v0012:1';
 const V0013_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0012-do-v0013:1';
 const V0014_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0013-do-v0014:1';
 const V0015_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:1';
+// v2 naprawia wyścig: poprzedni adapter zapisywał migrację zanim wewnętrzny
+// cache wybranej wersji biblioteki został zsynchronizowany. W efekcie v0015
+// mogła pojawić się na moment, po czym okresowe odświeżenie przywracało v0014.
+const V0015_STABLE_MIGRATION_KEY = 'mieszkanie-webgpu:lozko-v0014-do-v0015:2';
 const RETRY_AFTER_MS = 30000;
 let running = false;
 let failedVersion = null;
@@ -121,7 +125,7 @@ async function syncNativeBed(){
   try{
     const lib = await waitForLibrary();
     const manifest = await fetchManifest();
-    const wpis = lib.meble.get(ID);
+    let wpis = lib.meble.get(ID);
 
     let selectedId = wpis?.wersja || manifest.currentVersion;
     if(BROKEN_NATIVE_VERSIONS.has(selectedId) && manifest.currentVersion && manifest.currentVersion !== selectedId){
@@ -151,9 +155,30 @@ async function syncNativeBed(){
       migrationKey = V0015_MIGRATION_KEY;
     }
 
+    // Naprawa publikacji v0015: stary klucz mógł już zostać oznaczony mimo że
+    // biblioteka nadal pamiętała v0014 w swoim wewnętrznym cache. Używamy
+    // nowego klucza i — kluczowe — przeprowadzamy wybór przez publiczne API
+    // biblioteki, aby zsynchronizować stan, localStorage i bramkę pokoleń.
+    if(manifest.currentVersion === 'v0015' && !migrated(V0015_STABLE_MIGRATION_KEY)){
+      const moznaMigrowac = ['v0010','v0011','v0012','v0013','v0014','v0015'].includes(selectedId);
+      if(moznaMigrowac){
+        selectedId = 'v0015';
+        migrationKey = V0015_STABLE_MIGRATION_KEY;
+      }
+    }
+
+    if(migrationKey && typeof lib.przypnij === 'function' &&
+       (wpis?.wersja !== selectedId || wpis?.przypieta !== selectedId)){
+      await lib.przypnij(ID, selectedId);
+      wpis = lib.meble.get(ID);
+    }
+
     const versionEntry = manifest.versions?.find(v => v.id === selectedId);
     if(!versionEntry?.nativeOverrideFile) return;
-    if(wpis?.korzen?.userData?.nativeOverrideVersion === selectedId) return;
+    if(wpis?.korzen?.userData?.nativeOverrideVersion === selectedId){
+      if(migrationKey) markMigrated(migrationKey);
+      return;
+    }
 
     attemptedVersion = selectedId;
     if(failedVersion === selectedId && Date.now() - failedAt < RETRY_AFTER_MS) return;
