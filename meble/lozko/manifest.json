@@ -9,9 +9,9 @@
     "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
     "confirmationSvg": "meble/lozko/plany/v0008.svg",
-    "description": "Łóżko przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest teraz 400 mm od W4, a tylne wnęki o głębokości 200 mm wykorzystują połowę tego luzu, więc ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
+    "description": "Łóżko pozostaje przesunięte o 200 mm w stronę centrum pokoju: [1458,0,6275] mm, obrót 90°. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4. Schodki pozostają usunięte; stalowy pas 234 mm pozostaje po stronie SPF."
   },
-  "currentVersion": "v0008",
+  "currentVersion": "v0009",
   "versions": [
     {
       "id": "bazowa",
@@ -173,6 +173,24 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0008.svg",
         "description": "Jawnie zaakceptowane przesunięcie o 200 mm w stronę centrum pokoju. Korpus jest 400 mm od W4; tylne wnęki mają 200 mm głębokości i ich plecy pozostają 200 mm od W4."
+      }
+    },
+    {
+      "id": "v0009",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0009-native.js",
+      "nativeBuilder": "buildLozkoV0009",
+      "runtime": "native-override",
+      "summary": "Korekta v0008: usunięte dwie poduchy wzdłuż okna (poducha_okno_1, poducha_okno_2); pozostają dwie miękkie poduchy boczne. Tylny ciąg wnęk zachowuje wysokość 750–1200 mm, głębokość 200 mm i mocne LED 3000 K, ale ma teraz 7 pól o progresywnym rytmie Fibonacci/golden-ratio od SPF do strony poduszek bocznych: 200, 240, 276, 308, 337, 365, 400 mm. Osiem przegród po 18 mm + 2126 mm światła daje dokładnie 2270 mm szerokości. Placement i pozostałe elementy v0008 bez zmian.",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0008.svg",
+        "description": "Pozycja i footprint bez zmian względem v0008. Zmiana dotyczy usunięcia poduch przy oknie oraz przebudowy rytmu tylnych wnęk bez zmiany ich głębokości."
       }
     }
   ]
