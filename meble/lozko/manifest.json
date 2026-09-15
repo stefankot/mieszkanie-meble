@@ -8,10 +8,10 @@
     "wallId": "POKOJ-LOZKO-W4",
     "positionMm": [1458, 0, 6275],
     "rotationDeg": 90,
-    "confirmationSvg": "meble/lozko/plany/v0014.svg",
-    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0014 został zaakceptowany. Stalowy klocek 400 × 400 × 200 mm przylega do frontu łóżka, 400 mm biegnie wzdłuż łóżka, 200 mm wystaje w stronę pokoju, a jego prawa krawędź jest 500 mm od prawej ściany."
+    "confirmationSvg": "meble/lozko/plany/v0015.svg",
+    "description": "Łóżko pozostaje w pozycji [1458,0,6275] mm, obrót 90°. Plan v0015 został potwierdzony przy publikacji. Zamiast stalowego klocka są dwa schodki z polerowanej stali, każdy 300 mm szerokości i 200 mm głębokości: 300 mm wysokości od strony pokoju oraz 500 mm przy łóżku; prawa krawędź schodów pozostaje 500 mm od prawej ściany."
   },
-  "currentVersion": "v0014",
+  "currentVersion": "v0015",
   "versions": [
     {
       "id": "bazowa",
@@ -286,6 +286,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0014.svg",
         "description": "Plan v0014 zaakceptowany. Korpus łóżka pozostaje w pozycji v0013. Stalowy klocek rozszerza footprint o 200 mm przed frontem na odcinku 400 mm; world footprint X=2276–2476 mm, Z=5640–6040 mm, z prawą krawędzią 500 mm od prawej ściany."
+      }
+    },
+    {
+      "id": "v0015",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0015-native.js",
+      "nativeBuilder": "buildLozkoV0015",
+      "runtime": "native-override",
+      "summary": "Aktywna rewizja na bazie v0013. Stalowy klocek v0014 został zastąpiony dwoma schodkami z polerowanej stali o szerokości 300 mm: stopień 1 od środka pokoju ma 200 mm głębokości i 300 mm wysokości, stopień 2 przy łóżku ma 200 mm głębokości i 500 mm wysokości. Łączna projekcja schodów to 400 mm; prawa krawędź pozostaje 500 mm od prawej ściany. Białe drzwiczki wpuszczone 20 mm są teraz tylko w R1.2, R1.4, R2.3 i R2.6, wszystkie startują zamknięte. Materac i pozostałe poduchy mają kolor #c34811; płyty łóżka #D9D1CA. Układ wnęk i oświetlenie v0013/v0008 pozostają bez zmian.",
+      "createdAt": "2026-09-15T14:45:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1458, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0015.svg",
+        "description": "Pozycja potwierdzona przez użytkownika przy publikacji. Korpus pozostaje jak v0014, a schody zajmują world footprint X=2276–2676 mm, Z=5640–5940 mm. Stopień przy łóżku ma H=500 mm, zewnętrzny H=300 mm; oba mają 300 mm szerokości i 200 mm głębokości."
       }
     }
   ]
