@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="5900 2350 4200 2850">
+  <rect x="6120" y="2540" width="3700" height="2450" fill="#f4f4f1" stroke="#555" stroke-width="18"/>
+  <text x="7970" y="2460" font-family="sans-serif" font-size="90" text-anchor="middle">POKOJ-9 · 9,07 m²</text>
+
+  <!-- ściana okienna W2 -->
+  <line x1="9820" y1="2540" x2="9820" y2="4990" stroke="#333" stroke-width="28"/>
+  <rect x="9780" y="2570" width="80" height="1650" fill="#7fc5df"/>
+  <text x="9680" y="3370" font-family="sans-serif" font-size="62" text-anchor="end">W2 / okno</text>
+
+  <!-- drzwi do pokoju na W4 -->
+  <rect x="6000" y="3430" width="120" height="790" fill="#d8c3a5"/>
+  <text x="6260" y="3860" font-family="sans-serif" font-size="50">drzwi</text>
+
+  <!-- korpus łóżka: lokalny tył przy oknie -->
+  <rect x="7784" y="2720" width="1636" height="2270" fill="#D9D1CA" stroke="#111" stroke-width="24"/>
+  <text x="8602" y="3790" font-family="sans-serif" font-size="88" font-weight="700" text-anchor="middle">ŁÓŻKO POKÓJ 9</text>
+  <text x="8602" y="3910" font-family="sans-serif" font-size="58" text-anchor="middle">assetId: lozko-pokoj-9</text>
+  <text x="8602" y="4010" font-family="sans-serif" font-size="54" text-anchor="middle">pozycja [8602,0,3855] · obrót −90°</text>
+
+  <!-- tylne wnęki 200 mm w stronę okna; pozostaje 200 mm do W2 -->
+  <rect x="9420" y="2720" width="200" height="2270" fill="#cee7ef" fill-opacity="0.28" stroke="#5d8794" stroke-width="14" stroke-dasharray="30 20"/>
+  <line x1="9620" y1="2660" x2="9820" y2="2660" stroke="#174" stroke-width="10"/>
+  <text x="9720" y="2600" font-family="sans-serif" font-size="48" text-anchor="middle" fill="#174">200 mm</text>
+
+  <!-- schody: 600 × 600 mm, przy W3 -->
+  <rect x="7184" y="4390" width="600" height="600" fill="#dfe3e5" stroke="#6d7478" stroke-width="18"/>
+  <line x1="7384" y1="4390" x2="7384" y2="4990" stroke="#8d9498" stroke-width="10"/>
+  <line x1="7584" y1="4390" x2="7584" y2="4990" stroke="#8d9498" stroke-width="10"/>
+  <text x="7484" y="4710" font-family="sans-serif" font-size="54" text-anchor="middle">3 stopnie</text>
+  <text x="7484" y="4790" font-family="sans-serif" font-size="44" text-anchor="middle">600 × 600 × 600</text>
+  <text x="7484" y="4880" font-family="sans-serif" font-size="42" text-anchor="middle">0 mm od W3</text>
+
+  <!-- wolne dojście od drzwi do frontu łóżka -->
+  <line x1="6120" y1="4300" x2="7184" y2="4300" stroke="#174" stroke-width="10" stroke-dasharray="24 16"/>
+  <text x="6650" y="4225" font-family="sans-serif" font-size="48" text-anchor="middle" fill="#174">wolne dojście</text>
+
+  <text x="6180" y="5140" font-family="sans-serif" font-size="52">Kopia v0017; radiator starego pokoju nie jest częścią kopii.</text>
+  <text x="6180" y="5210" font-family="sans-serif" font-size="52">Pozycja potwierdzona automatycznie.</text>
+</svg>
