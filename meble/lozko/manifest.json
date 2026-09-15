@@ -9,9 +9,9 @@
     "positionMm": [1258, 0, 6275],
     "rotationDeg": 90,
     "confirmationSvg": "meble/lozko/plany/v0005.svg",
-    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki usunięte. Frontowa kratka wystaje 30 mm w stronę pokoju; stalowy pas 234 mm przeniesiony na przeciwny, lewy koniec przy SPF."
+    "description": "Pozycja korpusu bez zmian: [1258,0,6275] mm, obrót 90°, tylna krawędź 200 mm od POKOJ-LOZKO-W4. Schodki pozostają usunięte. Frontowa kratka v0005 została zastąpiona wnękami cofniętymi o 200 mm, więc zewnętrzny obrys podłogowy nie rośnie; stalowy pas 234 mm pozostaje po lewym końcu przy SPF."
   },
-  "currentVersion": "v0005",
+  "currentVersion": "v0006",
   "versions": [
     {
       "id": "bazowa",
@@ -117,6 +117,25 @@
         "rotationDeg": 90,
         "confirmationSvg": "meble/lozko/plany/v0005.svg",
         "description": "Pozycja korpusu bez zmian. Schodki usunięte, więc obrys został zmniejszony. Kratka frontowa zwiększa lokalną głębokość tylko o 30 mm; stalowa część jest teraz po stronie SPF. Zmiana opublikowana na wyraźne polecenie użytkownika."
+      }
+    },
+    {
+      "id": "v0006",
+      "legacy": true,
+      "file": "meble/lozko/wersje/bazowa-95056a0097fc.js",
+      "nativeOverrideFile": "meble/lozko/wersje/v0006-native.js",
+      "nativeBuilder": "buildLozkoV0006",
+      "runtime": "native-override",
+      "summary": "Korekta v0005: wszystkie płyty łóżka zmienione na białe #fff. Frontowa kratka została zastąpiona 20 prawdziwymi wnękami: 10 kolumn × 2 rzędy, ok. 207 × 336 mm światła i 200 mm głębokości, z przegrodami 18 mm. Ze względu na spód platformy na 726 mm górny pas 74 mm pozostaje pełny i wnęki nie przecinają platformy. Każda wnęka ma z tyłu, pod górną krawędzią, pasek LED z własnym delikatnym światłem 3000 K. BABY BLUE, stalowy pas po lewej, poduchy, perforacje, drony, sprzężony lift i siłowniki zachowane.",
+      "createdAt": "2026-09-15T09:28:00+02:00",
+      "placement": {
+        "confirmed": true,
+        "roomId": "POKOJ-LOZKO",
+        "wallId": "POKOJ-LOZKO-W4",
+        "positionMm": [1258, 0, 6275],
+        "rotationDeg": 90,
+        "confirmationSvg": "meble/lozko/plany/v0005.svg",
+        "description": "Pozycja i obrys zewnętrzny pozostają jak w v0005. Wnęki są cofnięte 200 mm w korpus, więc nie zwiększają footprintu. Zmiana opublikowana na wyraźne polecenie użytkownika."
       }
     }
   ]
