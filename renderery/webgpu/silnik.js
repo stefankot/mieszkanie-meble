@@ -33,7 +33,7 @@ import SunCalc from 'suncalc';
 import { utworzTekstury } from './tekstury.js';
 import { utworzPlan } from './plan.js?p7c1';
 import { uruchomBiblioteke } from './biblioteka.js?p7c1';
-import { utworzNawigacje } from './nawigacja.js?shift-arrows-v1';
+import { utworzNawigacje } from './nawigacja.js?camera-keys-v3';
 import { utworzSterowanie } from './sterowanie.js?panel-v2';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
 import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js?room-priority-v1';
@@ -47,7 +47,7 @@ import { wybierzSSR, SSR_MODERN, SSR_MODERN_SETTINGS } from './ssr-variants.js?d
 import { utworzArchPhoto } from './arch-photo.js';
 import { createPhotoRasterState, updatePhotoRasterState, photoRasterSlices } from './photo-raster.js';
 import { createPhotoPathIntegration } from './photo-path.js';
-import { runNavigationRegression } from './navigation-regression.js?shift-arrows-v1';
+import { runNavigationRegression } from './navigation-regression.js?camera-keys-v3';
 import { wlaczone } from './flagi.js';
 import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';

@@ -1,10 +1,11 @@
 export const NAV_KEY_MAP=Object.freeze({
   KeyW:'przod', ArrowUp:'przod', KeyS:'tyl', ArrowDown:'tyl',
-  KeyA:'obrotLewo', ArrowLeft:'obrotLewo', KeyD:'obrotPrawo', ArrowRight:'obrotPrawo'
+  KeyA:'obrotLewo', ArrowLeft:'obrotLewo', KeyD:'obrotPrawo', ArrowRight:'obrotPrawo',
+  Equal:'kameraGora', Minus:'kameraDol'
 });
 
 export const SHIFT_NAV_KEY_MAP=Object.freeze({
-  ArrowUp:'kameraGora', ArrowDown:'kameraDol',
+  ArrowUp:'patrzGora', ArrowDown:'patrzDol',
   ArrowLeft:'bokLewo', ArrowRight:'bokPrawo'
 });
 
@@ -69,14 +70,19 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     dispatchEvent(new KeyboardEvent('keyup',{code:'ArrowRight',shiftKey:true,bubbles:true}));
     results.shiftArrowStrafe=moved(p,camera.position) && !rotated(q,camera.quaternion);
 
+    nav.synchronizuj();
+    q=camera.quaternion.clone(); p=camera.position.clone();
+    dispatchEvent(new KeyboardEvent('keydown',{code:'ArrowUp',shiftKey:true,bubbles:true}));
+    for(let i=0;i<20;i++) nav.aktualizuj(1/60);
+    dispatchEvent(new KeyboardEvent('keyup',{code:'ArrowUp',shiftKey:true,bubbles:true}));
+    results.shiftArrowPitch=rotated(q,camera.quaternion) && !moved(p,camera.position);
+
     const eye=nav.wysokoscOczu;
-    const heightCode=eye<=225?'ArrowUp':'ArrowDown', heightDelta=heightCode==='ArrowUp'?5:-5;
-    dispatchEvent(new KeyboardEvent('keydown',{code:heightCode,shiftKey:true,bubbles:true}));
-    results.shiftArrowHeight=nav.wysokoscOczu===eye+heightDelta;
-    dispatchEvent(new KeyboardEvent('keyup',{code:heightCode,shiftKey:true,bubbles:true}));
-    const restoreCode=heightCode==='ArrowUp'?'ArrowDown':'ArrowUp';
-    dispatchEvent(new KeyboardEvent('keydown',{code:restoreCode,shiftKey:true,bubbles:true}));
-    dispatchEvent(new KeyboardEvent('keyup',{code:restoreCode,shiftKey:true,bubbles:true}));
+    dispatchEvent(new KeyboardEvent('keydown',{code:'Equal',bubbles:true}));
+    results.plusMinusHeight=nav.wysokoscOczu===eye+5;
+    dispatchEvent(new KeyboardEvent('keyup',{code:'Equal',bubbles:true}));
+    dispatchEvent(new KeyboardEvent('keydown',{code:'Minus',bubbles:true}));
+    dispatchEvent(new KeyboardEvent('keyup',{code:'Minus',bubbles:true}));
 
     p=camera.position.clone();
     const accepted=nav.podejdz({x:p.x+140,z:p.z+90},120);
@@ -104,7 +110,7 @@ export function runNavigationRegression({nav,camera,controls,canvas,THREE,storag
     if(nav.kolizje!==startCollisions) nav.przelaczKolizje();
     if(nav.tryb!==startMode && startMode!==nav.TRYBY.PTAK) nav.ustawTryb(startMode,{wymus:true,punkt:startPos});
   }
-  results.pass=['twoFingerLook','pinchDrive','dragLook','wasd','arrows','shiftArrowStrafe','shiftArrowHeight',
+  results.pass=['twoFingerLook','pinchDrive','dragLook','wasd','arrows','shiftArrowStrafe','shiftArrowPitch','plusMinusHeight',
     'pointAndGoEngine','collisions','topView','topTeleport','stateSave']
     .every(k=>results[k]===true);
   return results;

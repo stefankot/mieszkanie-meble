@@ -1,5 +1,5 @@
 import { utworzKadrowanie } from './kadrowanie.js?eye-167-v1';
-import { NAV_KEY_MAP, SHIFT_NAV_KEY_MAP, navigationActionForKey, classifyTrackpadGesture } from './navigation-regression.js?shift-arrows-v1';
+import { NAV_KEY_MAP, SHIFT_NAV_KEY_MAP, navigationActionForKey, classifyTrackpadGesture } from './navigation-regression.js?camera-keys-v3';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 
 /* ============================================================
@@ -185,9 +185,18 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const osPrzod = (klaw.przod ? 1 : 0) - (klaw.tyl ? 1 : 0) - joystick.y;
     const osBok = (klaw.bokPrawo ? 1 : 0) - (klaw.bokLewo ? 1 : 0);
     const osObrot = (klaw.obrotPrawo ? 1 : 0) - (klaw.obrotLewo ? 1 : 0) + joystick.x;
+    const osPochylenie = (klaw.patrzDol ? 1 : 0) - (klaw.patrzGora ? 1 : 0);
     if(Math.abs(osObrot) > .04){
       eulerPom.setFromQuaternion(camera.quaternion);
       eulerPom.y -= osObrot * PREDKOSC_OBROTU * dt;
+      eulerPom.x = pochylenie;
+      camera.quaternion.setFromEuler(eulerPom);
+      znacznik.visible = false;
+    }
+    if(osPochylenie){
+      eulerPom.setFromQuaternion(camera.quaternion);
+      pochylenie = THREE.MathUtils.clamp(pochylenie + osPochylenie*PREDKOSC_OBROTU*dt,
+                                         -PITCH_MAX, PITCH_MAX);
       eulerPom.x = pochylenie;
       camera.quaternion.setFromEuler(eulerPom);
       znacznik.visible = false;
@@ -415,6 +424,26 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const s = plan.roomCenter(p);
     przeliczMeble();
     podejdz({x: s.x, z: s.z}, POKOJ_MS, celWzrokuDlaPokoju(s));
+  }
+  function punktPokoju(i){
+    const pokoj = APARTMENT.rooms[i];
+    if(!pokoj) return null;
+    const srodek = plan.roomCenter(pokoj);
+    const wolne = najblizszeWolne(srodek.x, srodek.z);
+    if(!wolne) return null;
+    const pozycja = new THREE.Vector3(wolne.x, celOczu, wolne.z);
+    const cel = celWzrokuDlaPokoju(srodek)
+      || srodek.clone().add(new THREE.Vector3(0, 130, -100));
+    return {index:i, id:pokoj.id, nazwa:pokoj.name, pozycja, cel,
+      kat:Math.atan2(cel.z-pozycja.z, cel.x-pozycja.x)};
+  }
+  function punktyMapy(){
+    przeliczMeble();
+    return APARTMENT.rooms.map((_, i) => punktPokoju(i)).filter(Boolean);
+  }
+  function teleportujDoPokoju(i){
+    const punkt = punktPokoju(i);
+    return punkt ? ustawWidok(punkt.pozycja, punkt.cel) : false;
   }
 
   /* ---------- znacznik podejścia ---------- */
@@ -695,7 +724,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   /* ---------- klawiatura ---------- */
   /* Bez modyfikatora góra/dół idą, a lewo/prawo obracają kamerę.
-     Shift zmienia strzałki na regulację wysokości i ruch boczny. */
+     Shift zmienia strzałki na patrzenie w pionie i ruch boczny. Wysokość
+     regulują oba warianty fizycznych klawiszy =/+ oraz -/_. */
   /* Brief: sterowanie musi działać po użyciu panelu — ale wpisywanie daty nie
      może jednocześnie poruszać kamerą. */
   const wPolu = () => {
@@ -722,12 +752,9 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
       case 'Space':
         if(tryb === TRYBY.SPACER){ e.preventDefault(); if(naZiemi){ vy = SKOK; naZiemi = false; } }
         break;
-      case 'KeyF': case 'Enter': ustawTryb(TRYBY.SPACER); break;
       case 'KeyB': ustawTryb(tryb === TRYBY.PTAK ? TRYBY.ORBITA : TRYBY.PTAK); break;
       case 'KeyO': ustawTryb(TRYBY.ORBITA); break;
       case 'KeyK': przelaczKolizje(); break;
-      case 'KeyQ': zmienWysokoscOczu(-5); break;
-      case 'KeyE': zmienWysokoscOczu(+5); break;
       case 'Escape': if(tryb === TRYBY.SPACER) ustawTryb(TRYBY.ORBITA); break;
       default:
         if(/^Digit[1-7]$/.test(e.code)) doPokoju(+e.code.slice(5) - 1);
@@ -972,7 +999,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     }
   }
 
-  return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, zmienWysokoscOczu, przelaczKolizje, naprawKamere,
+  return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, teleportujDoPokoju, punktyMapy,
+          zmienWysokoscOczu, przelaczKolizje, naprawKamere,
           ustawWidok, kadrujMebel, synchronizuj, rysujZnacznik,
           podejdz, teleportujZPtaka, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
           diagnostyka:()=>({tryb,kolizje,wznowiono,joystick:{...joystick},zdarzenia:{...zdarzenia},
