@@ -1,4 +1,4 @@
-import { utworzKadrowanie } from './kadrowanie.js?eye-167-v1';
+import { utworzKadrowanie } from './kadrowanie.js?furniture-map-v1';
 import { NAV_KEY_MAP, SHIFT_NAV_KEY_MAP, navigationActionForKey, classifyTrackpadGesture } from './navigation-regression.js?camera-keys-v3';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
 
@@ -881,10 +881,15 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   }
   function kadrujMebel(korzen){
     naprawKamere();
-    const wynik = kadrowanie.kadruj(korzen,camera);
+    const wynik = znajdzKadrMebla(korzen);
     if(wynik.ok && !ustawWidok(wynik.pozycja,wynik.cel))
       return {ok:false,powod:'Wybrane miejsce nie jest już dostępne.'};
     return wynik;
+  }
+  /* Podgląd używany przez statyczną minimapę. Wyznacza dokładnie ten sam kadr,
+     który zostanie zastosowany po kliknięciu, ale nie przestawia kamery. */
+  function znajdzKadrMebla(korzen){
+    return kadrowanie.kadruj(korzen,camera);
   }
 
   /* Odczyt bieżącego stanu kamery do wewnętrznych pól — po tym, jak ktoś
@@ -1001,7 +1006,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, teleportujDoPokoju, punktyMapy,
           zmienWysokoscOczu, przelaczKolizje, naprawKamere,
-          ustawWidok, kadrujMebel, synchronizuj, rysujZnacznik,
+          ustawWidok, kadrujMebel, znajdzKadrMebla, synchronizuj, rysujZnacznik,
           podejdz, teleportujZPtaka, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
           diagnostyka:()=>({tryb,kolizje,wznowiono,joystick:{...joystick},zdarzenia:{...zdarzenia},
             pozycja:camera.position.toArray().map(v=>+v.toFixed(2))}),

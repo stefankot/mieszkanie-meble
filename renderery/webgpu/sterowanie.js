@@ -1,8 +1,8 @@
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 
 import { utworzNawigacjePanelu } from './panel-navigation.js?panel-v3';
-import { STYL_PANELU } from './panel-style.js?panel-v3';
-import { utworzMiniMape } from './mini-mapa.js?panel-v3';
+import { STYL_PANELU } from './panel-style.js?furniture-map-v1';
+import { utworzMiniMape } from './mini-mapa.js?furniture-map-v1';
 
 /* Panel według zadań. Tryb DEV zmienia tylko widoczność kontrolek. */
 
@@ -234,7 +234,12 @@ export function utworzSterowanie(api){
 
   /* Nawigacja panelu nie wysyła zdarzeń do ustawień sceny. */
   const panelNav = utworzNawigacjePanelu(el);
-  utworzMiniMape({kontener:$('#miniMapa'), plan, nawigacja});
+  const wybor = $('#mebelWybor');
+  const miniMapa = utworzMiniMape({THREE, kontener:$('#miniMapa'), plan, nawigacja, biblioteka,
+    przyWyborze:id => {
+      wybor.value=id;
+      wybor.dispatchEvent(new Event('change'));
+    }});
 
   /* ---------- widok ---------- */
   el.querySelectorAll('[data-tryb]').forEach(b =>
@@ -261,7 +266,6 @@ export function utworzSterowanie(api){
       ? nawigacja.TRYBY.ORBITA : nawigacja.TRYBY.PTAK));
 
   /* Jeden kontekst mebla: wersja, kadr, przeładowanie i mechanizmy. */
-  const wybor = $('#mebelWybor');
   const wersjaWybor = $('#mebelWersja');
   const kontrolkiWersji = [wersjaWybor, $('#przeladujMebel'), $('#sprawdzWersje')];
   function odswiezWersje(){
@@ -304,6 +308,7 @@ export function utworzSterowanie(api){
     odswiezWersje();
     odswiezStanBiblioteki();
     odswiezRuchy?.();
+    miniMapa.odswiez();
   }
   odswiezMeble();
   wybor.addEventListener('change', () => {

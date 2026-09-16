@@ -84,10 +84,14 @@ export const STYL_PANELU = `
 #sterowanie .mini-mapa svg{display:block;width:100%;height:100%}
 #sterowanie .mini-mapa-obrys{fill:#f9faf7;stroke:#55655b;stroke-width:10;stroke-linejoin:round}
 #sterowanie .mini-mapa-pokoj{fill:#e4e9e1;stroke:#aeb9af;stroke-width:5}
+#sterowanie .mini-mapa-mebel{fill:#b7804f;stroke:#5d4633;stroke-width:4;vector-effect:non-scaling-stroke}
+#sterowanie .mini-mapa-mebel.bez-kadru{fill:#b9b4a9;stroke:#777168}
+#sterowanie .mini-mapa-etykieta{fill:#fff;font:600 25px system-ui;text-anchor:middle;dominant-baseline:middle;paint-order:stroke;stroke:#493522;stroke-width:5;stroke-linejoin:round;pointer-events:none}
 #sterowanie .mini-mapa-punkty{position:absolute;inset:8px}
 #sterowanie .mini-mapa-punkt{position:absolute;display:grid;place-items:center;transform:translate(-50%,-50%);width:27px;height:27px;padding:0;border:2px solid #fff;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 2px 6px #16271f4d;cursor:pointer}
 #sterowanie .mini-mapa-punkt span{display:block;transform:rotate(var(--kierunek));font-size:13px;line-height:1}
 #sterowanie .mini-mapa-punkt:hover{scale:1.08;background:#1f4735}
+#sterowanie .mini-mapa-punkt:focus-visible{outline:3px solid #f0bd58;outline-offset:2px}
 #sterowanie #suwakiJakosci>details{border-top:1px solid var(--line);padding:6px 0}
 #sterowanie #suwakiJakosci summary{padding:6px 0;font-size:12px}
 #sterowanie #informacje>:not(summary){margin:12px}

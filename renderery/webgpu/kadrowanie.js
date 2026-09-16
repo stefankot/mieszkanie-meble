@@ -70,31 +70,59 @@ export function utworzKadrowanie({THREE, plan, biblioteka}){
     const front=new THREE.Vector3(0,0,1).applyQuaternion(q).setY(0).normalize();
     const rogi=[];
     for(const x of [b.min.x,b.max.x]) for(const y of [b.min.y,b.max.y]) for(const z of [b.min.z,b.max.z]) rogi.push(new THREE.Vector3(x,y,z));
+    /* Pięć punktów na rzucie mebla pozwala odróżnić prawdziwy szeroki widok
+       od kadru, w którym środek widać przez drzwi, lecz resztę zasłania ściana. */
+    const yProbki=THREE.MathUtils.clamp(c.y,b.min.y+1,b.max.y-1);
+    const probkiWidocznosci=[c.clone()];
+    for(const x of [THREE.MathUtils.lerp(b.min.x,b.max.x,.12),THREE.MathUtils.lerp(b.min.x,b.max.x,.88)])
+      for(const z of [THREE.MathUtils.lerp(b.min.z,b.max.z,.12),THREE.MathUtils.lerp(b.min.z,b.max.z,.88)])
+        probkiWidocznosci.push(new THREE.Vector3(x,yProbki,z));
     const probna=new THREE.PerspectiveCamera(camera.fov,
       Number.isFinite(camera.aspect)&&camera.aspect>0?camera.aspect:16/9,camera.near,camera.far);
     probna.zoom=camera.zoom;probna.updateProjectionMatrix();
     const zasieg=Math.hypot(granice.maxX-granice.minX,granice.maxZ-granice.minZ);
     let najlepszy=null;
-    // Najpierw front, następnie niewielkie odchylenia; nie kadruj przez ścianę.
-    for(const kat of [0,-15,15,-30,30,-45,45,-60,60]){
+    function ocenPozycje(p,kara=0){
+      if(!wolne(p) || !widocznyCel(p,c,korzen)) return;
+      probna.position.copy(p);probna.lookAt(c);probna.updateMatrixWorld(true);
+      let rozmiar=0;
+      for(const rog of rogi){
+        const v=rog.clone().project(probna);
+        if(v.z< -1 || v.z>1){rozmiar=Infinity;break;}
+        rozmiar=Math.max(rozmiar,Math.abs(v.x),Math.abs(v.y));
+      }
+      if(!Number.isFinite(rozmiar)) return;
+      const widoczne=probkiWidocznosci.reduce((n,cel)=>n+(widocznyCel(p,cel,korzen)?1:0),0);
+      const widocznosc=widoczne/probkiWidocznosci.length;
+      const caly=rozmiar<=.92 && widocznosc>=.8;
+      const ocena=(caly?0:1000+rozmiar*100+(1-widocznosc)*800)+kara+
+        (caly?Math.abs(.92-rozmiar)*10:0);
+      if(!najlepszy || ocena<najlepszy.ocena)
+        najlepszy={ok:true,pozycja:p.clone(),cel:c.clone(),caly,ocena,widocznosc};
+    }
+    /* Najpierw front, potem boki i tył. W ciasnych pokojach strona frontowa
+       bywa przy ścianie, choć z przeciwnej strony da się pokazać prawie cały
+       mebel. Każdy kandydat nadal musi leżeć w tym samym pokoju, być wolny i
+       mieć niezasłoniętą linię widzenia. */
+    for(const kat of [0,-15,15,-30,30,-45,45,-60,60,-90,90,-120,120,-150,150,180]){
       const kier=front.clone().applyAxisAngle(new THREE.Vector3(0,1,0),kat*Math.PI/180);
       for(let d=30;d<=zasieg;d+=10){
         const p=c.clone().addScaledVector(kier,d);
         p.y=THREE.MathUtils.clamp(DEFAULT_EYE_HEIGHT_CM,60,maxOczy);
         if(pokoj && plan.roomAt(p.x,p.z)!==pokoj) continue;
-        if(!wolne(p) || !widocznyCel(p,c,korzen)) continue;
-        probna.position.copy(p);probna.lookAt(c);probna.updateMatrixWorld(true);
-        let rozmiar=0;
-        for(const rog of rogi){
-          const v=rog.clone().project(probna);
-          if(v.z< -1 || v.z>1){rozmiar=Infinity;break;}
-          rozmiar=Math.max(rozmiar,Math.abs(v.x),Math.abs(v.y));
-        }
-        if(!Number.isFinite(rozmiar)) continue;
-        const caly=rozmiar<=.92;
-        const ocena=(caly?0:1000+rozmiar*100)+Math.abs(kat)*.15+(caly?Math.abs(.92-rozmiar)*10:0);
-        if(!najlepszy || ocena<najlepszy.ocena) najlepszy={ok:true,pozycja:p,cel:c.clone(),caly,ocena};
+        ocenPozycje(p,Math.abs(kat)*.15);
       }
+    }
+    /* Jeśli z pokoju nie da się objąć całego mebla, przeszukaj plan co 20 cm.
+       Pozwala to stanąć w otwartym przejściu lub sąsiednim pomieszczeniu.
+       Linia widzenia nadal eliminuje kadry prowadzące przez ścianę. */
+    if(!najlepszy?.caly){
+      for(let x=granice.minX+promien;x<=granice.maxX-promien;x+=20)
+        for(let z=granice.minZ+promien;z<=granice.maxZ-promien;z+=20){
+          const p=new THREE.Vector3(x,THREE.MathUtils.clamp(DEFAULT_EYE_HEIGHT_CM,60,maxOczy),z);
+          const pozaPokojem=pokoj && plan.roomAt(x,z)!==pokoj;
+          ocenPozycje(p,pozaPokojem?25:8);
+        }
     }
     return najlepszy || {ok:false,powod:'Brak wolnego miejsca przed meblem z widokiem niezasłoniętym ścianą.'};
   }
