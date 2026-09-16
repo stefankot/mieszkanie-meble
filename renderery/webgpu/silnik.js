@@ -1491,10 +1491,11 @@ function ustawPoziomJakosci(nazwa){
   ustawSzklo(j.szklo);
   ustawCienZieleni(j.cienZieleni);
 
-  /* Listwy podpółkowe to połowa świateł obszarowych w scenie. */
-  /* Emisyjne paski są darmowe, więc zostają zawsze; regulujemy tylko liczbę
-     rzeczywistych źródeł w puli. */
-  for(const [i, l] of (ledyMebli?.pula || []).entries()) l.visible = j.ledPodPolka || i < 2;
+  /* Pula ma zawsze najwyżej sześć źródeł. Wszystkie pozostają aktywne także
+     w profilu płynnym, bo po wejściu do pokoju cała pula obsługuje jeden mebel.
+     Ograniczenie jej do dwóch pozostawiało regał ciemny mimo prawidłowego
+     przypisania lamp do salonu. */
+  for(const l of ledyMebli?.pula || []) l.visible = true;
 
   dopracowanieWlaczone = j.dopracowanie;
   stopien = -1; klatekRuchu = 0; bezRuchu = 0;

@@ -57,6 +57,12 @@ test('salon strips stay assigned throughout the room without adding GPU lights',
   assert.equal(options.scena.children.filter(o => o.isLight).length,6);
 });
 
+test('every light in the fixed pool stays enabled in every quality profile',async()=>{
+  const engine = await readFile(new URL('../renderery/webgpu/silnik.js', import.meta.url),'utf8');
+  assert.match(engine,/for\(const l of ledyMebli\?\.pula \|\| \[\]\) l\.visible = true/);
+  assert.doesNotMatch(engine,/l\.visible\s*=\s*j\.ledPodPolka/);
+});
+
 test('pool follows the next room and remains safe outside the apartment or with no furniture',()=>{
   const {pool,camera,options} = fixture();
   camera.position.set(350,167,380); pool.aktualizuj(camera);
