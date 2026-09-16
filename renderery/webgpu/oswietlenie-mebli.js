@@ -220,13 +220,13 @@ export function oswietlWneki({THREE, korzen, scena, kolor = 0xffc582, moc = 170}
       sąsiednie powierzchnie i tak dostają ciepły odblask.
 
    2. RZECZYWISTE ŚWIATŁO — mała, STAŁA pula RectAreaLightów, które wędrują do
-      gniazd najbliższych kamerze. Stała liczba jest tu kluczowa: zmiana liczby
+      gniazd w pokoju kamery, a pozostałe do najbliższych. Stała liczba jest tu kluczowa: zmiana liczby
       świateł w scenie unieważnia materiały i wymusza rekompilację shaderów,
       więc gaszenie świateł co klatkę byłoby lekarstwem gorszym od choroby.
    ============================================================ */
 
 export function odswiezOswietlenieMebli({THREE, biblioteka, scena, poprzednie = null,
-                                         ilePuli = 6, kolor = 0xffc582, moc = 170}){
+                                         ilePuli = 6, kolor = 0xffc582, moc = 170, roomAt = () => null}){
   /* Sprzątanie po poprzednim wywołaniu. */
   if(poprzednie){
     for(const m of poprzednie.paski || []){ scena.remove(m); m.geometry.dispose(); }
@@ -238,6 +238,9 @@ export function odswiezOswietlenieMebli({THREE, biblioteka, scena, poprzednie = 
     if(!wpis.korzen) continue;
     gniazda.push(...oswietlWneki({THREE, korzen: wpis.korzen, scena, kolor, moc}));
   }
+
+  // Pozycje są w świecie; przypisanie do pokoju liczymy raz przy zmianie mebli.
+  const pokojeGniazd = new Map(gniazda.map(g => [g, roomAt(g.poz.x, g.poz.z)?.id]));
 
   /* Jeden materiał na wszystkie paski — jeden pipeline. */
   const materialPaska = new THREE.MeshStandardMaterial({
@@ -273,16 +276,24 @@ export function odswiezOswietlenieMebli({THREE, biblioteka, scena, poprzednie = 
 
   let ostatniaKam = new THREE.Vector3(NaN, NaN, NaN);
 
-  /* Przypisanie puli do najbliższych gniazd. Robione tylko wtedy, gdy kamera
-     ruszy się o ponad pół metra — przestawianie co klatkę nic by nie dało. */
+  let ostatniPokoj;
+
+  /* Światła pokoju mają pierwszeństwo przed bliższymi źródłami za ścianą.
+     Przekroczenie progu pokoju aktualizuje pulę od razu, nawet przy ruchu <50 cm.
+     W obrębie pokoju zachowujemy kolejność listew, żeby nie przeskakiwały. */
   function aktualizuj(kamera){
     if(!gniazda.length){ swiatla.forEach(l => { l.intensity = 0; }); return; }
-    if(ostatniaKam.distanceToSquared(kamera.position) < 2500) return;
+    const pokoj = roomAt(kamera.position.x, kamera.position.z)?.id;
+    if(pokoj === ostatniPokoj && ostatniaKam.distanceToSquared(kamera.position) < 2500) return;
     ostatniaKam.copy(kamera.position);
+    ostatniPokoj = pokoj;
 
     const posortowane = gniazda
-      .map(g => ({g, d: g.poz.distanceToSquared(kamera.position)}))
-      .sort((a, b) => Number(b.g.rodzaj === 'biblioteka') - Number(a.g.rodzaj === 'biblioteka') || a.d - b.d);
+      .map((g, i) => ({g, i, lokalne: pokoj != null && pokojeGniazd.get(g) === pokoj,
+        d: g.poz.distanceToSquared(kamera.position)}))
+      .sort((a, b) => Number(b.lokalne) - Number(a.lokalne)
+        || Number(b.g.rodzaj === 'biblioteka') - Number(a.g.rodzaj === 'biblioteka')
+        || (a.lokalne ? a.i - b.i : a.d - b.d));
 
     swiatla.forEach((l, i) => {
       const wpis = posortowane[i];

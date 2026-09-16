@@ -36,7 +36,7 @@ import { uruchomBiblioteke } from './biblioteka.js?p7c1';
 import { utworzNawigacje } from './nawigacja.js?shift-arrows-v1';
 import { utworzSterowanie } from './sterowanie.js?panel-v2';
 import { wczytajMaterialy, wczytajSrodowisko } from './materialy.js';
-import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js';
+import { odswiezOswietlenieMebli } from './oswietlenie-mebli.js?room-priority-v1';
 import { skrzywFormatki } from './niedoskonalosci.js';
 import { postep, koniecPomiaru } from './siec.js';
 import { utworzInterakcje } from './interakcje.js?p7c1';
@@ -843,7 +843,7 @@ let ledyMebli = null;
 function odswiezLedy(zrodlo){
   if(!zrodlo?.meble) return;
   ledyMebli = odswiezOswietlenieMebli({THREE, biblioteka: zrodlo, scena: scene,
-                                       poprzednie: ledyMebli, ilePuli: 6});
+                                       poprzednie: ledyMebli, ilePuli: 6, roomAt: PLAN.roomAt});
   ledyMebli.aktualizuj(camera);
   window.__silnik.ledy = ledyMebli;
 }
