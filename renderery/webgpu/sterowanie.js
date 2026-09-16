@@ -1,7 +1,8 @@
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 
-import { utworzNawigacjePanelu } from './panel-navigation.js?panel-v2';
-import { STYL_PANELU } from './panel-style.js?panel-v2';
+import { utworzNawigacjePanelu } from './panel-navigation.js?panel-v3';
+import { STYL_PANELU } from './panel-style.js?panel-v3';
+import { utworzMiniMape } from './mini-mapa.js?panel-v3';
 
 /* Panel według zadań. Tryb DEV zmienia tylko widoczność kontrolek. */
 
@@ -15,76 +16,55 @@ export function utworzSterowanie(api){
   const el = document.createElement('details');
   el.id = 'sterowanie'; el.open = true;
   el.dataset.panelMode = 'simple';
-  el.innerHTML = `<summary class="panel-tytul"><span><strong>Mieszkanie</strong><small>Studio 3D</small></span><span class="panel-zwin" aria-hidden="true">⌃</span><span class="sr-only">Zwiń lub rozwiń panel</span></summary>
+  el.innerHTML = `<summary class="panel-tytul"><span><strong>Mieszkanie</strong><small>Studio 3D</small></span>
+    <span class="panel-akcje"><button type="button" class="ikona-okragla" data-panel-mode-toggle aria-pressed="false" aria-label="Tryb deweloperski" title="Tryb DEV">D</button><span class="panel-zwin" aria-hidden="true">⌃</span></span>
+    <span class="sr-only">Zwiń lub rozwiń panel</span></summary>
   <div class="panel">
     <div class="panel-naglowek">
-      <div class="tryby-panelu" role="group" aria-label="Zakres panelu">
-        <button type="button" data-panel-mode="simple" aria-pressed="true">Prosty</button>
-        <button type="button" data-panel-mode="dev" aria-pressed="false">DEV</button>
-      </div>
       <div class="zakladki" role="tablist" aria-label="Sterowanie mieszkaniem">
         <button role="tab" data-z="meble" aria-selected="true">Meble</button>
-        <button role="tab" data-z="widok" aria-selected="false">Spacer</button>
         <button role="tab" data-z="swiatlo" aria-selected="false">Światło</button>
         <button role="tab" data-z="jakosc" aria-selected="false">Obraz</button>
+        <button role="tab" data-z="widok" aria-selected="false" class="dev-only">Ruch</button>
         <button role="tab" data-z="dev" aria-selected="false" class="dev-only">Laboratorium</button>
       </div>
     </div>
     <div class="panel-tresc">
     <section data-s="meble">
-      <div class="sekcja-wstep"><h2>Twój mebel</h2><p>Obejrzyj projekt i wypróbuj jego mechanizmy.</p></div>
-      <div class="karta"><label class="pole" for="mebelWybor">Wybrany projekt</label>
-
-      <select id="mebelWybor" aria-label="Wybrany mebel"></select>
-
-      <p id="mebelPodsumowanie" class="podsumowanie"></p>
+      <div class="sekcja-wstep naglowek-z-akcja"><h2 id="mebelNazwa">Mebel</h2>
+        <button type="button" class="ikona-okragla ikona-drzwi" id="drzwiMebla" aria-pressed="false" aria-label="Otwórz wszystkie drzwi" title="Otwórz wszystkie drzwi"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 17V3h9v14M7 5l7-1v12l-7-1zM11.8 10h.1"/></svg></button>
+      </div>
+      <div id="miniMapa" class="karta"></div>
+      <div class="karta"><label class="pole" for="mebelWybor">Projekt</label>
+      <div class="wiersz-z-ikona"><select id="mebelWybor" aria-label="Wybrany mebel"></select>
+        <button type="button" class="ikona-okragla dev-only" id="przeladujMebel" aria-label="Pobierz model ponownie" title="Pobierz model ponownie">↻</button></div>
+      <label class="pole" for="mebelWersja">Wersja projektu</label>
+      <div class="wiersz-z-ikona"><select id="mebelWersja" aria-label="Wersja wybranego mebla"></select>
+        <button type="button" class="ikona-okragla" id="sprawdzWersje" aria-label="Sprawdź nowe wersje" title="Sprawdź nowe wersje">↻</button></div>
+      <p class="uwaga dev-only" id="mebelStatus" role="status" aria-live="polite"></p>
       <button class="dzialanie glowna" id="kadrMebel">Pokaż mebel <span aria-hidden="true">↗</span></button>
-      <div class="opis" id="kadrInfo" role="status" aria-live="polite"></div></div>
-      <div class="karta"><h3>Otwieranie</h3><div class="siatka">
-        <button class="dzialanie" id="otworzWsz">Otwórz mebel</button>
-        <button class="dzialanie" id="zamknijWsz">Zamknij mebel</button>
       </div>
-<details class="grupa" id="czesciMebla"><summary>Poszczególne części <span id="liczbaRuchow" class="licznik"></span></summary><div id="ruchy"></div></details>
-      <p class="uwaga" id="ruchyInfo"></p>
-</div>
-      <details class="grupa"><summary>Wersje projektu</summary><div class="wnetrze"><label class="pole" for="mebelWersja">Wersja</label>
-      <select id="mebelWersja" aria-label="Wersja wybranego mebla"></select>
-      <button class="dzialanie" id="sprawdzWersje" >Sprawdź nowe wersje</button>
-      <p class="uwaga" id="mebelStatus" role="status" aria-live="polite"></p>
-
-      <button class="dzialanie tekstowa dev-only" id="przeladujMebel">Pobierz model ponownie</button></div></details>
+      <div class="karta dev-only" id="czesciMebla"><h3>Poszczególne części <span id="liczbaRuchow" class="licznik"></span></h3><div id="ruchy"></div></div>
     </section>
-    <section data-s="widok" hidden>
-      <div class="sekcja-wstep"><h2>Rozejrzyj się</h2><p>Kliknij podłogę, aby podejść. Przeciągnij, aby się rozejrzeć.</p></div>
-      <div class="karta"><h3>Przejdź do pomieszczenia</h3><div id="pokoje" class="pokoje"></div></div>
-      <div class="karta"><h3>Widok kamery</h3>
-      <div class="siatka">
-        <button class="dzialanie" data-tryb="spacer">Spacer</button>
-        <button class="dzialanie" data-tryb="orbita">Rozglądanie</button>
-        <button class="dzialanie" data-tryb="ptak" title="B — widok z góry / powrót">Z góry</button>
-      </div>
-
-      <details class="grupa"><summary>Ruch i wysokość</summary><div class="wnetrze">      <div class="strzalki" style="margin-top:6px">
+    <section data-s="widok" class="dev-only" hidden>
+      <div class="sekcja-wstep"><h2>Ruch i wysokość</h2></div>
+      <div class="karta"><div class="strzalki">
         <button class="dzialanie" data-krok="lewo" aria-label="Obróć kamerę w lewo"  title="A">←</button>
         <button class="dzialanie" data-krok="przod" aria-label="Idź do przodu" title="W">↑</button>
         <button class="dzialanie" data-krok="tyl" aria-label="Idź do tyłu"   title="S">↓</button>
         <button class="dzialanie" data-krok="prawo" aria-label="Obróć kamerę w prawo" title="D">→</button>
       </div>
       <div class="siatka" style="margin-top:6px;align-items:center">
-        <button class="dzialanie" id="oczNizej" aria-label="Obniż kamerę o 5 cm" title="Niżej o 5 cm · Q">−</button>
+        <button class="dzialanie" id="oczNizej" aria-label="Obniż kamerę o 5 cm" title="Niżej o 5 cm · −/_">−</button>
         <output id="oczy" style="text-align:center">160 cm</output>
-        <button class="dzialanie" id="oczWyzej" aria-label="Podnieś kamerę o 5 cm" title="Wyżej o 5 cm · E">+</button>
+        <button class="dzialanie" id="oczWyzej" aria-label="Podnieś kamerę o 5 cm" title="Wyżej o 5 cm · =/+">+</button>
       </div>
-<p class="uwaga">Shift + ↑ ↓: wysokość · Shift + ← →: ruch bokiem</p></div></details></div>
-      <details class="grupa dev-only"><summary>Widoczność i kolizje</summary><div class="wnetrze">
-      <button class="dzialanie" id="pokazMieszkanie" aria-pressed="true" title="P">Pokazuj mieszkanie</button>
-      <div class="suwak"><div class="naglowek"><label for="krycie">Krycie</label><output id="krycieVal">100%</output></div>
-        <input id="krycie" type="range" min="0" max="100" step="1" value="100"></div>
-      <label class="pole"><input type="checkbox" id="kolizje" checked>Kolizje ze ścianami <kbd>K</kbd></label>
-</div></details>
+      </div>
     </section>
     <section data-s="swiatlo" hidden>
-      <div class="sekcja-wstep"><h2>Światło i nastrój</h2><p>Sprawdź wnętrze o różnych porach dnia.</p></div>
+      <div class="sekcja-wstep naglowek-z-akcja"><h2>Światło</h2>
+        <button type="button" class="ikona-okragla ikona-zaslony" id="zaslonyToggle" aria-pressed="false" aria-label="Zasłoń wszystkie zasłony" title="Zasłoń wszystkie zasłony"><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M3 3h14M5 4v13M15 4v13M5 5c3 1 3 4 0 6m10-6c-3 1-3 4 0 6M3 17h14"/></svg></button>
+      </div>
       <div class="karta">
       <h3>Pora dnia</h3>
       <input type="hidden" id="presetSwiatla" value="${DOMYSLNY_PRESET_SWIATLA}">
@@ -105,7 +85,6 @@ export function utworzSterowanie(api){
       <div class="suwak"><div class="naglowek"><label for="rozproszenie">Rozproszenie</label><output id="rozproszenieVal">90%</output></div>
         <input id="rozproszenie" type="range" min="0" max="100" value="90"></div>
 </div>
-      <details class="grupa"><summary>Zasłony</summary><div class="wnetrze" id="zaslonySterowanie"></div></details>
       <details class="grupa dev-only"><summary>Źródła światła i otoczenie</summary><div class="wnetrze">
       <div class="suwak"><div class="naglowek"><label for="gOkna">Okna</label><output id="gOknaVal">100%</output></div>
         <input id="gOkna" type="range" min="0" max="200" step="5" value="100"></div>
@@ -118,7 +97,9 @@ export function utworzSterowanie(api){
 </div></details>
     </section>
     <section data-s="jakosc" hidden>
-      <div class="sekcja-wstep"><h2>Jakość obrazu</h2><p>Dobierz szczegółowość do płynności na swoim komputerze.</p></div>
+      <div class="sekcja-wstep naglowek-z-akcja"><h2>Obraz</h2>
+        <button type="button" class="ikona-okragla" id="widokToggle" aria-pressed="false" aria-label="Widok z góry" title="Widok z góry"><span aria-hidden="true">⌖</span></button>
+      </div>
       <div class="karta">
       <label class="pole" for="jakoscPoziom">Priorytet renderowania</label><select id="jakoscPoziom">
         <option value="minimalna">Płynność</option>
@@ -132,7 +113,7 @@ export function utworzSterowanie(api){
       <div class="suwak"><div class="naglowek"><label for="ekspozycja">Ekspozycja</label><output id="ekspozycjaVal">0,72</output></div>
         <input id="ekspozycja" type="range" min="0.35" max="2.2" step="0.01" value="0.72"></div>
 </div>
-      <details class="grupa"><summary>Kadry i perspektywa</summary><div class="wnetrze">
+      <div class="karta"><h3>Kadry i perspektywa</h3>
       <label class="pole" for="trybKamery">Perspektywa</label><select id="trybKamery">
         <option value="interactive">Kamera interaktywna</option>
         <option value="arch_photo">Proste piony — fotografia wnętrz</option>
@@ -144,7 +125,12 @@ export function utworzSterowanie(api){
       <div class="siatka" style="margin-top:4px"><select id="archKadry" aria-label="Zapisane kadry ARCH_PHOTO"></select>
         <button class="dzialanie" id="wczytajKadr" style="flex:0 0 52px">Otwórz</button>
         <button class="dzialanie tekstowa niebezpieczna" id="usunKadr" style="flex:0 0 45px">Usuń</button></div>
-</div></details>
+      <div class="dev-only"><h3>Widoczność i kolizje</h3>
+        <button class="dzialanie" id="pokazMieszkanie" aria-pressed="true" title="P">Mieszkanie widoczne</button>
+        <div class="suwak"><div class="naglowek"><label for="krycie">Krycie</label><output id="krycieVal">100%</output></div>
+          <input id="krycie" type="range" min="0" max="100" step="1" value="100"></div>
+        <label class="pole"><input type="checkbox" id="kolizje" checked>Kolizje ze ścianami <kbd>K</kbd></label>
+      </div></div>
       <div class="dev-only"><p class="uwaga" id="jakoscOpis"></p>
       <details class="grupa"><summary>Ustawienia renderera</summary><div class="wnetrze"><label class="pole" for="antyaliasing">Wygładzanie krawędzi</label><select id="antyaliasing" title="Porównanie wygładzania">
         <option value="taau" selected>TAA — domyślne (wysoka, ostre)</option>
@@ -169,14 +155,13 @@ export function utworzSterowanie(api){
       <p class="uwaga" id="photoPathInfo"></p>
       <label class="pole"><input type="checkbox" id="cienie" checked>Cienie</label>
       <label class="pole"><input type="checkbox" id="szkloFiz" checked>Szkło fizyczne (refrakcja, IOR 1,52)</label>
-      <p class="uwaga">Po zatrzymaniu kamery jakość światła pośredniego stopniowo rośnie.
-        Krawędzie są wygładzane w każdej klatce.</p>
       <h3>Parametry obrazu</h3>
       <div id="suwakiJakosci"><p class="uwaga">Suwaki pojawią się po zbudowaniu potoku efektów.</p></div>
 </div></details></div>
     </section>
     <section data-s="dev" hidden>
-      <div class="sekcja-wstep"><h2>Laboratorium</h2><p>Porównuj warianty i mierz wydajność. Presety przeładowują scenę.</p></div>
+      <div class="sekcja-wstep"><h2>Laboratorium</h2></div>
+      <button class="dzialanie glowna" id="profilM2" type="button">Profil optymalny · MacBook Air M2 <span aria-hidden="true">✓</span></button>
       <div class="karta">
       <h3>Presety eksperymentalne</h3>
       <select id="devPreset" aria-label="Preset testowy funkcji">
@@ -203,11 +188,9 @@ export function utworzSterowanie(api){
       <button class="dzialanie" id="devApply" type="button" style="margin-top:6px">Uruchom i przeładuj</button>
       <p class="uwaga" id="devOpis"></p>
       <a id="devUrl" href="#" style="display:block;margin-top:6px;overflow-wrap:anywhere">Adres presetu</a>
-      <p class="uwaga">P7 i P9 są aktywne stale. P11 pozostaje audytem MRT bez zmiany architektury.</p>
 </div>
       <details class="grupa" id="informacje"><summary>Wydajność i diagnostyka</summary>
       <button class="dzialanie" id="pomiarWydajnosci" type="button">Porównaj płynność — 20 s</button>
-      <p class="uwaga">Wysoka jakość: 10 s ze skalą obrazu 1,25, potem 10 s ze skalą 1,0 (z uwzględnieniem limitu ekranu). Ustawienia GI i SSR są takie same. Rozglądaj się w tym samym miejscu; zachowaj rozmiar okna.</p>
       <p id="wynikWydajnosci" style="white-space:pre-line"></p>
     </details>
     </section>
@@ -220,10 +203,11 @@ export function utworzSterowanie(api){
         <div><dt><kbd>W S</kbd></dt><dd>Przód / tył</dd></div>
         <div><dt><kbd>A D</kbd> / <kbd>← →</kbd></dt><dd>Obrót kamery</dd></div>
         <div><dt><kbd>Shift</kbd> + <kbd>← →</kbd></dt><dd>Ruch bokiem</dd></div>
-        <div><dt><kbd>Shift</kbd> + <kbd>↑ ↓</kbd></dt><dd>Podnieś / obniż kamerę</dd></div>
+        <div><dt><kbd>Shift</kbd> + <kbd>↑ ↓</kbd></dt><dd>Spójrz wyżej / niżej</dd></div>
+        <div><dt><kbd>= +</kbd> / <kbd>− _</kbd></dt><dd>Podnieś / obniż kamerę</dd></div>
         <div><dt><kbd>Shift</kbd> / <kbd>Spacja</kbd></dt><dd>Bieg / skok</dd></div>
-        <div><dt><kbd>Q</kbd> <kbd>E</kbd> / <kbd>C</kbd></dt><dd>Wysokość oczu / kucanie</dd></div>
-        <div><dt><kbd>F</kbd> <kbd>O</kbd> <kbd>B</kbd></dt><dd>Spacer / rozglądanie / z góry</dd></div>
+        <div><dt><kbd>C</kbd></dt><dd>Kucanie</dd></div>
+        <div><dt><kbd>B</kbd></dt><dd>Rozglądanie / z góry</dd></div>
         <div><dt><kbd>1</kbd>–<kbd>7</kbd></dt><dd>Pomieszczenia</dd></div>
         <div><dt>Dwa palce</dt><dd>Rozglądanie (jak panorama)</dd></div>
         <div><dt>Szczypanie</dt><dd>Podjazd do przodu / do tyłu</dd></div>
@@ -250,6 +234,7 @@ export function utworzSterowanie(api){
 
   /* Nawigacja panelu nie wysyła zdarzeń do ustawień sceny. */
   const panelNav = utworzNawigacjePanelu(el);
+  utworzMiniMape({kontener:$('#miniMapa'), plan, nawigacja});
 
   /* ---------- widok ---------- */
   el.querySelectorAll('[data-tryb]').forEach(b =>
@@ -271,18 +256,9 @@ export function utworzSterowanie(api){
   });
   $('#oczNizej').addEventListener('click', () => nawigacja.zmienWysokoscOczu(-5));
   $('#oczWyzej').addEventListener('click', () => nawigacja.zmienWysokoscOczu(+5));
-
-  const pokoje = $('#pokoje');
-  nawigacja.pokoje.forEach((p, i) => {
-    const b = document.createElement('button');
-    b.className = 'dzialanie'; b.textContent = p.name; b.title = p.dimensions + ' · ' + (i+1);
-    const numer = document.createElement('span'); numer.className = 'numer-pokoju'; numer.textContent = String(i+1);
-    const opis = document.createElement('span'); opis.textContent = p.name;
-    const metraz = document.createElement('small'); metraz.textContent = p.dimensions.split(' · ').pop();
-    opis.append(metraz); b.replaceChildren(numer, opis); b.setAttribute('aria-label', p.name + ' · ' + p.dimensions);
-    b.addEventListener('click', () => nawigacja.doPokoju(i));
-    pokoje.append(b);
-  });
+  $('#widokToggle').addEventListener('click', () =>
+    nawigacja.ustawTryb(nawigacja.tryb === nawigacja.TRYBY.PTAK
+      ? nawigacja.TRYBY.ORBITA : nawigacja.TRYBY.PTAK));
 
   /* Jeden kontekst mebla: wersja, kadr, przeładowanie i mechanizmy. */
   const wybor = $('#mebelWybor');
@@ -291,7 +267,8 @@ export function utworzSterowanie(api){
   function odswiezWersje(){
     const w = biblioteka.meble.get(wybor.value);
     wersjaWybor.innerHTML = '';
-    if(!w?.manifest){ $('#mebelPodsumowanie').textContent = 'Wybierz dostępny projekt'; return; }
+    $('#mebelNazwa').textContent = w?.nazwa || 'Mebel';
+    if(!w?.manifest) return;
     for(const v of biblioteka.dostepneWersje(wybor.value)){
       const o = document.createElement('option');
       o.value = v.id; o.disabled = !v.confirmed;
@@ -300,7 +277,6 @@ export function utworzSterowanie(api){
       wersjaWybor.append(o);
     }
     wersjaWybor.value = w.wersja || w.przypieta || '';
-    $('#mebelPodsumowanie').textContent = w.wersja ? 'W scenie · ' + w.wersja : 'Projekt w scenie';
   }
   function odswiezStanBiblioteki(tekst){
     const k = biblioteka.kontrola, w = biblioteka.meble.get(wybor.value);
@@ -331,7 +307,8 @@ export function utworzSterowanie(api){
   }
   odswiezMeble();
   wybor.addEventListener('change', () => {
-    odswiezWersje(); odswiezStanBiblioteki(); odswiezRuchy(); $('#kadrInfo').textContent='';
+    $('#drzwiMebla').setAttribute('aria-pressed','false');
+    odswiezWersje(); odswiezStanBiblioteki(); odswiezRuchy();
   });
   async function wykonajZmianeWersji(fn, komunikat){
     kontrolkiWersji.forEach(b => b.disabled = true);
@@ -350,9 +327,7 @@ export function utworzSterowanie(api){
   $('#kadrMebel').addEventListener('click', () => {
     const w = biblioteka.meble.get(wybor.value);
     if(!w || !w.korzen) return;
-    const wynik = nawigacja.kadrujMebel(w.korzen);
-    $('#kadrInfo').textContent = !wynik.ok ? wynik.powod
-      : wynik.caly ? '' : 'Widok częściowy — w pokoju brakuje miejsca na objęcie całego mebla.';
+    nawigacja.kadrujMebel(w.korzen);
   });
 
   /* ARCH_PHOTO: pozioma kamera i przesunięcie osi optycznej. Kadry są stanem
@@ -381,25 +356,19 @@ export function utworzSterowanie(api){
   $('#usunKadr').addEventListener('click',()=>{if(archKadry.value)archPhoto.usunKadr(archKadry.value);odswiezArchKadry();});
   odswiezArchKadry();
 
-  /* Jedna wspólna szyna na ścianę: wszystkie pary odsuwają się na boczne pasy. */
-  const odswiezZaslony=[];
-  for(const s of zaslony?.sciany || []){
-    const wiersz=document.createElement('div');
-    const opis=document.createElement('p');opis.className='uwaga';wiersz.append(opis);
-    const guziki=document.createElement('div');guziki.className='siatka';wiersz.append(guziki);
-    const lista=[];
-    for(const [tekst,cel] of [['Odsłoń',1],['Zasłoń',0]]){
-      const b=document.createElement('button');b.className='dzialanie';b.textContent=tekst;
-      b.setAttribute('aria-label',tekst+' zasłony — '+s.nazwa);
-      b.addEventListener('click',()=>zaslony.ustaw(s,cel));guziki.append(b);lista.push([b,cel]);
-    }
-    function odswiez(){
-      opis.textContent=s.nazwa+' · '+s.rodzaj+' · '+(s.cel===1?'odsłonięte':s.cel===0?'zasłonięte':'częściowo odsłonięte');
-      for(const [b,cel] of lista) b.setAttribute('aria-pressed',String(s.cel===cel));
-    }
-    odswiezZaslony.push(odswiez);odswiez();$('#zaslonySterowanie').append(wiersz);
+  /* Jedna kontrolka steruje wszystkimi szynami jednocześnie. */
+  const zaslonyToggle=$('#zaslonyToggle');
+  function odswiezZaslony(){
+    const zasloniete=Boolean(zaslony?.sciany?.length) && zaslony.sciany.every(s=>s.cel===0);
+    zaslonyToggle.setAttribute('aria-pressed',String(zasloniete));
+    zaslonyToggle.setAttribute('aria-label',zasloniete?'Odsłoń wszystkie zasłony':'Zasłoń wszystkie zasłony');
+    zaslonyToggle.title=zaslonyToggle.getAttribute('aria-label');
   }
-  zaslony?.obserwuj(()=>odswiezZaslony.forEach(fn=>fn()));
+  zaslonyToggle.addEventListener('click',()=>{
+    const zasloniete=zaslony?.sciany?.every(s=>s.cel===0);
+    for(const s of zaslony?.sciany || []) zaslony.ustaw(s,zasloniete?1:0);
+  });
+  zaslony?.obserwuj(odswiezZaslony);odswiezZaslony();
 
   /* Mechanizmy dotyczą wyłącznie mebla wybranego powyżej. */
   function odswiezRuchy(){
@@ -416,13 +385,15 @@ export function utworzSterowanie(api){
     }
     $('#liczbaRuchow').textContent = String(lista.length);
     $('#czesciMebla').hidden = !lista.length;
-    $('#otworzWsz').disabled = $('#zamknijWsz').disabled = !lista.length;
-    $('#ruchyInfo').textContent = lista.length
-      ? lista.length + ' ruchomych części wybranego mebla · można też kliknąć wprost w model'
-      : 'Ten mebel nie ma zadeklarowanych mechanizmów.';
+    $('#drzwiMebla').disabled = !lista.length;
   }
-  $('#otworzWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(true, wybor.value));
-  $('#zamknijWsz').addEventListener('click', () => api.interakcje?.otworzWszystko(false, wybor.value));
+  $('#drzwiMebla').addEventListener('click', event => {
+    const otwarte=event.currentTarget.getAttribute('aria-pressed')!=='true';
+    event.currentTarget.setAttribute('aria-pressed',String(otwarte));
+    event.currentTarget.setAttribute('aria-label',otwarte?'Zamknij wszystkie drzwi':'Otwórz wszystkie drzwi');
+    event.currentTarget.title=event.currentTarget.getAttribute('aria-label');
+    api.interakcje?.otworzWszystko(otwarte, wybor.value);
+  });
 
   const pokazMieszkanie = $('#pokazMieszkanie');
   let widoczne = true;
@@ -536,7 +507,7 @@ export function utworzSterowanie(api){
   });
 
   /* ---------- DEV: jawne, odwracalne presety query ---------- */
-  const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest','bez',
+  const DEV_KEYS = ['quality','aa','tone','gi','ssr','ktx2','camera','navtest','bez','light',
     'furnitureV2','furnitureSource'];
   const DEV_PRESETS = {
     baseline: {quality:'srednia', aa:'smaa', tone:'aces', ssr:'current', camera:'interactive'},
@@ -587,6 +558,25 @@ export function utworzSterowanie(api){
   }
   $('#devPreset').addEventListener('change', odswiezDev);
   $('#devApply').addEventListener('click', () => { location.href = devAdres().href; });
+  $('#profilM2').addEventListener('click', () => {
+    /* Profil rekomendowany na M2: wariant jakościowy, który w pomiarze zachował
+       ponad 25 FPS. Czyścimy ręczne nadpisania potoku, aby przycisk rzeczywiście
+       odtwarzał cały profil, a nie tylko trzy widoczne pola. */
+    try{
+      const zapis=JSON.parse(localStorage.getItem('mieszkanie-webgpu:ustawienia:1')||'{}');
+      zapis.pola={...(zapis.pola||{}),jakoscPoziom:'wysoka',antyaliasing:'taau',
+        toneMapping:'aces',presetSwiatla:DOMYSLNY_PRESET_SWIATLA,ekspozycja:'0.72',
+        cieplo:'45',rozproszenie:'90',gOkna:'100',gSlonce:'100',gKule:'0',
+        cienie:true,szkloFiz:true,animacjaTla:true,cienLisci:false};
+      for(const id of window.__silnik?.suwakiJakosci?.pola || []) delete zapis.pola[id];
+      localStorage.setItem('mieszkanie-webgpu:ustawienia:1',JSON.stringify(zapis));
+    }catch{}
+    const q=new URLSearchParams(location.search);
+    for(const key of DEV_KEYS) q.delete(key);
+    Object.entries({quality:'wysoka',aa:'taau',tone:'aces',ssr:'current',
+      camera:'interactive',light:DOMYSLNY_PRESET_SWIATLA}).forEach(([key,value])=>q.set(key,value));
+    location.search=q.toString();
+  });
   odswiezDev();
 
   /* ---------- pomoc ---------- */
@@ -669,8 +659,10 @@ export function utworzSterowanie(api){
   function odswiezStan(s){
     $('#oczy').textContent = (s.wysokoscOczu ?? nawigacja.wysokoscOczu) + ' cm';
     $('#kolizje').checked = s.kolizje ?? nawigacja.kolizje;
-    el.querySelectorAll('[data-tryb]').forEach(b =>
-      b.setAttribute('aria-pressed', String(b.dataset.tryb === (s.tryb ?? nawigacja.tryb))));
+    const ptak=(s.tryb ?? nawigacja.tryb)===nawigacja.TRYBY.PTAK;
+    $('#widokToggle').setAttribute('aria-pressed',String(ptak));
+    $('#widokToggle').setAttribute('aria-label',ptak?'Wróć do rozglądania':'Widok z góry');
+    $('#widokToggle').title=$('#widokToggle').getAttribute('aria-label');
     $('#stanPanelu').textContent =
       'Tryb: ' + (s.tryb ?? nawigacja.tryb) + ' · ' + (s.sposobPatrzenia || '');
   }

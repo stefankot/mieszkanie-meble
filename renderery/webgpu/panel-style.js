@@ -11,14 +11,16 @@ export const STYL_PANELU = `
 #sterowanie summary::-webkit-details-marker{display:none}
 #sterowanie .panel-tytul strong{display:block;font-size:17px;line-height:1.2;letter-spacing:-.4px}
 #sterowanie .panel-tytul small{display:block;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+#sterowanie .panel-akcje{display:flex;align-items:center;gap:7px;margin-left:auto}
 #sterowanie .panel-zwin{display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;width:28px;height:28px}
+#sterowanie .ikona-okragla{display:grid;place-items:center;flex:0 0 28px;width:28px;height:28px;min-width:28px!important;min-height:28px!important;padding:0!important;border:1px solid var(--line);border-radius:50%;background:#fff;color:var(--muted);font:700 11px/1 system-ui;cursor:pointer}
+#sterowanie .ikona-okragla:hover:not(:disabled){border-color:#91a99a;background:#edf2eb;color:var(--accent)}
+#sterowanie .ikona-okragla[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 2px #d8e4da}
+#sterowanie .ikona-okragla svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 #sterowanie:not([open]) .panel-zwin{transform:rotate(180deg)}
 #sterowanie .panel{display:flex;flex-direction:column;max-height:calc(100dvh - 111px)}
 #sterowanie:not([open]) .panel{display:none}
 #sterowanie .panel-naglowek{padding:0 14px 12px;flex-shrink:0;border-bottom:1px solid var(--line)}
-#sterowanie .tryby-panelu{display:flex;border:1px solid var(--line);padding:3px;border-radius:9px;background:#e9ede7;margin-bottom:12px}
-#sterowanie .tryby-panelu button{flex:1;border:0;border-radius:6px;background:transparent;font:600 11px/1.3 system-ui;color:var(--muted);min-height:28px;cursor:pointer}
-#sterowanie .tryby-panelu button[aria-pressed=true]{background:#fff;color:var(--accent);box-shadow:0 1px 3px #142a2314}
 #sterowanie .zakladki{display:flex;gap:2px;flex-wrap:wrap}
 #sterowanie .zakladki button{flex:1;min-height:36px;padding:7px 8px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:600 12px/1.3 system-ui;cursor:pointer}
 #sterowanie .zakladki button[aria-selected=true]{background:#dfe9df;color:#204b37}
@@ -26,6 +28,8 @@ export const STYL_PANELU = `
 #sterowanie .panel-tresc{padding:18px 14px;overflow-y:auto;overscroll-behavior:contain;min-height:0;scrollbar-width:thin;scrollbar-color:#bac6bb transparent}
 #sterowanie section:focus-visible{outline:2px solid #528db7;outline-offset:2px}
 #sterowanie .sekcja-wstep{padding:0 3px;margin-bottom:17px}
+#sterowanie .naglowek-z-akcja{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#sterowanie .naglowek-z-akcja h2{margin:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #sterowanie h2{font-size:21px;line-height:1.25;letter-spacing:-.6px;margin:0 0 7px;font-weight:650}
 #sterowanie .sekcja-wstep p{color:var(--muted);margin:0;line-height:1.5;font-size:12px}
 #sterowanie .karta{padding:14px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
@@ -46,6 +50,8 @@ export const STYL_PANELU = `
 #sterowanie .siatka{display:flex;gap:6px;flex-wrap:wrap}
 #sterowanie .siatka>*{flex:1 1 0;min-width:0}
 #sterowanie .siatka button{font-size:12px;padding:8px 5px}
+#sterowanie .wiersz-z-ikona{display:flex;align-items:center;gap:7px}
+#sterowanie .wiersz-z-ikona select{flex:1}
 #sterowanie .strzalki{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 #sterowanie .strzalki button{font-size:18px}
 #sterowanie output{font-variant-numeric:tabular-nums}
@@ -74,11 +80,14 @@ export const STYL_PANELU = `
 #sterowanie .pora{display:grid;grid-template-columns:36px repeat(3,1fr);gap:6px;align-items:center}
 #sterowanie .pora>strong{font-size:9px;letter-spacing:.7px;color:var(--muted)}
 #sterowanie .pora button{padding:8px 4px;font-size:12px}
-#sterowanie .pokoje{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-#sterowanie .pokoje button{display:flex;align-items:center;text-align:left;gap:8px;padding:9px 6px;background:#f5f7f2;border-color:transparent;font-size:12px}
-#sterowanie .numer-pokoju{color:#78947d;font-size:10px;flex:0 0 12px}
-#sterowanie .pokoje small{display:block;color:var(--muted);font-size:9px;line-height:1.4}
-#sterowanie #sprawdzWersje{margin-top:10px}
+#sterowanie .mini-mapa{position:relative;padding:8px;aspect-ratio:1.32;overflow:hidden;cursor:zoom-out;background:#eef1eb}
+#sterowanie .mini-mapa svg{display:block;width:100%;height:100%}
+#sterowanie .mini-mapa-obrys{fill:#f9faf7;stroke:#55655b;stroke-width:10;stroke-linejoin:round}
+#sterowanie .mini-mapa-pokoj{fill:#e4e9e1;stroke:#aeb9af;stroke-width:5}
+#sterowanie .mini-mapa-punkty{position:absolute;inset:8px}
+#sterowanie .mini-mapa-punkt{position:absolute;display:grid;place-items:center;transform:translate(-50%,-50%);width:27px;height:27px;padding:0;border:2px solid #fff;border-radius:50%;background:var(--accent);color:#fff;box-shadow:0 2px 6px #16271f4d;cursor:pointer}
+#sterowanie .mini-mapa-punkt span{display:block;transform:rotate(var(--kierunek));font-size:13px;line-height:1}
+#sterowanie .mini-mapa-punkt:hover{scale:1.08;background:#1f4735}
 #sterowanie #suwakiJakosci>details{border-top:1px solid var(--line);padding:6px 0}
 #sterowanie #suwakiJakosci summary{padding:6px 0;font-size:12px}
 #sterowanie #informacje>:not(summary){margin:12px}

@@ -4,7 +4,7 @@ const STORAGE_KEY = 'mieszkanie-webgpu:panel:2';
 export function utworzNawigacjePanelu(el, storage = localStorage){
   const tabs = [...el.querySelectorAll('[data-z]')];
   const panels = [...el.querySelectorAll('section[data-s]')];
-  const modes = [...el.querySelectorAll('[data-panel-mode]')];
+  const modeToggle = el.querySelector('[data-panel-mode-toggle]');
   const scroll = el.querySelector('.panel-tresc');
   let mode = 'simple', active = 'meble';
   const positions = new Map();
@@ -18,7 +18,8 @@ export function utworzNawigacjePanelu(el, storage = localStorage){
     try{ storage.setItem(STORAGE_KEY, JSON.stringify({mode, active})); }catch{}
   };
   function select(id){
-    if(!panels.some(p => p.dataset.s === id) || (id === 'dev' && mode !== 'dev')) id = 'meble';
+    const panel=panels.find(p => p.dataset.s === id);
+    if(!panel || (panel.classList.contains('dev-only') && mode !== 'dev')) id = 'meble';
     positions.set(active, scroll.scrollTop);
     active = id; el.dataset.activeTab = id;
     for(const b of tabs){
@@ -35,10 +36,10 @@ export function utworzNawigacjePanelu(el, storage = localStorage){
   }
   function setMode(value){
     mode = value === 'dev' ? 'dev' : 'simple'; el.dataset.panelMode = mode;
-    for(const b of modes) b.setAttribute('aria-pressed', String(b.dataset.panelMode === mode));
-    for(const b of tabs) if(b.dataset.z === 'dev') b.hidden = mode !== 'dev';
+    modeToggle?.setAttribute('aria-pressed', String(mode === 'dev'));
+    for(const b of tabs) if(b.classList.contains('dev-only')) b.hidden = mode !== 'dev';
     el.querySelector('#panelTrybOpis').textContent = mode === 'dev' ? 'Pełne ustawienia' : 'Codzienne sterowanie';
-    if(active === 'dev' && mode === 'simple') select('meble');
+    if(panels.find(p=>p.dataset.s===active)?.classList.contains('dev-only') && mode === 'simple') select('meble');
     syncOptions();
     save();
   }
@@ -63,7 +64,10 @@ export function utworzNawigacjePanelu(el, storage = localStorage){
       select(available[next].dataset.z); available[next].focus();
     });
   }
-  for(const b of modes) b.addEventListener('click', () => setMode(b.dataset.panelMode));
+  modeToggle?.addEventListener('click', event => {
+    event.preventDefault(); event.stopPropagation();
+    setMode(mode === 'dev' ? 'simple' : 'dev');
+  });
   el.addEventListener('change', syncOptions);
   el.addEventListener('keydown', e => {
     if(['Enter','Space'].includes(e.code) && e.target.closest('button,summary,input,select')) e.stopPropagation();
