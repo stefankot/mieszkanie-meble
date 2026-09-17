@@ -88,7 +88,7 @@ const kadruj = (korzen: unknown) => (silnik.value as any)?.nawigacja.kadrujMebel
 </script>
 
 <template>
-  <div v-if="widoczna && g" class="pointer-events-none absolute bottom-4 right-4 z-10 w-[220px]">
+  <div v-if="widoczna && g" class="pointer-events-none absolute bottom-20 right-4 z-10 w-[220px]">
     <svg :viewBox="viewBox" class="block w-full overflow-visible drop-shadow-[0_6px_10px_rgba(0,0,0,.45)]" role="img" aria-label="Apartment map">
       <defs>
         <mask id="obrys-mieszkania" maskUnits="userSpaceOnUse" :x="g.minX" :y="g.minZ" :width="g.szer" :height="g.wys">

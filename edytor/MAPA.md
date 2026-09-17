@@ -19,6 +19,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `silnik/tonowanie.ts` — render do celu float między klatkami silnika + ACES/sRGB na CPU → data URL.
 - `silnik/budowaMaterialu.ts` — materiał edytora w TSL (Solid/Texture/Pattern, korekty, bump, height field, szum, niedoskonałości); uniformy bez rekompilacji.
 - `silnik/materialyMebla.ts` — grupy elementów o wspólnym materiale w meblu, `ustawGrupe`, Selection colors (`koloryZaznaczenia`, `zmienKolor`).
+- `silnik/rzutZGory.ts` — granice planu z wielokątów pokoi, render ortograficzny pod sufitem.
 - `silnik/kulki.ts` — kulki materiałów (kula 30 cm, studio + mapa otoczenia sceny), kolejka i pamięć.
 - `silnik/hotspoty.ts` — źródła białych kropek (ruchome części, meble `biblioteka:*`, lampy), rzut co klatkę, zasłonięcie Raycasterem → `$kropki`.
 
@@ -26,6 +27,8 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ai/klucz.ts` — `$kluczOpenAI`: przeglądarka albo `.env.local` przez serwer dev (`/__lokalne/openai`).
 - `ai/klient.ts` — klient OpenAI w przeglądarce, `najnowszyModelObrazow()` (najnowszy gpt-image-*).
 - `ai/tekstury.ts` — `generujTeksture(opis)`: bezszwowy kafel.
+- `ai/kadr.ts` — kadr z płótna silnika (przycięcie do 3:2/1:1/2:3), mapa krawędzi Sobel, maska chroniąca mebel.
+- `ai/render.ts` — `renderujAI` (images.edit, input_fidelity, krawędzie, maska), `$wynikiAI`, `$nakladkaAI`.
 
 ## Meble parametryczne
 - `meble/rozklad.ts` — rozkład półek przy stałej wielkości: równe / Fibonacci / losowe (ziarno) / własne „60+40+20+40”; zapis własny ze środków półek (pełne cm).
@@ -110,6 +113,9 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/right/ZakladkaOtoczenie.vue` — Sky Light, Sun, Light Character, Light Sources, Weather.
 - `ui/right/TarczaSlonca.vue` — tarcza słońca z godziną.
 - `ui/right/ZakladkaInspektor.vue` — mebel (także przy zaznaczeniu jego modułu) → `InspektorMebla`.
-- `ui/render/PanelZdjecia.vue` — Image: Frame + AI Render.
+- `ui/render/PanelZdjecia.vue` — Image: Model (Latest), Size & orientation, Quality, Number of images, Accuracy, Prompt, Results + nakładka.
+- `ui/render/NakladkaAI.vue` — wynik AI na scenie w prostokącie kadru; krycie, mieszanie, porównanie A/B.
+- `ui/render/KluczAPI.vue` — klucz OpenAI zapisany w przeglądarce.
+- `ui/viewport/MiniMapa.vue` — mapa: rzut z góry w obrysie mieszkania z cieniem, pokoje, meble, pozycja i kierunek.
 - `ui/assets/OknoBiblioteki.vue` — pływające okno Assets.
 - `ui/command/PaletaPolecen.vue` — ⌘K: Reka Listbox + fuse.js nad rejestrem operacji.
