@@ -51,6 +51,9 @@ export function zDanymiDomyslnymi(op: Operacja) {
   return wynik.success ? wynik.data : null
 }
 
-/* Definicje narzędzi dla OpenAI (Realtime / Responses) — schemat JSON z zod. */
+/* Definicje narzędzi dla OpenAI (Realtime / Responses) — schemat JSON z zod.
+   API dopuszcza w nazwach tylko litery, cyfry, „_” i „-”, więc kropka z nazwy operacji staje się „_”. */
+const nazwaAI = (nazwa: string) => nazwa.replace(/\./g, '_')
+export const zNazwyAI = (nazwa: string) => lista().find((op) => nazwaAI(op.nazwa) === nazwa)?.nazwa ?? nazwa
 export const narzedziaAI = () =>
-  lista().map((op) => ({ type: 'function' as const, name: op.nazwa, description: op.tytul, parameters: z.toJSONSchema(op.wejscie) }))
+  lista().map((op) => ({ type: 'function' as const, name: nazwaAI(op.nazwa), description: op.tytul, parameters: z.toJSONSchema(op.wejscie) }))

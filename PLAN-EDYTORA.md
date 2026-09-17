@@ -174,7 +174,13 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
    - rozmycie ruchu: własny węzeł TSL po wektorze prędkości z MRT (three r185 nie ma MotionBlurNode),
    - głębia ostrości: `dof` z addonów (ogniskowa i przysłona w cm), ziarno: `film`; efekty na gotowej kompozycji.
    - **Pomiary (17.09, salon, 1280×800, jakość „wysoka”)**: bez profilu 55–56 kl./s; koszt pojedynczych efektów: ziarno 52,4; rozmycie ruchu 49,4; głębia ostrości 33,7. Z pełnym profilem i limitem 25 → **24,5–24,8 kl./s**. Pierwsze sekundy po włączeniu są wolniejsze (kompilacja shaderów), potem tempo jest równe. Ostrość obrazu (średnia różnica sąsiednich pikseli) spada z 7,78 na 5,72, czyli efekty faktycznie działają.
-9. AI: polecenia tekstowe + rozmowa Realtime na rejestrze operacji.
+9. ✅ AI na rejestrze operacji:
+   - `ai/agent.ts` — polecenia tekstowe (Responses API, pętla narzędzi max 6 rund, `previous_response_id`); model wybierany automatycznie jako najnowszy tekstowy z konta (`gpt-6-astra`). Nazwy narzędzi: kropka → `_` (API dopuszcza tylko `[a-zA-Z0-9_-]`), mapowane z powrotem przy wykonaniu.
+   - `ai/glos.ts` — rozmowa głosowa Realtime przez WebRTC (mikrofon, kanał zdarzeń, te same narzędzia, transkrypcje w rozmowie); model `gpt-realtime-*` z konta.
+   - `ui/left/PanelAgenta.vue` — rozmowa z wpisami narzędzi, wysyłanie Enterem, przycisk mikrofonu, stan klucza.
+   - Sprawdzone na API: „Ustaw 7 półek w regale w salonie, rozkład równy” → agent wywołał `scene.describe`, potem `furniture.setShelfLayout` (7 półek, rozkład równy), odpowiedział po polsku; w historii jeden krok Cofnij. Czas 8,4 s.
+   - **Pułapka do zapamiętania:** najnowszy model z listy to `gpt-live-1`, który na Responses zwraca 500 — filtr modeli pomija `live`, `realtime`, `codex`, `instruct`, obraz i dźwięk.
+   - Rozmowy głosowej nie dało się sprawdzić automatycznie (brak mikrofonu w środowisku testowym) — do potwierdzenia ręcznego.
 10. Render AI (kanały, maski, nakładka); warianty A/B; eksport JSON projektu.
 Później: VR, ControlNet, kolizje, CSG, fizyka.
 

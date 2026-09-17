@@ -34,6 +34,8 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 ## AI
 - `ai/klucz.ts` — `$kluczOpenAI`: przeglądarka albo `.env.local` przez serwer dev (`/__lokalne/openai`).
 - `ai/klient.ts` — klient OpenAI w przeglądarce, `najnowszyModelObrazow()` (najnowszy gpt-image-*).
+- `ai/agent.ts` — polecenia tekstowe: pętla narzędzi na rejestrze operacji, `$rozmowa`, `$agentPracuje`.
+- `ai/glos.ts` — rozmowa głosowa Realtime (WebRTC, te same narzędzia), `$glos`.
 - `ai/tekstury.ts` — `generujTeksture(opis)`: bezszwowy kafel.
 - `ai/kadr.ts` — kadr z płótna silnika (przycięcie do 3:2/1:1/2:3), mapa krawędzi Sobel, maska chroniąca mebel.
 - `ai/render.ts` — `renderujAI` (images.edit, input_fidelity, krawędzie, maska), `$wynikiAI`, `$nakladkaAI`.
@@ -114,7 +116,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/left/ListaWidokow.vue` — Scene List (miniatura, nazwa, ikona monitora).
 - `ui/left/ListaWarstw.vue` — Layer („✓ ⊜ nazwa”).
 - `ui/left/ListaObiektow.vue` — Object/Imported: szukaj + drzewo.
-- `ui/left/PanelAgenta.vue` — Figma Agents: sugestie, kompozytor z chipem zaznaczenia, głos.
+- `ui/left/PanelAgenta.vue` — rozmowa z agentem (tekst i głos), wpisy narzędzi, sugestie, chip zaznaczenia.
 - `ui/viewport/Gizmo.vue` — TransformControls silnika dla zaznaczonego mebla; zapis po puszczeniu myszy.
 - `ui/viewport/Scena.vue` — ramka renderera, CSS ukrywający stary panel, przeniesienie mini-mapy, kropki, uchwyty, pasek.
 - `ui/viewport/UchwytyPolek.vue` — linie i uchwyty półek na froncie zaznaczonego mebla, wymiary przegród; przeciąganie → Custom.
