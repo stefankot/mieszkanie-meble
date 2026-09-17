@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:silnik": "node --test tests/",
+    "test:silnik": "THREE_TEST_ROOT=$PWD/node_modules/three node --test 'tests/**/*.test.mjs'",
     "test:edytor": "vitest run"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "@vitejs/plugin-vue": "6.0.9",
     "sirv": "3.0.2",
     "tailwindcss": "4.3.3",
+    "three": "0.185.0",
     "typescript": "7.0.2",
     "vite": "8.3.0",
     "vitest": "5.0.1",

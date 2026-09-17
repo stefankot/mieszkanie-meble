@@ -149,7 +149,8 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
 12. Klucz OpenAI: użytkownik: „Na razie używaj tokena w kodzie lokalnie, przed publikacją… w pamięci przeglądarki i pliku”. Realizacja: `.env.local` (gitignored, `VITE_OPENAI_API_KEY`, tylko DEV) — wpisuje użytkownik; pole w ustawieniach zapisuje w przeglądarce. **Nigdy nie commitować klucza** (repo publiczne). Klucz wklejony w czacie — zalecono rotację.
 
 ## 8a. Zadania zgłoszone na „po UI”
-- **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.
+- ✅ **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`): dysk tylko na podłodze (normalna w górę, y < 15 cm); na ścianach i meblach kursor „idź” (SVG: pierścień + strzałka), na obiektach interaktywnych `pointer`; klik nadal prowadzi do celu. Sprawdzone promieniami w przedpokoju i pokoju.
+- ✅ Testy silnika: skrypt `test:silnik` naprawiony (Node 22 nie przyjmuje katalogu → wzorzec `tests/**/*.test.mjs`, `THREE_TEST_ROOT`), `three@0.185.0` w devDependencies; 64/64.
 
 ## 9. Następne kroki (kolejność po makiecie)
 1. Akceptacja wyglądu przez użytkownika → poprawki makiety.

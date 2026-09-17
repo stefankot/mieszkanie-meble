@@ -463,9 +463,24 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   nakladka.append(srodek, pierscien);
   document.body.append(nakladka);
   const punktZnacznika = new THREE.Vector3();
+  /* Dysk rysujemy tylko na podłodze. Na ścianie i meblu byłby za duży — tam cel podejścia pokazuje kursor
+     (niebieski pierścień ze strzałką „idź”), a sam znacznik zostaje niewidoczny, choć klik nadal prowadzi do celu. */
+  let dyskNaPodlodze = false;
+  const KURSOR_PODEJSCIA = `url("data:image/svg+xml,${encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">'
+    + '<circle cx="16" cy="16" r="11" fill="rgba(47,125,246,.22)" stroke="#fff" stroke-width="4"/>'
+    + '<circle cx="16" cy="16" r="11" fill="none" stroke="#2f7df6" stroke-width="2.4"/>'
+    + '<path d="M16 9.5l5 6h-3.2v6.5h-3.6V15.5H11z" fill="#2f7df6" stroke="#fff" stroke-width="1" stroke-linejoin="round"/></svg>'
+  )}") 16 16, pointer`;
+  function ustawKursor(rodzaj){
+    const wartosc = rodzaj === 'podejscie' ? KURSOR_PODEJSCIA : rodzaj === 'interakcja' ? 'pointer' : '';
+    if(plotno.style.cursor !== wartosc) plotno.style.cursor = wartosc;
+  }
   function rysujZnacznik(){
     nakladka.style.display = 'none';
-    if(!znacznik.visible) return;
+    // Znacznik ukryty gdzie indziej (przeciąganie, animacja, zmiana trybu) — kursor „idź” też znika.
+    if(!znacznik.visible && plotno.style.cursor === KURSOR_PODEJSCIA) ustawKursor(null);
+    if(!znacznik.visible || !dyskNaPodlodze) return;
     const r = plotno.getBoundingClientRect();
     if(r.width <= 0 || r.height <= 0) return;
     camera.updateMatrixWorld();
@@ -536,9 +551,11 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   }
   const celPodejscia = new THREE.Vector3();
   const kameraZnacznika = new THREE.Vector3(), obrotZnacznika = new THREE.Quaternion();
+  const PODLOGA_MAX_Y = 15;   // cm — dywan i próg jeszcze są podłogą, blat łóżka już nie
   function odswiezZnacznik(e){
-    znacznik.visible = false; ostatnieTrafienie = null;
+    znacznik.visible = false; ostatnieTrafienie = null; dyskNaPodlodze = false;
     przyNajechaniu?.(null);
+    ustawKursor(null);
     if((tryb !== TRYBY.ORBITA && tryb !== TRYBY.PTAK) || animacja) return;
     naprawKamere(); camera.updateMatrixWorld();
     const r = plotno.getBoundingClientRect();
@@ -554,6 +571,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     if(interaktywny){
       ostatnieTrafienie = pierwsze.object;
       przyNajechaniu?.(interaktywny);
+      ustawKursor('interakcja');
       return;
     }
     /* Wybierz pierwsze trafienie prowadzące do legalnego celu. Przezroczysta
@@ -572,6 +590,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     znacznik.quaternion.setFromUnitVectors(OS_Z, n);
     znacznik.position.copy(traf.point).addScaledVector(n, 1.2);
     znacznik.visible = true; celPodejscia.copy(cel);
+    dyskNaPodlodze = n.y > 0.85 && traf.point.y < PODLOGA_MAX_Y;
+    ustawKursor(dyskNaPodlodze ? null : 'podejscie');
     kameraZnacznika.copy(camera.position); obrotZnacznika.copy(camera.quaternion);
   }
   function zejdzZPtakaDo(cel){
@@ -649,7 +669,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   function anulujWskaznik(){ wcisniety=false; pointerId=null; ruszyl=true; znacznik.visible=false; przyNajechaniu?.(null); }
   plotno.addEventListener('pointercancel', anulujWskaznik);
   plotno.addEventListener('lostpointercapture', () => { if(wcisniety) anulujWskaznik(); });
-  plotno.addEventListener('pointerleave', () => { znacznik.visible=false; przyNajechaniu?.(null); });
+  plotno.addEventListener('pointerleave', () => { znacznik.visible=false; przyNajechaniu?.(null); ustawKursor(null); });
   plotno.addEventListener('click', e => {
     if(e.button !== 0 || animacja || wcisniety || ruszyl) return;
     if(tryb === TRYBY.SPACER){ if(document.pointerLockElement !== plotno) zablokujWskaznik(); return; }
