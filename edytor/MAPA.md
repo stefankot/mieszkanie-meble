@@ -26,6 +26,8 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `silnik/materialyMebla.ts` — grupy elementów o wspólnym materiale w meblu, `ustawGrupe`, Selection colors (`koloryZaznaczenia`, `zmienKolor`).
 - `silnik/rzutZGory.ts` — granice planu z wielokątów pokoi, render ortograficzny pod sufitem.
 - `silnik/kulki.ts` — kulki materiałów (kula 30 cm, studio + mapa otoczenia sceny), kolejka i pamięć.
+- `silnik/przyciaganie.ts` — dosunięcie mebla do najbliższej ściany (bryły ścian z planu silnika).
+- `silnik/swiatlaPanel.ts` — jedno wejście dla panelu: światła silnika i własne z dokumentu.
 - `silnik/zaznaczanie.ts` — klik w scenie → mebel i część (`biblioteka:<id>`, `<id>:<część>`), przeciągnięcie ≠ klik.
 - `silnik/hotspoty.ts` — źródła białych kropek (ruchome części, meble `biblioteka:*`, lampy), rzut co klatkę, zasłonięcie Raycasterem → `$kropki`.
 
@@ -47,7 +49,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 ## Dane i operacje
 - `data/mieszkanie.ts` — dane makiety z repo: widoki, warstwy, obiekty, materiały, palety, kategorie Assets.
 - `ops/rejestr.ts` — rejestr operacji (zod): `zdefiniuj`, `wykonaj` (wynik + `$dziennikOperacji`), `zDanymiDomyslnymi`, `narzedziaAI()`.
-- `ops/operacje.ts` — pierwsze operacje (kamera, światło, jakość, meble, palety, render AI).
+- `ops/operacje.ts` — 25 operacji działających na silniku i dokumencie (kamera, meble, materiały, palety, światła, render AI, projekt).
 
 ## UI — prymitywy (Reka UI + styl D5)
 - `ui/primitives/Sekcja.vue` — zwijana sekcja, chevron po lewej (Collapsible).
@@ -113,6 +115,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/left/ListaWarstw.vue` — Layer („✓ ⊜ nazwa”).
 - `ui/left/ListaObiektow.vue` — Object/Imported: szukaj + drzewo.
 - `ui/left/PanelAgenta.vue` — Figma Agents: sugestie, kompozytor z chipem zaznaczenia, głos.
+- `ui/viewport/Gizmo.vue` — TransformControls silnika dla zaznaczonego mebla; zapis po puszczeniu myszy.
 - `ui/viewport/Scena.vue` — ramka renderera, CSS ukrywający stary panel, przeniesienie mini-mapy, kropki, uchwyty, pasek.
 - `ui/viewport/UchwytyPolek.vue` — linie i uchwyty półek na froncie zaznaczonego mebla, wymiary przegród; przeciąganie → Custom.
 - `ui/right/PrawaKolumna.vue` — Image + Walk ▶; zakładki Inspector | Prototype albo panel Image.

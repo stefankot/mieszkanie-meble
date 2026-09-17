@@ -497,6 +497,53 @@ export async function uruchomBiblioteke(api){
     return true;
   }
   wynik.przebudujParametryczny = przebudujParametryczny;
+
+  /* Kopia mebla wstawiana przez edytor. Nowy assetId daje unikalne nazwy części i mechanizmów,
+     więc zaznaczanie, LED-y i interakcje działają jak dla mebla z biblioteki. Kopie nie są odświeżane
+     z GitHuba (nie ma ich na liście MEBLE) — żyją tylko w sesji edytora, projekt zapisuje je u siebie. */
+  function wstawKopie(zrodloId, {id, positionMm, rotationDeg = 0, nadpisania = null} = {}){
+    const w = stan.get(zrodloId);
+    if(!w?.dokument) throw Error('Ten mebel nie ma dokumentu JSON — nie można go skopiować.');
+    if(!id || stan.has(id)) throw Error('Kopia wymaga wolnego identyfikatora.');
+    const dane = structuredClone(w.dokument);
+    dane.assetId = id;
+    if(nadpisania && dane.parametric) dane.parametricOverrides = nadpisania;
+    const zbudowane = zbudujModel(normalizeFurnitureDocument(dane).document, {THREE, materialBazowy, boxGeo});
+    const umiejscowienie = {positionMm: positionMm || w.umiejscowienie?.positionMm || [0,0,0], rotationDeg};
+    ustaw(zbudowane.korzen, umiejscowienie, THREE);
+    scena.add(zbudowane.korzen);
+    stan.set(id, {nazwa: `${w.nazwa} — kopia`, manifest: w.manifest, wersja: w.wersja, opis: w.opis,
+                  korzen: zbudowane.korzen, ruchy: zbudowane.ruchy || [], pominiete: zbudowane.pominiete || [],
+                  status: w.status, aktywnyStatus: w.aktywnyStatus, przypieta: w.przypieta,
+                  umiejscowienie, dokument: dane, nadpisania: dane.parametricOverrides || null, kopiaZ: zrodloId});
+    wynik.ruchy = [...stan.values()].flatMap(x => x.ruchy || []);
+    przyZmianie?.(wynik); powiadom();
+    return id;
+  }
+  function usunMebel(id){
+    const w = stan.get(id);
+    if(!w?.kopiaZ) return false;            // meble z biblioteki zostają — usuwamy tylko kopie edytora
+    usun(scena, w);
+    stan.delete(id);
+    wynik.ruchy = [...stan.values()].flatMap(x => x.ruchy || []);
+    przyZmianie?.(wynik); powiadom();
+    return true;
+  }
+  function ustawUmiejscowienie(id, {positionMm, rotationDeg}){
+    const w = stan.get(id);
+    if(!w?.korzen) return false;
+    const umiejscowienie = {positionMm: positionMm || w.umiejscowienie?.positionMm || [0,0,0],
+                            rotationDeg: rotationDeg ?? w.umiejscowienie?.rotationDeg ?? 0};
+    ustaw(w.korzen, umiejscowienie, THREE);
+    w.korzen.updateMatrixWorld(true);
+    stan.set(id, {...w, umiejscowienie});
+    przyZmianie?.(wynik); powiadom();
+    return true;
+  }
+  wynik.wstawKopie = wstawKopie;
+  wynik.usunMebel = usunMebel;
+  wynik.ustawUmiejscowienie = ustawUmiejscowienie;
+  wynik.umiejscowienie = id => stan.get(id)?.umiejscowienie || null;
   wynik.parametryczny = id => stan.get(id)?.dokument?.parametric || null;
 
   /* Przypięcie konkretnej wersji jest trwałym wyborem użytkownika. */

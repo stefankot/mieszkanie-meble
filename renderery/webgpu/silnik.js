@@ -54,6 +54,7 @@ import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 import { utworzHoverOutline } from './hover-outline.js?silhouette-v2';
+import { utworzSwiatlaEdytora } from './swiatla-edytora.js?swiatla-edytora-v1';
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 import {modelSwiatlaDziennego} from './model-swiatla-dziennego.mjs';
 
@@ -988,6 +989,21 @@ sterowanie = utworzSterowanie({
 });
 window.__silnik.sterowanie = sterowanie;
 window.__silnik.biblioteka = biblioteka;
+window.__silnik.plan = PLAN;
+/* Własne światła edytora (poza pulami silnika). */
+const swiatlaEdytora = utworzSwiatlaEdytora({THREE, scena: scene, przyZmianie: () => oznaczZmiane()});
+window.__silnik.swiatlaEdytora = swiatlaEdytora;
+/* Gizmo edytora — ładowane leniwie przy pierwszym wywołaniu. */
+let gizmoEdytora = null;
+window.__silnik.gizmo = async () => {
+  if(!gizmoEdytora){
+    const {utworzGizmo} = await import('./gizmo.js?gizmo-v1');
+    gizmoEdytora = await utworzGizmo({THREE, camera, renderer, scena: scene,
+      przyZmianie: () => oznaczZmiane(),
+      przyPrzeciaganiu: trwa => { nawigacja.ustawBlokade(trwa); oznaczZmiane(); }});
+  }
+  return gizmoEdytora;
+};
 window.__silnik.opisBiblioteki = () => opiszBiblioteke(biblioteka);
 
 /* Speedball instaluje fabrykę węzłów świateł, więc opt-in musi nastąpić przed

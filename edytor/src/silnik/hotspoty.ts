@@ -18,6 +18,7 @@ export const $zrodlaKropek = new Map<string, Zrodlo>()
 
 const ZASIEG = { ruch: 320, mebel: 900, swiatlo: 700 }
 let ledyKropek: unknown = null
+let ileWlasnych = 0
 
 function zbuduj(s: Silnik) {
   const T = s.THREE
@@ -29,6 +30,7 @@ function zbuduj(s: Silnik) {
   }
   $zrodlaKropek.clear()
   ledyKropek = s.ledy
+  ileWlasnych = (s as any).swiatlaEdytora?.ile ?? 0
   const meble = new Map<string, string>()
   for (const { mebel, nazwaMebla, ruch } of s.interakcje.ruchy()) {
     meble.set(mebel, nazwaMebla)
@@ -45,6 +47,9 @@ function zbuduj(s: Silnik) {
   // Światła: lampy sufitowe pokoi (kotwica — widoczna kula) i listwy LED mebli (kotwica — pierwszy pasek).
   for (const l of swiatlaPokoi(s)) {
     if (l.kula) $zrodlaKropek.set(l.id, { id: l.id, typ: 'swiatlo', etykieta: `Ceiling light · ${l.etykieta}`, obiekt: l.kula, lokalnie: new T.Vector3(), zasieg: ZASIEG.swiatlo, swiatlo: l, zaslonieta: false })
+  }
+  for (const l of (s as any).swiatlaEdytora?.lista() ?? []) {
+    $zrodlaKropek.set(`wlasne:${l.id}`, { id: `wlasne:${l.id}`, typ: 'swiatlo', etykieta: `Light · ${l.id}`, obiekt: l.kula, lokalnie: new T.Vector3(), zasieg: ZASIEG.swiatlo, zaslonieta: false })
   }
   for (const [mebel, ledy] of swiatlaMebli(s)) {
     for (const l of ledy) {
@@ -65,7 +70,7 @@ export function uruchomKropki(ramka: HTMLIFrameElement) {
     const h = ramka.clientHeight
     const sprawdzZaslone = czas - ostatniaZaslona > 280
     // Silnik odtwarza listwy LED po wczytaniu lub zmianie mebli — kotwice kropek trzeba wtedy zbudować od nowa.
-    if (sprawdzZaslone && s.ledy !== ledyKropek) zbuduj(s)
+    if (sprawdzZaslone && (s.ledy !== ledyKropek || ((s as any).swiatlaEdytora?.ile ?? 0) !== ileWlasnych)) zbuduj(s)
     if (sprawdzZaslone) ostatniaZaslona = czas
     const wynik: Kropka[] = []
     const p = new T.Vector3()

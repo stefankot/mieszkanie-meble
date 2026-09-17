@@ -70,6 +70,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   let tryb = TRYBY.ORBITA;
   let kolizje = true;
+  /* Blokada zewnętrzna (edytor: przeciąganie gizmo) — kamera i Point & Go nie reagują na wskaźnik. */
+  let blokadaZewnetrzna = false;
   const stopy = new THREE.Vector3(551, 0, 470);
   const predkosc = new THREE.Vector3();
   let vy = 0, naZiemi = true, kuca = false, wysokoscOczu = OCZY, celOczu = OCZY;
@@ -609,6 +611,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   const PODLOGA_MAX_Y = 15;   // cm — dywan i próg jeszcze są podłogą, blat łóżka już nie
   function odswiezZnacznik(e){
     znacznik.visible = false; ostatnieTrafienie = null; dyskNaPodlodze = false;
+    if(blokadaZewnetrzna){ ustawKursor(null); return; }
     przyNajechaniu?.(null);
     ustawKursor(null);
     if((tryb !== TRYBY.ORBITA && tryb !== TRYBY.PTAK) || animacja) return;
@@ -697,7 +700,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   /* Klik jest odróżniany od przeciągnięcia progiem 3 px; anulowany gest nie klika. */
   let wcisniety = false, ruszyl = false, ostX = 0, ostY = 0, startX = 0, startY = 0, pointerId = null;
   plotno.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.isPrimary === false) return;
+    if(blokadaZewnetrzna || e.button !== 0 || e.isPrimary === false) return;
     plotno.focus({preventScroll: true});
     wcisniety = true; ruszyl = false; pointerId = e.pointerId;
     ostX = startX = e.clientX; ostY = startY = e.clientY;
@@ -729,7 +732,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   plotno.addEventListener('lostpointercapture', () => { if(wcisniety) anulujWskaznik(); });
   plotno.addEventListener('pointerleave', () => { znacznik.visible=false; przyNajechaniu?.(null); ustawKursor(null); });
   plotno.addEventListener('click', e => {
-    if(e.button !== 0 || animacja || wcisniety || ruszyl) return;
+    if(blokadaZewnetrzna || e.button !== 0 || animacja || wcisniety || ruszyl) return;
     if(tryb === TRYBY.SPACER){ if(document.pointerLockElement !== plotno) zablokujWskaznik(); return; }
     odswiezZnacznik(e); // klik/tap bez wcześniejszego hoveru też wyznacza cel
     if(tryb !== TRYBY.PTAK && ostatnieTrafienie && przyKlikniecie?.(ostatnieTrafienie)){ znacznik.visible=false; return; }
@@ -1101,7 +1104,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, teleportujDoPokoju, punktyMapy,
           zmienWysokoscOczu, przelaczKolizje, naprawKamere,
-          ustawWidok, przejdzDo, kadrujMebel, znajdzKadrMebla, synchronizuj, rysujZnacznik,
+          ustawWidok, przejdzDo, kadrujMebel,
+          ustawBlokade(v){ blokadaZewnetrzna = !!v; if(v) anulujWskaznik(); }, znajdzKadrMebla, synchronizuj, rysujZnacznik,
           podejdz, teleportujZPtaka, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
           diagnostyka:()=>({tryb,kolizje,wznowiono,joystick:{...joystick},zdarzenia:{...zdarzenia},
             pozycja:camera.position.toArray().map(v=>+v.toFixed(2))}),

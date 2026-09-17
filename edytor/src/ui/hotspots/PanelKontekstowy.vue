@@ -6,8 +6,8 @@ import { computed, ref } from 'vue'
 import { palety } from '@/data/mieszkanie'
 import { $kropki, $zrodlaKropek } from '@/silnik/hotspoty'
 import { $silnik } from '@/silnik/most'
-import { zmienProjekt } from '@/projekt/projekt'
-import { parametrySwiatla, znajdzSwiatlo, type ParametrySwiatla } from '@/silnik/swiatla'
+import { odczytajSwiatlo, zapiszSwiatlo } from '@/silnik/swiatlaPanel'
+import type { ParametrySwiatla } from '@/silnik/swiatla'
 import SuwakMaterialu from '@/ui/material/SuwakMaterialu.vue'
 import { $tryb, $zakladkaPrawa, $zaznaczenie } from '@/stan'
 
@@ -26,14 +26,11 @@ const uchwyt = ref('groove')
 const paleta = ref(palety[0].id)
 const BARWY: [number, string][] = [[2700, '#ffb46b'], [3000, '#ffcf8f'], [4000, '#fff1dc']]
 // Parametry światła czytane z silnika przy otwarciu panelu; każda zmiana od razu trafia do silnika.
-const zrodloSwiatla = zrodlo.value?.swiatlo && znajdzSwiatlo($silnik.get(), zrodlo.value.swiatlo.id)
-const swiatlo = ref<ParametrySwiatla | null>(zrodloSwiatla ? parametrySwiatla(zrodloSwiatla) : null)
+const swiatlo = ref<ParametrySwiatla | null>(kropka.value?.typ === 'swiatlo' ? odczytajSwiatlo(props.id) : null)
 function zmienSwiatlo(zmiana: Partial<ParametrySwiatla>) {
-  const z = zrodlo.value?.swiatlo && znajdzSwiatlo($silnik.get(), zrodlo.value.swiatlo.id)
-  if (!z || !swiatlo.value) return
+  if (!swiatlo.value) return
   Object.assign(swiatlo.value, zmiana)
-  const p = { ...swiatlo.value }
-  zmienProjekt(`Light · ${kropka.value?.etykieta ?? z.id}`, (d) => (d.swiatla[z.id] = p), { scal: `swiatlo:${z.id}` })
+  zapiszSwiatlo(props.id, { ...swiatlo.value }, kropka.value?.etykieta ?? props.id)
 }
 
 const pozycja = computed(() => {
@@ -102,7 +99,7 @@ function wiecej() {
       <SuwakMaterialu :model-value="swiatlo.skupienie" etykieta="Beam focus" :min="0" :max="100" :krok="1" :mnoznik="1" jednostka=" %" @update:model-value="zmienSwiatlo({ skupienie: $event })" />
       <p class="mb-[7px] mt-2 text-[10px] text-label">Beam direction</p>
       <TarczaKierunku :pochylenie="swiatlo.pochylenie" :azymut="swiatlo.azymut" @update:pochylenie="zmienSwiatlo({ pochylenie: $event })" @update:azymut="zmienSwiatlo({ azymut: $event })" />
-      <template v-if="zrodlo.id.startsWith('lampa:')">
+      <template v-if="zrodlo.id.startsWith('lampa:') || zrodlo.id.startsWith('wlasne:')">
         <p class="mb-[9px] mt-3 text-[10px] text-label">Color temperature</p>
         <div class="flex gap-2">
           <Kafelek v-for="[k, c] in BARWY" :key="k" :etykieta="k + 'K'" :tlo="c" :wybrany="swiatlo.kelwiny === k" @wybierz="zmienSwiatlo({ kelwiny: k })" />

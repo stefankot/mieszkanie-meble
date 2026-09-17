@@ -163,7 +163,12 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
    **BatchedMesh — odrzucone po pomiarze** (17.09, scena salonu): 75 wywołań rysowania i 59 tys. trójkątów na klatkę przy 585 siatkach w scenie (467 w meblach, 59 materiałów) — odcinanie niewidocznego już załatwia koszt, a łączenie siatek zabrałoby zaznaczanie części, podmianę materiału grupy i wykrywanie listew LED. Wrócić tylko, jeśli pomiar pokaże wąskie gardło w wywołaniach rysowania.
    `FORMAT-MEBLA-V2.md` — opis v2 i sekcji `parametric` dla ChatGPT (odnośnik dodany w `FORMAT-MEBLA.md`).
 6. ✅ Rejestr operacji podłączony do silnika i dokumentu (25 operacji: scena/kamera, meble, materiały i palety, światła, obraz, projekt). `wykonaj` zwraca wynik i pisze do `$dziennikOperacji` (dla agenta), operacje z danymi domyślnymi (zaznaczenie, bieżący widok) uruchamia ⌘K jednym kliknięciem, reszta czeka na argumenty od AI. Sprawdzone na scenie: opis (6 mebli, 7 lamp pokoi, 15 grup LED), preset materiału, paleta, zapalenie 7 lamp, cofnięcie.
-7. Biblioteka: wstawianie + przyciąganie do ścian + gizmo; własne światła.
+7. ✅ Biblioteka, gizmo i własne światła:
+   - Silnik: `gizmo.js` (TransformControls z addons, ładowane leniwie, `nawigacja.ustawBlokade` wyłącza kamerę i Point & Go na czas przeciągania), `biblioteka.wstawKopie/usunMebel/ustawUmiejscowienie` (kopia dostaje własny `assetId`, więc części, LED-y i interakcje są unikalne), `plan` wystawiony dla przyciągania, `swiatla-edytora.js` (punktowe i stożkowe + znacznik, lumeny → kandele).
+   - Edytor: dokument zna `meble` (przesunięcia i kopie) oraz `swiatlaWlasne`; `silnik/przyciaganie.ts` dosuwa mebel plecami do najbliższej ściany (zasięg 30 cm) i obraca do jej płaszczyzny; `ui/viewport/Gizmo.vue` zapisuje położenie dopiero po puszczeniu myszy (jeden krok Cofnij); okno Assets wstawia mebel (Insert / podwójny klik), materiał i paletę; operacje `furniture.insert/place/remove`, `light.add/remove`; przycisk żarówki na pasku dodaje światło.
+   - Panel przy kropce obsługuje światła silnika i własne przez `silnik/swiatlaPanel.ts`.
+   - Sprawdzone na scenie: wstawienie kopii regału (przyciągnięcie do ściany), gizmo, przeniesienie, usunięcie i cofnięcie; własne światło (SpotLight, zmiana lumenów i skupienia, usunięcie, cofnięcie).
+   - Kalibracja jasności (pomiar w kadrze salonu): tło 0,230; lampa silnika +0,028; własne 1600 lm bez kalibracji +1,399 → stała 1/6,3 daje +0,225, czyli podwojenie jasności w pobliżu.
 8. Profil filmowy 25 FPS (najpierw pomiar).
 9. AI: polecenia tekstowe + rozmowa Realtime na rejestrze operacji.
 10. Render AI (kanały, maski, nakładka); warianty A/B; eksport JSON projektu.

@@ -18,6 +18,7 @@ const SZKIC = 'edytor:projekt:v1'
 let bazaUkladowPamiec: Map<string, UkladMebla> | null = null
 const bazaUkladow = () => (bazaUkladowPamiec ??= new Map(Object.entries(structuredClone($uklady.get()))))
 const bazaSwiatel = new Map<string, ParametrySwiatla>()
+const bazaMebli = new Map<string, { positionMm: [number, number, number]; rotationDeg: number }>()
 
 function projektuj(przed: DokumentProjektu, po: DokumentProjektu) {
   for (const id of zmienioneKlucze(przed.uklady, po.uklady)) {
@@ -43,6 +44,44 @@ function projektuj(przed: DokumentProjektu, po: DokumentProjektu) {
     if (!przed.swiatla[id] && !bazaSwiatel.has(id)) bazaSwiatel.set(id, parametrySwiatla(swiatlo))
     const cel = po.swiatla[id] ?? bazaSwiatel.get(id)
     if (cel) ustawParametrySwiatla(s, swiatlo, cel)
+  }
+  // Meble: kopie wstawione przez użytkownika oraz przesunięcia mebli z biblioteki.
+  for (const id of zmienioneKlucze(przed.meble ?? {}, po.meble ?? {})) {
+    const b = (s as any).biblioteka
+    const wpis = po.meble?.[id]
+    if (!b) break
+    if (!bazaMebli.has(id)) {
+      const u = b.umiejscowienie?.(id)
+      if (u) bazaMebli.set(id, { positionMm: [...u.positionMm], rotationDeg: u.rotationDeg ?? 0 })
+    }
+    if (!wpis) {
+      if (!b.usunMebel?.(id)) {
+        const baza = bazaMebli.get(id)
+        if (baza) b.ustawUmiejscowienie?.(id, baza)
+      }
+    } else if (wpis.kopia && !s.scene.getObjectByName(`biblioteka:${id}`)) {
+      try {
+        b.wstawKopie?.(wpis.asset, { id, positionMm: wpis.positionMm, rotationDeg: wpis.rotationDeg })
+      } catch (e) {
+        console.warn('[projekt] nie wstawiono kopii', id, e)
+      }
+    } else b.ustawUmiejscowienie?.(id, { positionMm: wpis.positionMm, rotationDeg: wpis.rotationDeg })
+    duza = true
+  }
+  // Własne światła użytkownika: kierunek liczymy z pochylenia i azymutu panelu.
+  for (const id of zmienioneKlucze(przed.swiatlaWlasne ?? {}, po.swiatlaWlasne ?? {})) {
+    const w = po.swiatlaWlasne?.[id]
+    const edytora = (s as any).swiatlaEdytora
+    if (!edytora) break
+    if (!w) edytora.usun(id)
+    else {
+      const t = (w.pochylenie * Math.PI) / 180
+      const a = (w.azymut * Math.PI) / 180
+      edytora.ustaw(id, {
+        typ: w.typ, pozycja: w.pozycjaMm, kierunek: [Math.sin(t) * Math.cos(a), -Math.cos(t), Math.sin(t) * Math.sin(a)],
+        lumeny: w.lumeny, kelwiny: w.kelwiny, skupienie: w.skupienie, wlaczone: w.wlaczone, zasieg: w.zasiegCm
+      })
+    }
   }
   for (const klucz of zmienioneKlucze(przed.widocznosc, po.widocznosc)) {
     const [mebel, czesc] = klucz.split(':')

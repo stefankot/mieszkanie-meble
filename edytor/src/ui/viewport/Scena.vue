@@ -13,6 +13,7 @@ import Kropki from '@/ui/hotspots/Kropki.vue'
 import PasekNarzedzi from '@/ui/toolbar/PasekNarzedzi.vue'
 import TrybSpaceru from '@/ui/walk/TrybSpaceru.vue'
 
+import Gizmo from './Gizmo.vue'
 import MiniMapa from './MiniMapa.vue'
 import UchwytyPolek from './UchwytyPolek.vue'
 
@@ -76,6 +77,7 @@ watch([silnik, zaznaczenie, tryb, przebudowa], ([s, id, t]) => {
     <UchwytyPolek />
 
     <TrybSpaceru v-if="tryb === 'walk'" />
+    <Gizmo v-if="tryb === 'edit'" />
     <MiniMapa />
     <PasekNarzedzi />
   </section>

@@ -4,7 +4,9 @@ import { useDraggable } from '@vueuse/core'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { kategorieBiblioteki, materialy, obiekty, palety } from '@/data/mieszkanie'
-import { $bibliotekaOtwarta } from '@/stan'
+import { wykonaj } from '@/ops/rejestr'
+import '@/ops/operacje'
+import { $bibliotekaOtwarta, $zaznaczenie } from '@/stan'
 import Pudelko from '@/ui/primitives/Pudelko.vue'
 
 /* D5 Assets (pomiar: okno ~632×876, tytuł 23, zakładki Online/Local 26, wiersz kontrolek 28, nawigacja 137,
@@ -16,6 +18,18 @@ const typ = ref<'model' | 'material' | 'palette'>('model')
 const dynamiczne = ref(false)
 const wybrana = ref('regal-salon')
 const meble = computed(() => obiekty.filter((o) => o.typ === 'mebel'))
+const blad = ref('')
+/* Podwójny klik wstawia mebel przed kamerą (kopia w projekcie), nadaje materiał albo paletę zaznaczeniu. */
+function uzyj(id: string) {
+  blad.value = ''
+  try {
+    if (typ.value === 'model') wykonaj('furniture.insert', { asset: id })
+    else if (typ.value === 'palette') wykonaj('palette.apply', { paleta: id, mebel: $zaznaczenie.get() ?? undefined })
+    else wykonaj('material.setColor', { kolor: materialy.find((m) => m.id === id)?.kolor ?? '#cccccc' })
+  } catch (e) {
+    blad.value = e instanceof Error ? e.message : String(e)
+  }
+}
 const karta = (id: string) => (wybrana.value === id ? 'ring-2 ring-[#3b6cff]' : 'ring-1 ring-transparent hover:ring-[#3a3d45]')
 const wierszListy = 'flex h-(--wiersz-listy) items-center gap-2 rounded-[3px] px-2 text-[10.5px]'
 </script>
@@ -37,7 +51,9 @@ const wierszListy = 'flex h-(--wiersz-listy) items-center gap-2 rounded-[3px] px
     <div class="flex h-7 shrink-0 items-center justify-end gap-3 pr-3.5">
       <label class="flex items-center gap-1.5 text-[10.5px] text-label"><Pudelko v-model="dynamiczne" /> Dynamic only</label>
       <button type="button" class="flex h-5 items-center gap-2 rounded-d5 bg-field pl-2 pr-1.5 text-[10.5px] text-text">Medium Icons <ChevronDown :size="10" class="text-muted" /></button>
+      <button type="button" class="flex h-5 items-center rounded-d5 bg-accent px-2 text-[10.5px] font-medium text-white" @click="uzyj(wybrana)">{{ typ === 'model' ? 'Insert' : 'Apply' }}</button>
     </div>
+    <p v-if="blad" class="px-4 pb-1 text-[10.5px] text-[#ff8a80]">{{ blad }}</p>
     <div class="grid min-h-0 flex-1 grid-cols-[137px_1fr]">
       <nav class="flex min-h-0 flex-col overflow-y-auto pb-3 pl-2 pr-1">
         <div class="flex h-6 items-center gap-3 px-1">
@@ -58,19 +74,19 @@ const wierszListy = 'flex h-(--wiersz-listy) items-center gap-2 rounded-[3px] px
       </nav>
       <div class="grid min-h-0 auto-rows-[150px] grid-cols-3 content-start gap-1.5 overflow-y-auto pb-3 pl-4 pr-3">
         <template v-if="typ === 'model'">
-          <button v-for="m in meble" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id">
+          <button v-for="m in meble" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id" @dblclick="uzyj(m.id)">
             <span class="flex flex-1 items-center justify-center text-[#5b5f67]"><Box :size="46" :stroke-width="0.8" /></span>
             <span class="truncate px-2.5 pb-2.5 text-[10.5px] text-text">{{ m.nazwa }}</span>
           </button>
         </template>
         <template v-else-if="typ === 'material'">
-          <button v-for="m in materialy" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id">
+          <button v-for="m in materialy" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id" @dblclick="uzyj(m.id)">
             <span class="mx-auto mt-3 aspect-square w-[92px] rounded-full bg-cover bg-center" :style="{ backgroundColor: m.kolor, backgroundImage: m.miniatura ? `url(${m.miniatura})` : undefined }" />
             <span class="mt-auto truncate px-2.5 pb-2.5 text-[10.5px] text-text">{{ m.nazwa }}</span>
           </button>
         </template>
         <template v-else>
-          <button v-for="p in palety" :key="p.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(p.id)" @click="wybrana = p.id">
+          <button v-for="p in palety" :key="p.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(p.id)" @click="wybrana = p.id" @dblclick="uzyj(p.id)">
             <span class="mx-3 mt-3 flex flex-1 overflow-hidden rounded-[2px]"><i v-for="k in p.kolory" :key="k.rola" class="flex-1" :style="{ background: k.hex }" /></span>
             <span class="truncate px-2.5 py-2.5 text-[10.5px] text-text">{{ p.nazwa }}</span>
           </button>

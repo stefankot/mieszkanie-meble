@@ -6,6 +6,8 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { widoki } from '@/data/mieszkanie'
 import { $silnik, kliknij, wcisniety } from '@/silnik/most'
+import { wykonaj } from '@/ops/rejestr'
+import '@/ops/operacje'
 import { $aktywnyWidok, $bibliotekaOtwarta, $kropkiWidoczne, $mapaWidoczna, $narzedzie, $panelWidokow, $tryb, $trybPrawejKolumny } from '@/stan'
 import UstawieniaSpaceru from '@/ui/walk/UstawieniaSpaceru.vue'
 
@@ -20,6 +22,7 @@ const narzedzie = useStore($narzedzie)
 const trybPrawej = useStore($trybPrawejKolumny)
 const kropki = useStore($kropkiWidoczne)
 const mapa = useStore($mapaWidoczna)
+const dodajSwiatlo = () => wykonaj('light.add', {})
 const panelWidokow = useStore($panelWidokow)
 const aktywny = useStore($aktywnyWidok)
 const silnik = useStore($silnik)
@@ -70,7 +73,7 @@ const pozycjaMenu = 'flex h-7 items-center gap-2 rounded-[5px] px-2 text-[12px] 
         </DropdownMenuPortal>
       </DropdownMenuRoot>
       <PrzyciskPaska :ikona="Sofa" opis="Place furniture" @click="$bibliotekaOtwarta.set(true)" />
-      <PrzyciskPaska :ikona="Lightbulb" opis="Add light" />
+      <PrzyciskPaska :ikona="Lightbulb" opis="Add light" @click="dodajSwiatlo" />
       <PrzyciskPaska :ikona="Route" opis="Go to point" />
       <span class="mx-1 h-6 w-px bg-[#34363c]" />
       <DropdownMenuRoot>

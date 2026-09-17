@@ -5,11 +5,12 @@ import { renderujAI } from '@/ai/render'
 import { palety, widoki } from '@/data/mieszkanie'
 import { presetyMaterialow, kopiaUstawien } from '@/meble/material'
 import { uklad, zmienUklad } from '@/meble/uklad'
-import { cofnij, eksportujProjekt, ponow, zapiszWersje, zmienProjekt } from '@/projekt/projekt'
+import { cofnij, dokumentProjektu, eksportujProjekt, ponow, zapiszWersje, zmienProjekt } from '@/projekt/projekt'
 import { grupyMaterialow, koloryZaznaczenia, ustawieniaPoZmianieKoloru } from '@/silnik/materialyMebla'
 import { $silnik, kliknij, ustawKontrolke } from '@/silnik/most'
+import { przyciagnijDoSciany } from '@/silnik/przyciaganie'
 import { parametrySwiatla, swiatlaMebli, swiatlaPokoi, znajdzSwiatlo } from '@/silnik/swiatla'
-import { $aktywnyWidok, $mapaWidoczna, $tryb, $trybPrawejKolumny, $zaznaczenie } from '@/stan'
+import { $aktywnyWidok, $mapaWidoczna, $przyciaganie, $tryb, $trybPrawejKolumny, $zaznaczenie } from '@/stan'
 
 import { zdefiniuj } from './rejestr'
 
@@ -21,6 +22,7 @@ const nazwyPresetow = presetyMaterialow.map((p) => p.nazwa) as [string, ...strin
 const HEX = z.string().regex(/^#[0-9a-fA-F]{6}$/)
 
 const silnik = () => $silnik.get()
+const dokumentMebli = () => dokumentProjektu().meble ?? {}
 const mebelZaznaczony = () => $zaznaczenie.get() ?? undefined
 const wymagajMebla = (mebel?: string) => {
   const id = mebel ?? mebelZaznaczony()
@@ -130,6 +132,56 @@ zdefiniuj({
       if (widoczny) delete d.widocznosc[klucz]
       else d.widocznosc[klucz] = false
     })
+  }
+})
+
+zdefiniuj({
+  nazwa: 'furniture.insert', tytul: 'Wstaw kopię mebla przed kamerą', grupa: 'Meble',
+  wejscie: z.object({ asset: z.string(), odlegloscCm: z.number().min(60).max(600).default(220) }),
+  wykonaj: ({ asset, odlegloscCm }) => {
+    const s = silnik()
+    if (!s) throw new Error('Silnik nie jest gotowy.')
+    const T = s.THREE
+    const kierunek = s.camera.getWorldDirection(new T.Vector3())
+    kierunek.y = 0
+    kierunek.normalize()
+    const punkt = s.camera.position.clone().addScaledVector(kierunek, odlegloscCm)
+    const numery = Object.keys(dokumentMebli()).filter((k) => k.startsWith(`${asset}-`))
+    const id = `${asset}-${numery.length + 2}`
+    const obrotKamery = (Math.atan2(kierunek.x, kierunek.z) * 180) / Math.PI
+    const u = { positionMm: [Math.round(punkt.x * 10), 0, Math.round(punkt.z * 10)] as [number, number, number], rotationDeg: Math.round(obrotKamery) }
+    zmienProjekt(`Insert ${asset}`, (d) => (d.meble[id] = { asset, ...u, kopia: true }))
+    // Po wstawieniu mebel jest w scenie — dopiero teraz da się policzyć przyciąganie do ściany.
+    if ($przyciaganie.get()) {
+      const dosuniete = przyciagnijDoSciany(s, id, u)
+      if (dosuniete !== u) zmienProjekt(`Snap ${id}`, (d) => (d.meble[id] = { asset, ...dosuniete, kopia: true }))
+    }
+    $zaznaczenie.set(id)
+    return id
+  }
+})
+zdefiniuj({
+  nazwa: 'furniture.place', tytul: 'Ustaw mebel (pozycja i obrót)', grupa: 'Meble',
+  wejscie: z.object({ mebel: z.string().optional(), xMm: z.number(), zMm: z.number(), rotationDeg: z.number().min(-360).max(360).default(0), przyciagaj: z.boolean().default(true) }),
+  wykonaj: ({ mebel, xMm, zMm, rotationDeg, przyciagaj }) => {
+    const id = wymagajMebla(mebel)
+    const s = silnik()
+    const wpis = dokumentMebli()[id]
+    const asset = wpis?.asset ?? id
+    let u = { positionMm: [xMm, wpis?.positionMm[1] ?? 0, zMm] as [number, number, number], rotationDeg }
+    if (przyciagaj) u = przyciagnijDoSciany(s, id, u)
+    zmienProjekt(`Move ${id}`, (d) => (d.meble[id] = { asset, ...u, kopia: wpis?.kopia ?? false }))
+    return u
+  }
+})
+zdefiniuj({
+  nazwa: 'furniture.remove', tytul: 'Usuń wstawioną kopię mebla', grupa: 'Meble',
+  wejscie: z.object({ mebel: z.string().optional() }), domyslne: () => ({ mebel: mebelZaznaczony() }),
+  wykonaj: ({ mebel }) => {
+    const id = wymagajMebla(mebel)
+    if (!dokumentMebli()[id]?.kopia) throw new Error('Usuwać można tylko kopie wstawione w edytorze.')
+    zmienProjekt(`Remove ${id}`, (d) => delete d.meble[id])
+    if ($zaznaczenie.get() === id) $zaznaczenie.set(null)
   }
 })
 
@@ -245,6 +297,42 @@ zdefiniuj({
     $trybPrawejKolumny.set('zdjecie')
     const wyniki = await renderujAI(s, { model: 'latest', orientacja, jakosc, ile, opis, wiernosc: true, krawedzie: true, chronMebel: chronZaznaczony ? mebelZaznaczony() ?? null : null })
     return wyniki.length
+  }
+})
+
+zdefiniuj({
+  nazwa: 'light.add', tytul: 'Dodaj własne światło przed kamerą', grupa: 'Światło',
+  wejscie: z.object({
+    typ: z.enum(['punktowe', 'stozek']).default('punktowe'),
+    lumeny: z.number().min(50).max(6000).default(900),
+    kelwiny: z.number().min(1800).max(6500).default(3000),
+    wysokoscCm: z.number().min(20).max(300).default(215),
+    odlegloscCm: z.number().min(50).max(600).default(180)
+  }),
+  domyslne: () => ({}),
+  wykonaj: ({ typ, lumeny, kelwiny, wysokoscCm, odlegloscCm }) => {
+    const s = silnik()
+    if (!s) throw new Error('Silnik nie jest gotowy.')
+    const T = s.THREE
+    const kierunek = s.camera.getWorldDirection(new T.Vector3())
+    kierunek.y = 0
+    kierunek.normalize()
+    const p = s.camera.position.clone().addScaledVector(kierunek, odlegloscCm)
+    const id = `swiatlo-${Object.keys(dokumentProjektu().swiatlaWlasne ?? {}).length + 1}`
+    zmienProjekt('Add light', (d) => (d.swiatlaWlasne[id] = {
+      typ, lumeny, kelwiny, skupienie: 40, pochylenie: typ === 'stozek' ? 0 : 0, azymut: 0, wlaczone: true,
+      pozycjaMm: [Math.round(p.x * 10), Math.round(wysokoscCm * 10), Math.round(p.z * 10)], zasiegCm: 900
+    }))
+    return id
+  }
+})
+zdefiniuj({
+  nazwa: 'light.remove', tytul: 'Usuń własne światło', grupa: 'Światło',
+  wejscie: z.object({ swiatlo: z.string() }),
+  wykonaj: ({ swiatlo }) => {
+    const id = swiatlo.startsWith('wlasne:') ? swiatlo.slice(7) : swiatlo
+    if (!dokumentProjektu().swiatlaWlasne?.[id]) throw new Error('To światło nie należy do projektu.')
+    zmienProjekt('Remove light', (d) => delete d.swiatlaWlasne[id])
   }
 })
 
