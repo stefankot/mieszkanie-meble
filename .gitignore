@@ -1,5 +1,7 @@
 node_modules/
 dist-edytor/
+# edytor-app/ zapisuje wyłącznie workflow edytor.yml na main
+edytor-app/
 .DS_Store
 # Klucze API tylko lokalnie — nigdy do repo
 .env

@@ -1,0 +1,46 @@
+name: Edytor — testy i build
+# Na każdej gałęzi i w PR: testy silnika (Node + three r185), testy edytora (vitest) i build Vite.
+# Na main dodatkowo zapisuje zbudowany edytor do edytor-app/ — strona GitHub Pages działa z gałęzi main
+# (tak jak katalog rendererów w renderery.yml), więc edytor jest pod /edytor-app/ obok renderery/.
+on:
+  push:
+    paths:
+      - 'edytor/**'
+      - 'renderery/webgpu/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - '.github/workflows/edytor.yml'
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: edytor-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  testy-i-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:silnik
+      - run: npm run test:edytor
+      - name: Build edytora
+        run: npx vite build --outDir ../edytor-app --emptyOutDir
+      - name: Zapisz edytor dla GitHub Pages (tylko main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f edytor-app
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Zbuduj edytor (edytor-app) dla GitHub Pages'
+          git pull --rebase origin main
+          git push origin HEAD:main

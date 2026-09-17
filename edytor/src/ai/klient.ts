@@ -1,17 +1,19 @@
-import OpenAI from 'openai'
+import type OpenAI from 'openai'
 
 import { $kluczOpenAI } from './klucz'
 
-/* Klient OpenAI w przeglądarce (klucz użytkownika, bez serwera pośredniczącego).
+/* Klient OpenAI w przeglądarce (klucz użytkownika, bez serwera pośredniczącego). Biblioteka ładowana dopiero
+   przy pierwszym użyciu AI — nie spowalnia startu edytora.
    Model obrazów „zawsze najnowszy”: z listy modeli konta wybieramy najnowszy gpt-image-*. */
 let klient: OpenAI | null = null
 let kluczKlienta = ''
 
-export function openai() {
+export async function openai() {
   const klucz = $kluczOpenAI.get()
   if (!klucz) throw new Error('Add an OpenAI API key in Settings (or OPENAI_API_KEY in .env.local for dev).')
   if (!klient || kluczKlienta !== klucz) {
-    klient = new OpenAI({ apiKey: klucz, dangerouslyAllowBrowser: true })
+    const { default: OpenAIKlient } = await import('openai')
+    klient = new OpenAIKlient({ apiKey: klucz, dangerouslyAllowBrowser: true })
     kluczKlienta = klucz
   }
   return klient
@@ -23,7 +25,7 @@ let najnowszy: Promise<string> | null = null
 export function modeleObrazow(): Promise<string[]> {
   return (async () => {
     const lista: { id: string; created: number }[] = []
-    for await (const m of openai().models.list()) if (/^gpt-image/.test(m.id)) lista.push(m)
+    for await (const m of (await openai()).models.list()) if (/^gpt-image/.test(m.id)) lista.push(m)
     return lista.sort((a, b) => b.created - a.created).map((m) => m.id)
   })()
 }

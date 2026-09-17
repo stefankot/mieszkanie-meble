@@ -1,5 +1,4 @@
 import { atom } from 'nanostores'
-import { toFile } from 'openai'
 
 import type { Silnik } from '@/silnik/most'
 
@@ -55,6 +54,7 @@ export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]>
   const model = o.model === 'latest' ? await najnowszyModelObrazow() : o.model
   const { kadr, blob, maska, ekran } = await przechwycKadr(s, o.orientacja, o.chronMebel)
   const zrodlo = kadr.toDataURL('image/jpeg', 0.9)
+  const { toFile } = await import('openai')
   const obrazy = [await toFile(blob, 'kadr.png', { type: 'image/png' })]
   const zasady = [...ZASADY]
   if (o.krawedzie) {
@@ -64,8 +64,8 @@ export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]>
   if (maska) zasady.push('The masked furniture must stay pixel-identical.')
   const [W, H] = ROZMIARY[o.orientacja]
   const plikMaski = maska ? await toFile(maska, 'maska.png', { type: 'image/png' }) : null
-  const wyslij = (wiernosc: boolean) =>
-    openai().images.edit({
+  const wyslij = async (wiernosc: boolean) =>
+    (await openai()).images.edit({
       model,
       image: obrazy,
       ...(plikMaski ? { mask: plikMaski } : {}),

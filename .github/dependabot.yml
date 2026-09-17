@@ -1,0 +1,25 @@
+# Automatyczne aktualizacje zależności (biblioteki utrzymywane, wersje przypięte dokładnie; 0.x też).
+# Dependabot działa od razu po scaleniu do main — bez instalowania aplikacji w ustawieniach konta.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    versioning-strategy: increase
+    open-pull-requests-limit: 10
+    groups:
+      vue-i-ui:
+        patterns: ['vue', '@vue/*', '@vitejs/*', 'reka-ui', '@vueuse/*', '@lucide/vue', 'tailwindcss', '@tailwindcss/*']
+      stan-i-narzedzia:
+        patterns: ['nanostores', '@nanostores/*', 'tinykeys', 'fuse.js', 'zod']
+      build-i-testy:
+        patterns: ['vite', 'vitest', 'typescript', 'vue-tsc', 'sirv']
+    ignore:
+      # three musi zgadzać się z importmap silnika (r185) — podnosimy ręcznie razem z rendererem.
+      - dependency-name: three
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
