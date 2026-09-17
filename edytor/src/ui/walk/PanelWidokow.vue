@@ -3,7 +3,7 @@ import { PanelLeftClose } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
 
 import { widoki } from '@/data/mieszkanie'
-import { $miniatury } from '@/silnik/most'
+import { $miniatury } from '@/silnik/miniatury'
 import { $aktywnyWidok, $panelWidokow } from '@/stan'
 
 /* D5 3.1 prezentacja: pływająca lista slajdów (~177 px). Wiersz = numer w lewym górnym rogu + miniatura ~128×73,

@@ -3,7 +3,7 @@ import { EllipsisVertical, ImagePlus, Monitor } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
 
 import { widoki } from '@/data/mieszkanie'
-import { $miniatury } from '@/silnik/most'
+import { $miniatury } from '@/silnik/miniatury'
 import { $aktywnyWidok } from '@/stan'
 
 /* D5 3.x Scene List: nagłówek 36 px; wiersz 44 px — miniatura 48×31 (wcięcie 33 px), nazwa 8 px dalej,

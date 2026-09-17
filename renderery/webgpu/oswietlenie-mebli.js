@@ -281,14 +281,17 @@ export function odswiezOswietlenieMebli({THREE, biblioteka, scena, poprzednie = 
   /* Światła pokoju mają pierwszeństwo przed bliższymi źródłami za ścianą.
      Przekroczenie progu pokoju aktualizuje pulę od razu, nawet przy ruchu <50 cm.
      W obrębie pokoju zachowujemy kolejność listew, żeby nie przeskakiwały. */
-  function aktualizuj(kamera){
+  /* Edytor: gniazdo z `wylaczone` nie dostaje światła z puli (jego pasek ukrywa edytor), `mnoznik` skaluje moc.
+     `wymus` przelicza pulę po takiej zmianie bez ruchu kamery. */
+  function aktualizuj(kamera, wymus = false){
     if(!gniazda.length){ swiatla.forEach(l => { l.intensity = 0; }); return; }
     const pokoj = roomAt(kamera.position.x, kamera.position.z)?.id;
-    if(pokoj === ostatniPokoj && ostatniaKam.distanceToSquared(kamera.position) < 2500) return;
+    if(!wymus && pokoj === ostatniPokoj && ostatniaKam.distanceToSquared(kamera.position) < 2500) return;
     ostatniaKam.copy(kamera.position);
     ostatniPokoj = pokoj;
 
     const posortowane = gniazda
+      .filter(g => !g.wylaczone)
       .map((g, i) => ({g, i, lokalne: pokoj != null && pokojeGniazd.get(g) === pokoj,
         d: g.poz.distanceToSquared(kamera.position)}))
       .sort((a, b) => Number(b.lokalne) - Number(a.lokalne)
@@ -302,7 +305,7 @@ export function odswiezOswietlenieMebli({THREE, biblioteka, scena, poprzednie = 
       l.position.copy(g.poz);
       l.width = g.szer; l.height = g.wys;
       l.lookAt(g.cel); // Światło świeci w -Z; pomocniczy Object3D patrzył w +Z.
-      l.intensity = moc;
+      l.intensity = moc * (g.mnoznik ?? 1);
     });
   }
 

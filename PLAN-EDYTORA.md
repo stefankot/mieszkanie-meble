@@ -130,11 +130,23 @@ Wymagania użytkownika: font **Avenir**; kontrolki „drzwiczki” większe; meb
 - Naprawiony błąd globalny: rozmiar czcionki był ustawiony na `html`, przez co wszystkie klasy Tailwind w rem (h-6, gap-2…) były ~34% mniejsze; teraz rozmiar tekstu jest na `body`.
 - Ograniczenie makiety: geometria modelu jeszcze się nie przebudowuje (linie pokazują docelowy układ). Przebudowa wymaga schematu v2 (`definitions`/`instances`) i generatora — krok 5 planu wdrożenia.
 
-### Makieta 5 — ogólny układ jak Figma UI3 (17.09, W TOKU)
-Wymagania: układ ekranu jak zrzut Figma UI3; **pływający pasek narzędzi na dole** zamiast górnego paska; **AI w lewym panelu od razu z sugestiami**; prawy panel: zakładki **Inspector (pierwsza) → Environment**; **Effect nie w prawym panelu** — do menu Settings, trybu aparatu albo osobnej ikony „jakość obrazu/renderu”.
-- Zrobione (strona się ładuje, build OK): `ui/rail/Szyna.vue` (File, Agent, Scene, Palettes, Assets, pomoc/skróty `Skroty.vue`), `ui/left/LewyPanel.vue` (+ nowy `PanelAgenta.vue` z sugestiami, `PanelPalet.vue`, `PanelProjektu.vue`), `App.vue` kolumny 56/264/scena/240, `PrawaKolumna.vue` (Image + Walk ▶ u góry, zakładki Inspector/Environment). Usunięte: `GornyPasek.vue`, `LewaKolumna.vue`; stan `$zakladkaLewa` → `$panelLewy`.
-- Do zrobienia: pływający pasek na dole sceny (narzędzia, tryb kamery, Image, AI render, ikona Render quality z zawartością `ZakladkaEfekty.vue` — plik na razie nieużywany), przeniesienie nakładek D5 ze `Scena.vue` do paska, pasek w trybie spaceru (Edit, Views, kropki, pager, Settings), aktualizacja MAPA.md.
-- Następny etap zgłoszony przez użytkownika: interfejs renderowania 3D/AI (wzór: panel „Model / Image settings”: Model, Size & orientation, Quality, Number of images; model obrazowy „zawsze najnowszy”) + wdrożenie opcji ograniczających zniekształcenia (kanały: obraz, albedo, głębia, normalne, maski; nakładka z kryciem). **Klucza API nie zapisywać w repo** — tylko w przeglądarce (IndexedDB), zgodnie z decyzją.
+### Makieta 5 — ogólny układ jak Figma UI3 (17.09, ZAKOŃCZONA, commit ae138ed)
+Szyna ikon + lewy panel (Agent z sugestiami domyślnie), pływający pasek na dole (`ui/toolbar/*`), Render quality jako osobny popover, prawa kolumna Image + Walk ▶ i zakładki. Sprawdzone w przeglądarce 1440×900: edycja i spacer.
+
+### Makieta 6 — zgłoszenia 17.09 (W TOKU)
+Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
+1. ✅ Environment pod Assets w szynie (panel lewy). ✅ Prawa kolumna: **Inspector | Prototype** (Environment usunięte z prawej).
+2. ✅ Prototype: ruchy wg mebli + **światła mebli pod meblami** (LED po wnękach) + **Apartment lighting** (lampy sufitowe pokoi); przełączniki działają na silniku (`silnik/swiatla.ts`, drobna zmiana `oswietlenie-mebli.js`: `wylaczone`, `mnoznik`, `aktualizuj(kamera, wymus)`).
+3. ✅ Kopie komponentu (pojedyncze drzwiczki) jako rozwijana lista.
+4. ✅ Miniatury scen: render poza ekranem z punktu widoku, **5 s po dużej zmianie mebla** (decyzja użytkownika: bez cyklicznego odświeżania); kadry skierowane w ścianę (WC, łazienka) zastąpione najdłuższym wolnym widokiem (także przy teleporcie).
+5. ✅ Błąd: `useStore($silnik)` dawał readonly proxy Vue na obiektach three.js (zapisy nie działały, tysiące ostrzeżeń) → `markRaw`.
+6. ⏳ Inspector: **Selection colors** (ładniejsza paleta, wzór Figma Selection colors + color picker Custom/Libraries) PRZED Door; **materiały jako presety** („Burgund mat”) z **kulką 3D** jak D5; edycja całej grupy elementów o tych samych właściwościach w meblu (jak Figma) — grupy po współdzielonym materiale (uuid).
+7. ⏳ Pływające okno presetu/custom: kolor, tekstura (upload, generowanie AI, suwaki Exposure/Contrast/Saturation/Temperature/Tint/Highlights/Shadows), **Pattern**, **height field tracing / bump**, **generatywne wypukłości i niedoskonałości**.
+8. ⏳ Panel światła przy kropce: **lumeny**, **skupienie strumienia %**, **kierunek strumienia kołowo**.
+9. ⏳ Top view dostępne zawsze (jest na pasku w obu trybach — sprawdzić działanie).
+10. ⏳ Mapa: mniejsze znaczniki, stale pozycja i kierunek patrzenia; tło = rzut z góry prostopadle do podłogi, odświeżany co minutę lub po dużej zmianie (`$duzaZmiana`).
+11. ⏳ Render AI (Model: najnowszy automatycznie, Size & orientation, Quality, Number of images) + opcje przeciw zniekształceniom (input fidelity high, krawędzie, maska chroniąca meble, nakładka z kryciem i A/B) + **generowanie tekstur przez AI**.
+12. Klucz OpenAI: użytkownik: „Na razie używaj tokena w kodzie lokalnie, przed publikacją… w pamięci przeglądarki i pliku”. Realizacja: `.env.local` (gitignored, `VITE_OPENAI_API_KEY`, tylko DEV) — wpisuje użytkownik; pole w ustawieniach zapisuje w przeglądarce. **Nigdy nie commitować klucza** (repo publiczne). Klucz wklejony w czacie — zalecono rotację.
 
 ## 8a. Zadania zgłoszone na „po UI”
 - **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.
