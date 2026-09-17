@@ -1,16 +1,23 @@
+import { atom } from 'nanostores'
 import { z } from 'zod'
 
 /* Rejestr operacji: jedyna droga zmian w scenie. Z tych samych definicji korzystają
    przyciski UI, ⌘K, polecenia tekstowe (structured outputs) i rozmowa głosowa (Realtime tools).
-   Makieta: `wykonaj` tylko waliduje i loguje — silnik nie jest jeszcze podłączony. */
+   Zmiany projektu operacje wykonują przez dokument (`zmienProjekt`), więc działa Cofnij/Ponów. */
 export interface Operacja<S extends z.ZodType = z.ZodType> {
   nazwa: string
   tytul: string
   grupa: string
   wejscie: S
   tylkoOdczyt?: boolean
-  wykonaj?: (dane: z.infer<S>) => void
+  /* Dane domyślne (bieżące zaznaczenie, widok). Jeśli przechodzą walidację, operację można
+     wywołać jednym kliknięciem z ⌘K; bez nich pozostaje dostępna dla AI z jawnymi argumentami. */
+  domyslne?: () => unknown
+  wykonaj?: (dane: z.infer<S>) => unknown
 }
+
+export interface WpisDziennika { nazwa: string; dane: unknown; wynik?: unknown; blad?: string; czas: number }
+export const $dziennikOperacji = atom<WpisDziennika[]>([])
 
 const operacje = new Map<string, Operacja>()
 
@@ -25,9 +32,23 @@ export function wykonaj(nazwa: string, surowe: unknown) {
   const op = operacje.get(nazwa)
   if (!op) throw new Error(`Nieznana operacja: ${nazwa}`)
   const dane = op.wejscie.parse(surowe)
-  op.wykonaj?.(dane)
-  console.info('[operacja]', nazwa, dane)
-  return dane
+  try {
+    const wynik = op.wykonaj?.(dane)
+    zapisz({ nazwa, dane, wynik: wynik instanceof Promise ? 'w toku' : wynik, czas: Date.now() })
+    return wynik ?? dane
+  } catch (e) {
+    zapisz({ nazwa, dane, blad: e instanceof Error ? e.message : String(e), czas: Date.now() })
+    throw e
+  }
+}
+
+const zapisz = (wpis: WpisDziennika) => $dziennikOperacji.set([wpis, ...$dziennikOperacji.get()].slice(0, 50))
+
+/* Operacje wykonalne jednym kliknięciem z ⌘K (mają komplet danych domyślnych). */
+export function zDanymiDomyslnymi(op: Operacja) {
+  const dane = op.domyslne?.() ?? {}
+  const wynik = op.wejscie.safeParse(dane)
+  return wynik.success ? wynik.data : null
 }
 
 /* Definicje narzędzi dla OpenAI (Realtime / Responses) — schemat JSON z zod. */

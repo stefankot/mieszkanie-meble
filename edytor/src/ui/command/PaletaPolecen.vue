@@ -4,12 +4,13 @@ import Fuse from 'fuse.js'
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, ListboxContent, ListboxGroup, ListboxGroupLabel, ListboxItem, ListboxRoot } from 'reka-ui'
 import { computed, ref } from 'vue'
 
-import { lista, wykonaj } from '@/ops/rejestr'
+import { lista, wykonaj, zDanymiDomyslnymi } from '@/ops/rejestr'
 import '@/ops/operacje'
 import { $paletaPolecenOtwarta } from '@/stan'
 
 /* ⌘K (wzór Spline/openpencil): operacje z rejestru — te same, które wywołuje AI.
-   Reka Listbox (nawigacja klawiaturą) + fuse.js (wyszukiwanie rozmyte). */
+   Wykonujemy te, które mają komplet danych (zaznaczenie, bieżący widok); pozostałe wymagają
+   argumentów i są dostępne dla agenta. Reka Listbox (klawiatura) + fuse.js (szukanie rozmyte). */
 const otwarta = useStore($paletaPolecenOtwarta)
 const zapytanie = ref('')
 const fuse = new Fuse(lista(), { keys: ['tytul', 'nazwa', 'grupa'], threshold: 0.4 })
@@ -19,10 +20,27 @@ const grupy = computed(() => {
   for (const op of wyniki) mapa.set(op.grupa, [...(mapa.get(op.grupa) ?? []), op])
   return [...mapa]
 })
+const blad = ref('')
 function wybierz(nazwa: unknown) {
+  const op = lista().find((x) => x.nazwa === nazwa)
+  const dane = op && zDanymiDomyslnymi(op)
+  if (!op || !dane) {
+    blad.value = op ? `„${op.tytul}” wymaga argumentów — poproś agenta w panelu po lewej.` : ''
+    return
+  }
   $paletaPolecenOtwarta.set(false)
   zapytanie.value = ''
-  if (nazwa === 'scene.describe') wykonaj(nazwa, {})
+  blad.value = ''
+  try {
+    const wynik = wykonaj(op.nazwa, dane)
+    if (wynik instanceof Promise) wynik.catch((e) => console.warn('[operacja]', op.nazwa, e))
+  } catch (e) {
+    blad.value = e instanceof Error ? e.message : String(e)
+  }
+}
+const gotowa = (nazwa: string) => {
+  const op = lista().find((x) => x.nazwa === nazwa)
+  return !!(op && zDanymiDomyslnymi(op))
 }
 </script>
 
@@ -38,11 +56,13 @@ function wybierz(nazwa: unknown) {
             <ListboxGroup v-for="[grupa, ops] in grupy" :key="grupa">
               <ListboxGroupLabel class="px-2 pb-0.5 pt-1.5 text-2xs text-muted">{{ grupa }}</ListboxGroupLabel>
               <ListboxItem v-for="op in ops" :key="op.nazwa" :value="op.nazwa" class="flex h-[26px] items-center gap-2 rounded-d5 px-2 text-xs text-text outline-none data-[highlighted]:bg-accent data-[highlighted]:text-white">
-                <span class="flex-1 truncate">{{ op.tytul }}</span>
+                <span class="flex-1 truncate" :class="gotowa(op.nazwa) ? '' : 'opacity-60'">{{ op.tytul }}</span>
+                <span v-if="!gotowa(op.nazwa)" class="text-2xs text-muted">args</span>
                 <code class="font-mono text-2xs opacity-60">{{ op.nazwa }}</code>
               </ListboxItem>
             </ListboxGroup>
             <p v-if="!grupy.length" class="p-3 text-center text-xs text-muted">No commands.</p>
+            <p v-if="blad" class="px-3 pb-2 pt-1 text-2xs text-[#ff8a80]">{{ blad }}</p>
           </ListboxContent>
         </ListboxRoot>
       </DialogContent>

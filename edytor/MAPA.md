@@ -40,12 +40,13 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `meble/rozklad.ts` — rozkład półek przy stałej wielkości: równe / Fibonacci / losowe (ziarno) / własne „60+40+20+40”; zapis własny ze środków półek (pełne cm).
 - `meble/rozklad.test.ts` — testy vitest (`npm run test:edytor`).
 - `meble/material.ts` — schemat zod `UstawieniaMaterialu`, presety (Burgund mat…), `kopiaUstawien`.
+- `meble/parametryczneEdytor.ts` — układ Inspektora ↔ `parametric`/`parametricOverrides`, przebudowa mebla.
 - `meble/uklad.ts` — stan parametryczny mebli (`$uklady`): przepływ, półki, kolumny, rozkład, płyty, marginesy, komponenty powtarzane N razy.
 - `silnik/wymiary.ts` — wymiary i położenie mebla ze sceny (mm).
 
 ## Dane i operacje
 - `data/mieszkanie.ts` — dane makiety z repo: widoki, warstwy, obiekty, materiały, palety, kategorie Assets.
-- `ops/rejestr.ts` — rejestr operacji (zod): `zdefiniuj`, `wykonaj`, `narzedziaAI()` → narzędzia OpenAI.
+- `ops/rejestr.ts` — rejestr operacji (zod): `zdefiniuj`, `wykonaj` (wynik + `$dziennikOperacji`), `zDanymiDomyslnymi`, `narzedziaAI()`.
 - `ops/operacje.ts` — pierwsze operacje (kamera, światło, jakość, meble, palety, render AI).
 
 ## UI — prymitywy (Reka UI + styl D5)
