@@ -1,6 +1,7 @@
 import { utworzKadrowanie } from './kadrowanie.js?furniture-map-v1';
 import { NAV_KEY_MAP, SHIFT_NAV_KEY_MAP, navigationActionForKey, classifyTrackpadGesture } from './navigation-regression.js?camera-keys-v3';
 import { DEFAULT_EYE_HEIGHT_CM } from './navigation-config.mjs';
+import { dlugoscTrasy, widac, znajdzTrase } from './trasa.js?trasa-v1';
 
 /* ============================================================
    NAWIGACJA — Point & Go, spacer, widok z lotu ptaka
@@ -47,6 +48,7 @@ const PROGI = [14, 85];
 const PODEJSCIE_MS = 1000;   // [oaksun] l = 1e3
 const POKOJ_MS = 2500;       // brief: przejście do pomieszczenia 2–3 s
 const ODSTEP_OD_CELU = 80;   // [oaksun] t.sub(s.multiplyScalar(.8)) — 0,8 m
+const SPACER_CM_S = 160;     // tempo przejścia po trasie (spokojny krok z kamerą)
 
 /* ORBITA to nazwa historyczna — od teraz jest to ROZGLĄDANIE: kamera stoi
    w miejscu, a przeciągnięcie obraca widok, jak przy panoramie na telefonie.
@@ -95,7 +97,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
   const OKRAG = [[0,0],[1,0],[-1,0],[0,1],[0,-1],[.7,.7],[.7,-.7],[-.7,.7],[-.7,-.7]]
                   .map(([a,b]) => [a*PROMIEN, b*PROMIEN]);
   function zablokowane(x, y, z){
-    if(!kolizje) return false;
+    return kolizje && kolizjaGracza(x, y, z);
+  }
+  /* Trasy zawsze omijają ściany i meble — także gdy chodzenie ma wyłączone kolizje. */
+  function kolizjaGracza(x, y, z){
     if(!plan.czyPodloga(x, z)) return true;
     for(const h of [PROGI[0], PROGI[1], wysokoscOczu - 12])
       for(const [ox, oz] of OKRAG)
@@ -270,6 +275,50 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
                 uplynelo: 0, czas: czas || PODEJSCIE_MS, po: poCzasie};
     controls.enabled = false;
   }
+  /* Przejście po trasie omijającej ściany i meble: pozycja po krzywej (CatmullRom, centripetal) ze stałym
+     tempem, wzrok najpierw płynnie przechodzi na kierunek marszu, a pod koniec na docelowy (`patrzNa`)
+     albo z powrotem na kierunek sprzed przejścia. Poziom oczu stały. */
+  const granicePlanu = (() => {
+    const xs = APARTMENT.outer.map(p => p[0]), zs = APARTMENT.outer.map(p => p[1]);
+    return {minX: Math.min(...xs), maxX: Math.max(...xs), minZ: Math.min(...zs), maxZ: Math.max(...zs)};
+  })();
+  const kolizjaStop = (x, z) => kolizjaGracza(x, 0, z);
+  function trasaDo(cel){
+    przeliczMeble();
+    const punkty = znajdzTrase({od: {x: camera.position.x, z: camera.position.z}, cel: {x: cel.x, z: cel.z},
+                                zablokowane: kolizjaStop, granice: granicePlanu});
+    return punkty && punkty.map(p => new THREE.Vector3(p.x, cel.y, p.z));
+  }
+  function lecPoTrasie(punkty, patrzNa, poCzasie){
+    const y = punkty[punkty.length - 1].y;
+    punkty[0] = camera.position.clone();
+    const krzywa = new THREE.CatmullRomCurve3(punkty.map((p, i) => i ? p.clone().setY(y) : p), false, 'centripetal');
+    const dlugosc = dlugoscTrasy(punkty.map(p => ({x: p.x, z: p.z})));
+    const pom = new THREE.PerspectiveCamera();
+    pom.position.copy(punkty[punkty.length - 1]);
+    if(patrzNa) pom.lookAt(patrzNa); else pom.quaternion.copy(camera.quaternion);
+    qMarszu.copy(camera.quaternion);
+    animacja = {trasa: krzywa, odQ: camera.quaternion.clone(), doQ: pom.quaternion.clone(),
+                uplynelo: 0, czas: THREE.MathUtils.clamp(dlugosc / SPACER_CM_S * 1000, 900, 6000), po: poCzasie};
+    controls.enabled = false;
+  }
+  // Kamera pomocnicza: jej lookAt kieruje −Z na cel, tak jak patrzy kamera sceny.
+  const qMarszu = new THREE.Quaternion(), pomMarszu = new THREE.PerspectiveCamera(), przed = new THREE.Vector3();
+  function animujTrase(t){
+    const a = animacja;
+    const e = t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;   // easeInOutCubic
+    const p = a.trasa.getPointAt(e);
+    camera.position.copy(p);
+    a.trasa.getPointAt(Math.min(1, e + .04), przed);
+    if(przed.distanceToSquared(p) > .25){
+      pomMarszu.position.copy(p); przed.y = p.y;
+      pomMarszu.lookAt(przed);
+      qMarszu.copy(pomMarszu.quaternion);
+    }
+    const wejscie = THREE.MathUtils.smoothstep(e, 0, .22), wyjscie = THREE.MathUtils.smoothstep(e, .72, 1);
+    camera.quaternion.slerpQuaternions(a.odQ, qMarszu, wejscie).slerp(a.doQ, wyjscie);
+  }
+
   /* Kierunek liczymy WPROST z kwaternionu, nie przez getWorldDirection.
      Ten drugi czyta matrixWorld, którą odświeża dopiero render — a my pytamy
      o kierunek zaraz po ustawieniu obrotu, więc dostawaliśmy stan sprzed
@@ -285,6 +334,11 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     if(!animacja) return;
     animacja.uplynelo += dt*1000;
     const t = Math.min(1, animacja.uplynelo / animacja.czas);
+    if(animacja.trasa){
+      animujTrase(t);
+      if(t >= 1){ const po = animacja.po; animacja = null; po && po(); }
+      return;
+    }
     if(animacja.tylkoPozycja){
       /* [oaksun] dt(): easeOutCubic i WYŁĄCZNIE pozycja. Kierunek patrzenia
          zostaje nietknięty — tak działa podejście w demo, i dlatego nie ma tu
@@ -390,7 +444,8 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     if(!wolne) return false;
     stopy.set(wolne.x, 0, wolne.z);
     const doceloweOko = new THREE.Vector3(wolne.x, celOczu, wolne.z);
-    lec(doceloweOko, patrzNa, czas || PODEJSCIE_MS, () => {
+    const trasa = trasaDo(doceloweOko);
+    (trasa && trasa.length > 2 ? (cel, patrz, _czas, po) => lecPoTrasie(trasa, patrz, po) : lec)(doceloweOko, patrzNa, czas || PODEJSCIE_MS, () => {
       /* NIE przechodzimy w tryb spaceru. Wcześniej tu było `tryb = SPACER`,
          przez co następne kliknięcie trafiało w gałąź „spacer bez blokady"
          i zamiast kolejnego podejścia włączało blokadę wskaźnika z krzyżykiem.
@@ -628,7 +683,10 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     const cel = celPodejscia.clone();
     if(tryb === TRYBY.PTAK) return zejdzZPtakaDo(cel);
     zatrzymajRuch();
-    animacja = {odP: camera.position.clone(), doP: cel,
+    // Cel za przeszkodą (róg, ościeże, mebel po drodze) — przejście po trasie zamiast przez przeszkodę.
+    const trasa = widac({x: camera.position.x, z: camera.position.z}, {x: cel.x, z: cel.z}, kolizjaStop) ? null : trasaDo(cel);
+    if(trasa && trasa.length > 2) lecPoTrasie(trasa, null, () => { synchronizuj(); });
+    else animacja = {odP: camera.position.clone(), doP: cel,
       uplynelo: 0, czas: PODEJSCIE_MS, tylkoPozycja: true,
       po: () => { synchronizuj(); }};
     znacznik.visible = false;
@@ -899,6 +957,23 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
     camera.updateMatrixWorld(); odswiezPanel(); zapiszStan();
     return true;
   }
+  /* Płynne przejście do punktu widoku (edytor: zmiana sceny w trybie spaceru). Z widoku z góry albo bez
+     trasy — cięcie jak ustawWidok. */
+  function przejdzDo(pozycja, cel){
+    if(tryb === TRYBY.PTAK || animacja) return ustawWidok(pozycja, cel);
+    const wolne = najblizszeWolne(pozycja.x, pozycja.z);
+    if(!wolne) return ustawWidok(pozycja, cel);
+    const doceloweOko = new THREE.Vector3(wolne.x, celOczu, wolne.z);
+    const trasa = trasaDo(doceloweOko);
+    if(!trasa) return ustawWidok(pozycja, cel);
+    zatrzymajRuch(); znacznik.visible = false; ustawKrycieWidoku?.(1);
+    lecPoTrasie(trasa, cel, () => {
+      synchronizuj();
+      if(cel) controls.target.copy(cel);
+      odswiezPanel(); zapiszStan();
+    });
+    return true;
+  }
   function kadrujMebel(korzen){
     naprawKamere();
     const wynik = znajdzKadrMebla(korzen);
@@ -1026,7 +1101,7 @@ export function utworzNawigacje({THREE, camera, controls, renderer, plan, biblio
 
   return {aktualizuj, ustawTryb, przeliczMeble, doPokoju, teleportujDoPokoju, punktyMapy,
           zmienWysokoscOczu, przelaczKolizje, naprawKamere,
-          ustawWidok, kadrujMebel, znajdzKadrMebla, synchronizuj, rysujZnacznik,
+          ustawWidok, przejdzDo, kadrujMebel, znajdzKadrMebla, synchronizuj, rysujZnacznik,
           podejdz, teleportujZPtaka, zapiszStan, sprawdzKolizje, TRYBY, pokoje: APARTMENT.rooms, wznowiono,
           diagnostyka:()=>({tryb,kolizje,wznowiono,joystick:{...joystick},zdarzenia:{...zdarzenia},
             pozycja:camera.position.toArray().map(v=>+v.toFixed(2))}),

@@ -157,7 +157,7 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
 ## 9. Następne kroki (kolejność po makiecie)
 1. Akceptacja wyglądu przez użytkownika → poprawki makiety.
 2. ✅ Build + CI + aktualizacje: `.github/workflows/edytor.yml` (na każdej gałęzi/PR: `test:silnik`, `test:edytor`, build; na main zapisuje build do `edytor-app/`, bo Pages działa w trybie legacy z gałęzi main — jak `renderery.yml`; adres po scaleniu: `/mieszkanie-meble/edytor-app/`). **Dependabot zamiast Renovate** — działa bez instalowania aplikacji w ustawieniach konta; grupy zależności, `three` wykluczony (musi zgadzać się z importmap r185). `openai` ładowany leniwie (osobny fragment 270 kB).
-3. Płynne przejścia po siatce nawigacyjnej (zamiast `lec()` po prostej).
+3. ✅ Płynne przejścia po trasie: `renderery/webgpu/trasa.js` (A* na siatce 15 cm funkcji kolizji gracza — plan, ściany, pudełka mebli, promień 20 cm; uproszczenie po linii widoczności; testy `tests/trasa.test.mjs`). `nawigacja.js`: `lecPoTrasie` (CatmullRom centripetal, 160 cm/s, wzrok: kierunek marszu → cel), używane w `podejdz`/`doPokoju`, w Point & Go gdy cel za przeszkodą, nowe `przejdzDo(pozycja, cel)` — edytor zmienia scenę przejściem (start aplikacji: cięcie). Sprawdzone krokowaniem `aktualizuj(1/60)` na scenie: 3 trasy, prosta przecinała ściany, trasa 0 przecięć, koniec w celu.
 4. Scalenie logiki z kopii Codex (historia/cofnij, zaznaczanie, klawiatura, kadrowanie).
 5. Schemat mebli v2 (definitions/instances) + konwerter + BatchedMesh + nowy FORMAT-MEBLA dla ChatGPT.
 6. Podłączenie powłoki do silnika przez rejestr operacji; Inspektor (parametry, materiały, palety).
