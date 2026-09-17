@@ -1,5 +1,7 @@
 # Format biblioteki mebli — wersja 1
 
+> Meble parametryczne (półki, kolumny i powtarzalne komponenty z ustawień) opisuje [FORMAT-MEBLA-V2.md](FORMAT-MEBLA-V2.md). Ten dokument pozostaje obowiązujący dla wersji `schemaVersion: 1`.
+
 Repozytorium: `stefankot/mieszkanie-meble`, gałąź `main`. Pliki są publiczne.
 
 ## Model i ustawienie
