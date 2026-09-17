@@ -1,7 +1,7 @@
 # PLAN-EDYTORA — plan działania i stan przekazania
 
 Plik dla modelu, który przejmuje pracę. Aktualizowany przyrostowo w trakcie prac.
-**Ostatnia aktualizacja:** 2026-09-17 — makieta 3: odstępy i kontrolki według pomiarów zrzutów D5 (tokeny w `edytor/src/styles/app.css`).
+**Ostatnia aktualizacja:** 2026-09-17 — makieta 4: Inspector mebla parametrycznego w stylu Figma UI3, uchwyty półek na scenie, font Avenir.
 
 ## 1. Cel
 Edytor aranżacji wnętrz 3D (przeglądarka, WebGPU) na bazie istniejącego renderera
@@ -122,6 +122,13 @@ Pomiary na zrzutach D5 3.x (obraz 2000 px ≈ okno 1920 px) → tokeny CSS w `st
 Zweryfikowane w DOM przy 1440×900: grupa etykieta+pole co 47–48 px (D5 50), wiersze z ikoną co 34 (D5 34–35), nagłówek sekcji → pierwszy wiersz 30 (D5 32), Scene List 44 (D5 44), drzewo 25 (D5 25), kolumny 198/180, pasek 32, pole 21.
 Zmiany wzorca: Altitude/Azimuth w bloku opcji „Custom” (slot w `Radio.vue`); lista slajdów w trybie spaceru bez podpisów (numer + miniatura, jak D5 3.1); przełącznik transformacji jako jedna lista rozwijana (D5), okno Assets ~632×876.
 Otwarte: dokładne kolory i czcionka Windows (Segoe UI) vs Inter na macOS; ikony D5 są własne (tu lucide) — do decyzji, jeśli użytkownik wskaże różnice.
+
+### Makieta 4 — meble parametryczne jak komponenty Figmy (17.09)
+Wymagania użytkownika: font **Avenir**; kontrolki „drzwiczki” większe; mebel w Inspectorze jak obiekt/grupa/komponent w Figmie (wzór: zrzut panelu Figma UI3 — Position, Auto layout); półki zmieniane suwakiem i ręcznie na ekranie **bez zmiany wielkości mebla**; rozkłady: random, Fibonacci, równe, custom „60+40+20+40”; drzwi = **jeden komponent powtarzany N razy**.
+- Zrobione: `meble/rozklad.ts` (+6 testów vitest), `meble/uklad.ts`, prymitywy `ui/figma/*`, `ui/inspector/*`, `ui/viewport/UchwytyPolek.vue`, operacje `furniture.setShelfLayout` i `furniture.setComponent` w rejestrze, ikony komponent/instancja w drzewie, prawa kolumna 240 px (panel Figmy ~235 px), font Avenir Next/Avenir.
+- Zweryfikowane w przeglądarce: przeciągnięcie uchwytu na regale w salonie → rozkład Custom (pełne cm) + etykiety wymiarów na scenie i w Inspectorze; stany drzwi regału w kuchni sterowane z listy kopii (silnik `interakcje.ustaw`).
+- Naprawiony błąd globalny: rozmiar czcionki był ustawiony na `html`, przez co wszystkie klasy Tailwind w rem (h-6, gap-2…) były ~34% mniejsze; teraz rozmiar tekstu jest na `body`.
+- Ograniczenie makiety: geometria modelu jeszcze się nie przebudowuje (linie pokazują docelowy układ). Przebudowa wymaga schematu v2 (`definitions`/`instances`) i generatora — krok 5 planu wdrożenia.
 
 ## 8a. Zadania zgłoszone na „po UI”
 - **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.

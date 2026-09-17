@@ -19,7 +19,7 @@
   --color-accent: #2f6bff;
   --color-accent-soft: #2f6bff33;
   --color-dot: #f4f4f2;
-  --font-sans: 'Inter', 'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-sans: 'Avenir Next', 'Avenir', 'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --text-2xs: 10px;
   --text-xs: 10.5px;
   --radius-d5: 2px;
@@ -28,7 +28,7 @@
 :root {
   --pasek: 32px;
   --kolumna-lewa: 198px;
-  --kolumna-prawa: 180px;
+  --kolumna-prawa: 240px;
   --zakladki: 32px;
   --naglowek-sekcji: 32px;
   --pad-x: 12px;
@@ -43,17 +43,22 @@
   --wiersz-sceny: 44px;
 }
 
+/* Rozmiar tekstu ustawiany na body, NIE na html: Tailwind liczy odstępy w rem względem html (16 px),
+   więc zmiana html zmniejszałaby wszystkie h-6, gap-2 itd. */
 html,
 body,
 #app {
   height: 100%;
   margin: 0;
+  overflow: hidden;
+}
+
+body {
   background: var(--color-app);
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 10.5px;
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
 }
 
 * {

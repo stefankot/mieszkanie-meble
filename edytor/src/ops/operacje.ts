@@ -33,6 +33,21 @@ zdefiniuj({
   wejscie: z.object({ mebel: z.string(), parametr: z.string(), wartosc: z.number() })
 })
 zdefiniuj({
+  nazwa: 'furniture.setShelfLayout', tytul: 'Zmień układ półek (stała wielkość mebla)', grupa: 'Meble',
+  wejscie: z.object({
+    mebel: z.string(),
+    przeplyw: z.enum(['wiersze', 'kolumny', 'siatka']).optional(),
+    polki: z.number().int().min(0).max(12).optional(),
+    kolumny: z.number().int().min(1).max(8).optional(),
+    rozklad: z.enum(['rowne', 'fibonacci', 'losowe', 'wlasne']).optional(),
+    wlasne: z.string().regex(/^\s*\d+(?:[.,]\d+)?(?:\s*\+\s*\d+(?:[.,]\d+)?)*\s*$/).optional()
+  })
+})
+zdefiniuj({
+  nazwa: 'furniture.setComponent', tytul: 'Zmień komponent powtarzany (liczba kopii, uchwyt, kierunek)', grupa: 'Meble',
+  wejscie: z.object({ mebel: z.string(), komponent: z.string(), ile: z.number().int().min(1).max(24).optional(), uchwyt: z.enum(['groove', 'knob', 'push']).optional(), otwieranie: z.enum(['left', 'right']).optional() })
+})
+zdefiniuj({
   nazwa: 'palette.apply', tytul: 'Zastosuj paletę kolorów', grupa: 'Materiały',
   wejscie: z.object({ paleta: z.enum(idPalet), cel: z.string(), tryb: z.enum(['role', 'kolejnosc', 'recznie']) })
 })

@@ -13,6 +13,7 @@ import Kropki from '@/ui/hotspots/Kropki.vue'
 import TrybSpaceru from '@/ui/walk/TrybSpaceru.vue'
 
 import MenuSceny from './MenuSceny.vue'
+import UchwytyPolek from './UchwytyPolek.vue'
 import PasekSkrotow from './PasekSkrotow.vue'
 
 /* Jedna ramka renderera dla obu trybów (bez przeładowania przy przełączaniu).
@@ -82,6 +83,7 @@ const aktywneNarzedzie = computed(() => narzedzia.find((n) => n.id === narzedzie
   <section class="relative min-h-0 min-w-0 overflow-hidden bg-[#e3e5e6]">
     <iframe :src="zrodlo" title="Apartment renderer" class="absolute inset-0 size-full border-0" @load="poZaladowaniu" />
     <Kropki />
+    <UchwytyPolek />
 
     <TrybSpaceru v-if="tryb === 'walk'" />
     <template v-else>

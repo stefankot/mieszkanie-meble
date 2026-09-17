@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, Boxes, ChevronDown, DoorOpen, LayoutGrid, Lamp, Search } from '@lucide/vue'
+import { ChevronDown, Component, Diamond, DoorOpen, LayoutGrid, Lamp, Search } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
 import { ref } from 'vue'
 
@@ -10,7 +10,9 @@ import { $zaznaczenie } from '@/stan'
    zaznaczenie pełnym niebieskim wierszem. Moduły „× N” to kopie jednej definicji (schemat v2). */
 const zaznaczone = useStore($zaznaczenie)
 const zakladka = ref<'object' | 'imported'>('object')
-const ikona = (w: Wezel) => ({ mebel: Box, modul: Boxes, mechanizm: DoorOpen, swiatlo: Lamp })[w.typ]
+// Jak w Figmie: mebel parametryczny = komponent (fioletowy), moduł powtarzany = instancja.
+const ikona = (w: Wezel) => ({ mebel: Component, modul: Diamond, mechanizm: DoorOpen, swiatlo: Lamp })[w.typ]
+const kolorIkony = (w: Wezel, id: string) => (zaznaczone.value === id ? '' : w.typ === 'mebel' || w.typ === 'modul' ? 'text-[#a78bfa]' : '')
 const wiersz = (id: string) => (zaznaczone.value === id ? 'bg-accent text-white' : 'text-text hover:bg-[#24262b]')
 </script>
 
@@ -30,13 +32,13 @@ const wiersz = (id: string) => (zaznaczone.value === id ? 'bg-accent text-white'
       <template v-for="w in obiekty" :key="w.id">
         <li>
           <button type="button" class="flex h-(--wiersz-listy) w-full items-center gap-2 rounded-[3px] px-2 text-left text-xs" :class="wiersz(w.id)" @click="$zaznaczenie.set(w.id)">
-            <component :is="ikona(w)" :size="12" :stroke-width="1.75" class="shrink-0" />
+            <component :is="ikona(w)" :size="12" :stroke-width="1.75" class="shrink-0" :class="kolorIkony(w, w.id)" />
             <span class="truncate">{{ w.nazwa }}</span>
           </button>
         </li>
         <li v-for="d in w.dzieci" :key="d.id">
           <button type="button" class="flex h-(--wiersz-listy) w-full items-center gap-2 rounded-[3px] pl-[30px] pr-2 text-left text-xs" :class="wiersz(d.id)" @click="$zaznaczenie.set(d.id)">
-            <component :is="ikona(d)" :size="12" :stroke-width="1.75" class="shrink-0 opacity-80" />
+            <component :is="ikona(d)" :size="12" :stroke-width="1.75" class="shrink-0" :class="kolorIkony(d, d.id)" />
             <span class="truncate">{{ d.nazwa }}</span>
           </button>
         </li>
