@@ -15,12 +15,22 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `silnik/punktWidoku.ts` — punkt widoku sceny; gdy cel silnika jest za ścianą, kierunek z najdłuższym wolnym widokiem.
 - `silnik/miniatury.ts` — `$miniatury`: render poza ekranem z punktu widoku (float RT + ACES/sRGB w JS), 5 s po dużej zmianie.
 - `silnik/zmiany.ts` — `$duzaZmiana`: mebel przesunięty > 30 cm / obrócony > 5° / dodany / usunięty, `zglosDuzaZmiane()` dla palet; `poDuzejZmianie(ms, fn)`.
-- `silnik/swiatla.ts` — listwy LED mebli (grupy po wnęce, przypisane do bryły mebla) i lampy sufitowe pokoi; włącz/wyłącz na silniku.
+- `silnik/swiatla.ts` — listwy LED mebli (grupy po wnęce) i lampy sufitowe pokoi; włącz/wyłącz, lumeny, skupienie, kierunek, barwa K; `znajdzSwiatlo` po id.
+- `silnik/tonowanie.ts` — render do celu float między klatkami silnika + ACES/sRGB na CPU → data URL.
+- `silnik/budowaMaterialu.ts` — materiał edytora w TSL (Solid/Texture/Pattern, korekty, bump, height field, szum, niedoskonałości); uniformy bez rekompilacji.
+- `silnik/materialyMebla.ts` — grupy elementów o wspólnym materiale w meblu, `ustawGrupe`, Selection colors (`koloryZaznaczenia`, `zmienKolor`).
+- `silnik/kulki.ts` — kulki materiałów (kula 30 cm, studio + mapa otoczenia sceny), kolejka i pamięć.
 - `silnik/hotspoty.ts` — źródła białych kropek (ruchome części, meble `biblioteka:*`, lampy), rzut co klatkę, zasłonięcie Raycasterem → `$kropki`.
+
+## AI
+- `ai/klucz.ts` — `$kluczOpenAI`: przeglądarka albo `.env.local` przez serwer dev (`/__lokalne/openai`).
+- `ai/klient.ts` — klient OpenAI w przeglądarce, `najnowszyModelObrazow()` (najnowszy gpt-image-*).
+- `ai/tekstury.ts` — `generujTeksture(opis)`: bezszwowy kafel.
 
 ## Meble parametryczne
 - `meble/rozklad.ts` — rozkład półek przy stałej wielkości: równe / Fibonacci / losowe (ziarno) / własne „60+40+20+40”; zapis własny ze środków półek (pełne cm).
 - `meble/rozklad.test.ts` — testy vitest (`npm run test:edytor`).
+- `meble/material.ts` — schemat zod `UstawieniaMaterialu`, presety (Burgund mat…), `kopiaUstawien`.
 - `meble/uklad.ts` — stan parametryczny mebli (`$uklady`): przepływ, półki, kolumny, rozkład, płyty, marginesy, komponenty powtarzane N razy.
 - `silnik/wymiary.ts` — wymiary i położenie mebla ze sceny (mm).
 
@@ -57,6 +67,8 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/inspector/SekcjaPozycji.vue` — Position: wyrównanie do ściany, X/Y, przyciąganie, obrót i odbicia.
 - `ui/inspector/SekcjaUkladuPolek.vue` — Shelf Layout: Flow, Shelves/Columns (suwaki), Distribution, Custom, Resizing Fixed, Board, Padding.
 - `ui/inspector/PodgladRozkladu.vue` — podgląd frontu z przeciągalnymi liniami półek.
+- `ui/inspector/SekcjaKolorow.vue` — Selection colors: kolory grup, color picker, paleta projektu.
+- `ui/inspector/SekcjaMaterialow.vue` — Selection materials: kulki grup; otwiera okno materiału.
 - `ui/inspector/SekcjaKomponentu.vue` — komponent powtarzany N razy: Repeat, Handle/Opening/Glass, rozwijana lista kopii (stany drzwi z silnika).
 
 ## UI — pływający pasek (Figma UI3) i tryb spaceru
@@ -67,9 +79,18 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/walk/PanelWidokow.vue` — lista widoków z numerami i miniaturami.
 - `ui/walk/UstawieniaSpaceru.vue` — Furniture i Light przez most do starego panelu.
 
+## UI — kolor i materiał (pływające okna)
+- `ui/kolor/WyborKoloru.vue` — color picker Figma: Custom (Reka ColorArea/ColorSlider, pipeta, HEX) | Libraries (palety).
+- `ui/material/OknoMaterialu.vue` — okno przeciągane: kulka, nazwa, Custom | Libraries; zmiany raz na klatkę.
+- `ui/material/BibliotekaMaterialow.vue` — presety jako kulki, szukaj.
+- `ui/material/UstawieniaWlasne.vue` — Base, Surface, Relief, Imperfections, Mapping.
+- `ui/material/PoleTekstury.vue` — skan ze sceny / obraz (upload) / generowanie AI.
+- `ui/material/PoleKoloru.vue`, `SuwakMaterialu.vue`, `KulkaMaterialu.vue` — wiersz koloru, wiersz suwaka, kulka.
+
 ## UI — kropki
 - `ui/hotspots/Kropki.vue` — białe kółka nad elementami; klik otwiera panel.
-- `ui/hotspots/PanelKontekstowy.vue` — panel „All Variable Sets” obok kropki; stan drzwi działa; „More…” → Inspector.
+- `ui/hotspots/PanelKontekstowy.vue` — panel „All Variable Sets” obok kropki; drzwi i światła działają (lm, skupienie, kierunek, K); „More…” → Inspector.
+- `ui/hotspots/TarczaKierunku.vue` — tarcza kierunku strumienia (pochylenie + azymut, klawiatura).
 - `ui/hotspots/Kafelek.vue` — kafelek opcji (miniatura + podpis).
 
 ## UI — tryb edycji (Figma UI3, logika D5)
@@ -88,9 +109,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/right/ZakladkaPrototyp.vue` — Interactions wg mebli: ruchy + LED mebla (przełączniki), Apartment lighting; Animation (makieta).
 - `ui/right/ZakladkaOtoczenie.vue` — Sky Light, Sun, Light Character, Light Sources, Weather.
 - `ui/right/TarczaSlonca.vue` — tarcza słońca z godziną.
-- `ui/right/ZakladkaInspektor.vue` — mebel (także przy zaznaczeniu jego modułu) → `InspektorMebla`; pod spodem Material i Palette.
-- `ui/right/SekcjaMaterialu.vue` — Material: szablon, mapy, Color Space, UV, Triplanar, Advanced.
-- `ui/right/SekcjaPalety.vue` — Color Palette: import JSON/SVG, Apply By (Roles/Order/Manual).
+- `ui/right/ZakladkaInspektor.vue` — mebel (także przy zaznaczeniu jego modułu) → `InspektorMebla`.
 - `ui/render/PanelZdjecia.vue` — Image: Frame + AI Render.
 - `ui/assets/OknoBiblioteki.vue` — pływające okno Assets.
 - `ui/command/PaletaPolecen.vue` — ⌘K: Reka Listbox + fuse.js nad rejestrem operacji.

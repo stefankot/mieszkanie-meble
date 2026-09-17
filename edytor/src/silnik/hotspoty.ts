@@ -4,18 +4,20 @@ import { obiekty } from '@/data/mieszkanie'
 import { $kropkiWidoczne } from '@/stan'
 
 import { $silnik, type Silnik } from './most'
+import { swiatlaMebli, swiatlaPokoi, type SwiatloMebla, type SwiatloPokoju } from './swiatla'
 
 /* Białe kropki (D5 3.1 „3D triggers”) przy ruchomych częściach, meblach i światłach.
    Punkt kotwicy liczony raz w układzie lokalnym obiektu, rzutowany co klatkę; zasłonięcie
    sprawdzane promieniem kilka razy na sekundę. Jednostki sceny: cm. */
 export type TypKropki = 'ruch' | 'mebel' | 'swiatlo'
 export interface Kropka { id: string; typ: TypKropki; etykieta: string; mebel?: string; x: number; y: number; otwarta?: boolean }
-interface Zrodlo { id: string; typ: TypKropki; etykieta: string; mebel?: string; obiekt: any; lokalnie: any; zasieg: number; ruch?: any; zaslonieta: boolean }
+interface Zrodlo { id: string; typ: TypKropki; etykieta: string; mebel?: string; obiekt: any; lokalnie: any; zasieg: number; ruch?: any; swiatlo?: SwiatloPokoju | SwiatloMebla; zaslonieta: boolean }
 
 export const $kropki = atom<Kropka[]>([])
 export const $zrodlaKropek = new Map<string, Zrodlo>()
 
 const ZASIEG = { ruch: 320, mebel: 900, swiatlo: 700 }
+let ledyKropek: unknown = null
 
 function zbuduj(s: Silnik) {
   const T = s.THREE
@@ -26,6 +28,7 @@ function zbuduj(s: Silnik) {
     return g.boundingBox.getCenter(new T.Vector3())
   }
   $zrodlaKropek.clear()
+  ledyKropek = s.ledy
   const meble = new Map<string, string>()
   for (const { mebel, nazwaMebla, ruch } of s.interakcje.ruchy()) {
     meble.set(mebel, nazwaMebla)
@@ -39,8 +42,14 @@ function zbuduj(s: Silnik) {
     const etykieta = meble.get(id) ?? obiekty.find((o) => o.id === id)?.nazwa ?? id
     $zrodlaKropek.set(`mebel:${id}`, { id: `mebel:${id}`, typ: 'mebel', etykieta, mebel: id, obiekt: korzen, lokalnie: korzen.worldToLocal(srodek), zasieg: ZASIEG.mebel, zaslonieta: false })
   })
-  for (const [i, z] of [...s.lampy.zarowki, ...s.lampy.lampySufitowe].entries()) {
-    $zrodlaKropek.set(`swiatlo:${i}`, { id: `swiatlo:${i}`, typ: 'swiatlo', etykieta: z.name, obiekt: z, lokalnie: new T.Vector3(), zasieg: ZASIEG.swiatlo, zaslonieta: false })
+  // Światła: lampy sufitowe pokoi (kotwica — widoczna kula) i listwy LED mebli (kotwica — pierwszy pasek).
+  for (const l of swiatlaPokoi(s)) {
+    if (l.kula) $zrodlaKropek.set(l.id, { id: l.id, typ: 'swiatlo', etykieta: `Ceiling light · ${l.etykieta}`, obiekt: l.kula, lokalnie: new T.Vector3(), zasieg: ZASIEG.swiatlo, swiatlo: l, zaslonieta: false })
+  }
+  for (const [mebel, ledy] of swiatlaMebli(s)) {
+    for (const l of ledy) {
+      if (l.paski[0]) $zrodlaKropek.set(l.id, { id: l.id, typ: 'swiatlo', etykieta: l.etykieta, mebel, obiekt: l.paski[0], lokalnie: new T.Vector3(0, 0, 2), zasieg: ZASIEG.ruch, swiatlo: l, zaslonieta: false })
+    }
   }
 }
 
@@ -55,6 +64,8 @@ export function uruchomKropki(ramka: HTMLIFrameElement) {
     const w = ramka.clientWidth
     const h = ramka.clientHeight
     const sprawdzZaslone = czas - ostatniaZaslona > 280
+    // Silnik odtwarza listwy LED po wczytaniu lub zmianie mebli — kotwice kropek trzeba wtedy zbudować od nowa.
+    if (sprawdzZaslone && s.ledy !== ledyKropek) zbuduj(s)
     if (sprawdzZaslone) ostatniaZaslona = czas
     const wynik: Kropka[] = []
     const p = new T.Vector3()
