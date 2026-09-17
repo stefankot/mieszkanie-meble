@@ -1,7 +1,7 @@
 # PLAN-EDYTORA — plan działania i stan przekazania
 
 Plik dla modelu, który przejmuje pracę. Aktualizowany przyrostowo w trakcie prac.
-**Ostatnia aktualizacja:** 2026-09-17 — makieta 4: Inspector mebla parametrycznego w stylu Figma UI3, uchwyty półek na scenie, font Avenir.
+**Ostatnia aktualizacja:** 2026-09-17 — makieta 5 (układ Figma UI3) w toku: szyna + lewy panel AI + zakładki Inspector/Environment działają; pływający pasek i przeniesienie Effect NIEZROBIONE.
 
 ## 1. Cel
 Edytor aranżacji wnętrz 3D (przeglądarka, WebGPU) na bazie istniejącego renderera
@@ -129,6 +129,12 @@ Wymagania użytkownika: font **Avenir**; kontrolki „drzwiczki” większe; meb
 - Zweryfikowane w przeglądarce: przeciągnięcie uchwytu na regale w salonie → rozkład Custom (pełne cm) + etykiety wymiarów na scenie i w Inspectorze; stany drzwi regału w kuchni sterowane z listy kopii (silnik `interakcje.ustaw`).
 - Naprawiony błąd globalny: rozmiar czcionki był ustawiony na `html`, przez co wszystkie klasy Tailwind w rem (h-6, gap-2…) były ~34% mniejsze; teraz rozmiar tekstu jest na `body`.
 - Ograniczenie makiety: geometria modelu jeszcze się nie przebudowuje (linie pokazują docelowy układ). Przebudowa wymaga schematu v2 (`definitions`/`instances`) i generatora — krok 5 planu wdrożenia.
+
+### Makieta 5 — ogólny układ jak Figma UI3 (17.09, W TOKU)
+Wymagania: układ ekranu jak zrzut Figma UI3; **pływający pasek narzędzi na dole** zamiast górnego paska; **AI w lewym panelu od razu z sugestiami**; prawy panel: zakładki **Inspector (pierwsza) → Environment**; **Effect nie w prawym panelu** — do menu Settings, trybu aparatu albo osobnej ikony „jakość obrazu/renderu”.
+- Zrobione (strona się ładuje, build OK): `ui/rail/Szyna.vue` (File, Agent, Scene, Palettes, Assets, pomoc/skróty `Skroty.vue`), `ui/left/LewyPanel.vue` (+ nowy `PanelAgenta.vue` z sugestiami, `PanelPalet.vue`, `PanelProjektu.vue`), `App.vue` kolumny 56/264/scena/240, `PrawaKolumna.vue` (Image + Walk ▶ u góry, zakładki Inspector/Environment). Usunięte: `GornyPasek.vue`, `LewaKolumna.vue`; stan `$zakladkaLewa` → `$panelLewy`.
+- Do zrobienia: pływający pasek na dole sceny (narzędzia, tryb kamery, Image, AI render, ikona Render quality z zawartością `ZakladkaEfekty.vue` — plik na razie nieużywany), przeniesienie nakładek D5 ze `Scena.vue` do paska, pasek w trybie spaceru (Edit, Views, kropki, pager, Settings), aktualizacja MAPA.md.
+- Następny etap zgłoszony przez użytkownika: interfejs renderowania 3D/AI (wzór: panel „Model / Image settings”: Model, Size & orientation, Quality, Number of images; model obrazowy „zawsze najnowszy”) + wdrożenie opcji ograniczających zniekształcenia (kanały: obraz, albedo, głębia, normalne, maski; nakładka z kryciem). **Klucza API nie zapisywać w repo** — tylko w przeglądarce (IndexedDB), zgodnie z decyzją.
 
 ## 8a. Zadania zgłoszone na „po UI”
 - **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.

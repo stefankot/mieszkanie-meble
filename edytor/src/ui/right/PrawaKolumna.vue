@@ -1,36 +1,47 @@
 <script setup lang="ts">
-import { Sparkles } from '@lucide/vue'
+import { Camera, Play } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
 import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 
-import { $trybPrawejKolumny, $zakladkaPrawa, $zaznaczenie } from '@/stan'
+import { $tryb, $trybPrawejKolumny, $zakladkaPrawa, $zaznaczenie } from '@/stan'
+import PrzyciskF from '@/ui/figma/PrzyciskF.vue'
 import PanelZdjecia from '@/ui/render/PanelZdjecia.vue'
 
-import ZakladkaEfekty from './ZakladkaEfekty.vue'
 import ZakladkaInspektor from './ZakladkaInspektor.vue'
 import ZakladkaOtoczenie from './ZakladkaOtoczenie.vue'
 
-/* D5: zakładki Environment / Effect; Inspector pojawia się tylko przy zaznaczeniu. Ikona AI po prawej.
-   Tryb Image podmienia kolumnę na ustawienia obrazu. */
+/* Figma UI3: u góry akcje (Walk ▶ — tryb spaceru, Image — tryb zdjęcia), pod nimi zakładki Inspector → Environment.
+   Effect przeniesiony poza prawy panel (docelowo osobna ikona jakości renderu na pływającym pasku). */
 const tryb = useStore($trybPrawejKolumny)
 const zakladka = useStore($zakladkaPrawa)
 const zaznaczenie = useStore($zaznaczenie)
-const zakladki = computed(() => (zaznaczenie.value ? ['environment', 'effect', 'inspector'] : ['environment', 'effect']) as (typeof zakladka.value)[])
-watch(zaznaczenie, (z) => $zakladkaPrawa.set(z ? 'inspector' : 'environment'))
+const zakladki = ['inspector', 'environment'] as const
+watch(zaznaczenie, (z) => z && $zakladkaPrawa.set('inspector'))
 </script>
 
 <template>
-  <aside class="flex min-h-0 flex-col bg-panel">
+  <aside class="flex min-h-0 flex-col border-l border-[#2a2c31] bg-panel">
+    <div class="flex h-12 shrink-0 items-center gap-1 border-b border-[#2a2c31] px-3">
+      <PrzyciskF :ikona="Camera" opis="Image" :aktywny="tryb === 'zdjecie'" @click="$trybPrawejKolumny.set(tryb === 'zdjecie' ? 'edycja' : 'zdjecie')" />
+      <button type="button" class="ml-auto flex h-7 items-center gap-1.5 rounded-[6px] bg-[#0d99ff] px-3 text-[12px] font-medium text-white hover:bg-[#2aa5ff]" @click="$tryb.set('walk')">
+        <Play :size="12" fill="currentColor" /> Walk
+      </button>
+    </div>
     <PanelZdjecia v-if="tryb === 'zdjecie'" />
     <TabsRoot v-else :model-value="zakladka" class="flex min-h-0 flex-1 flex-col" @update:model-value="$zakladkaPrawa.set($event as typeof zakladka)">
-      <TabsList class="flex h-(--zakladki) shrink-0 items-center gap-2.5 pl-2.5 pr-2.5">
-        <TabsTrigger v-for="z in zakladki" :key="z" :value="z" class="text-[10.5px] capitalize text-muted data-[state=active]:font-semibold data-[state=active]:text-white">{{ z }}</TabsTrigger>
-        <Sparkles :size="12" class="ml-auto shrink-0 text-label" />
+      <TabsList class="flex h-10 shrink-0 items-center gap-1 px-3">
+        <TabsTrigger
+          v-for="z in zakladki"
+          :key="z"
+          :value="z"
+          class="h-6 rounded-[5px] px-2 text-[12px] capitalize text-[#a4a7ae] outline-none data-[state=active]:bg-[#2c2e34] data-[state=active]:font-semibold data-[state=active]:text-white"
+        >
+          {{ z }}
+        </TabsTrigger>
       </TabsList>
-      <TabsContent value="environment" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaOtoczenie /></TabsContent>
-      <TabsContent value="effect" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaEfekty /></TabsContent>
       <TabsContent value="inspector" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaInspektor /></TabsContent>
+      <TabsContent value="environment" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaOtoczenie /></TabsContent>
     </TabsRoot>
   </aside>
 </template>

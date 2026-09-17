@@ -8,13 +8,13 @@ import { skrotyPowloki } from './skroty'
 import { $bibliotekaOtwarta, $tryb } from './stan'
 import OknoBiblioteki from './ui/assets/OknoBiblioteki.vue'
 import PaletaPolecen from './ui/command/PaletaPolecen.vue'
-import LewaKolumna from './ui/left/LewaKolumna.vue'
+import LewyPanel from './ui/left/LewyPanel.vue'
+import Szyna from './ui/rail/Szyna.vue'
 import PrawaKolumna from './ui/right/PrawaKolumna.vue'
-import GornyPasek from './ui/top-bar/GornyPasek.vue'
 import Scena from './ui/viewport/Scena.vue'
 
 /* Start w trybie spaceru (scena na cały ekran, nakładki D5 3.1 Presentation).
-   Tryb edycji: układ D5 3.x — pasek 32 px, kolumny 198/180 px (tokeny w styles/app.css), scena pomiędzy.
+   Tryb edycji: układ Figma UI3 — szyna ikon 56 px, lewy panel 264 px (AI domyślnie), scena, prawy panel 240 px.
    Ta sama ramka renderera w obu trybach (siatka zmienia tylko szablon). */
 const tryb = useStore($tryb)
 const biblioteka = useStore($bibliotekaOtwarta)
@@ -24,15 +24,13 @@ onBeforeUnmount(odepnij)
 
 <template>
   <TooltipProvider>
-    <!-- v-show usuwa panel z siatki, więc w trybie spaceru szablon ma jeden wiersz i jedną kolumnę. -->
-    <div class="grid h-full" :class="tryb === 'edit' ? 'grid-rows-[var(--pasek)_minmax(0,1fr)]' : 'grid-rows-[minmax(0,1fr)]'">
-      <GornyPasek v-show="tryb === 'edit'" />
-      <main class="grid min-h-0" :class="tryb === 'edit' ? 'grid-cols-[var(--kolumna-lewa)_minmax(0,1fr)_var(--kolumna-prawa)]' : 'grid-cols-[minmax(0,1fr)]'">
-        <LewaKolumna v-show="tryb === 'edit'" />
-        <Scena />
-        <PrawaKolumna v-show="tryb === 'edit'" />
-      </main>
-    </div>
+    <!-- v-show usuwa panel z siatki, więc w trybie spaceru szablon ma jedną kolumnę. -->
+    <main class="grid h-full min-h-0" :class="tryb === 'edit' ? 'grid-cols-[56px_264px_minmax(0,1fr)_var(--kolumna-prawa)]' : 'grid-cols-[minmax(0,1fr)]'">
+      <Szyna v-show="tryb === 'edit'" />
+      <LewyPanel v-show="tryb === 'edit'" />
+      <Scena />
+      <PrawaKolumna v-show="tryb === 'edit'" />
+    </main>
     <OknoBiblioteki v-if="biblioteka && tryb === 'edit'" />
     <PaletaPolecen />
   </TooltipProvider>
