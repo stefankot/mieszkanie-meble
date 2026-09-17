@@ -21,7 +21,7 @@ Użytkownik pracuje sam, na laptopie z gładzikiem. Język UI: polski.
 | Miejsce | Stan |
 |---|---|
 | GitHub `stefankot/mieszkanie-meble` `main` | 83ddb0a (16.09) — źródło prawdy dla renderera |
-| Ten worktree: `Desktop/mieszkanie walkthrough/mieszkanie-edytor`, gałąź `edytor-vue` | od origin/main; upstream celowo odpięty (zwykłe `git push` nie trafi na main) |
+| Ten worktree: `Desktop/mieszkanie walkthrough/mieszkanie-edytor`, gałąź `edytor-vue` | od origin/main; śledzi `origin/edytor-vue` (push trafia tylko na tę gałąź) |
 | `Desktop/mieszkanie walkthrough/repo-do-wyslania` (lokalny `main`) | 163 commity za GitHubem; **nie synchronizować bez zgody** |
 | Kopia Codex `Documents/Codex/2026-09-16/prompt-wdro-eniowy-ui-i-edytor/work/repo` | origin/main + 10 commitów (powłoka Calcite) + 19 niezacommitowanych plików (E1: `ui/parametric-document.js`, `document-persistence.js`, `framing-controller.js`, `selection-controller.js`, `keyboard-router.js`). Nic nie wypchnięte. Decyzja: **brać logikę, nie UI Calcite**. |
 
