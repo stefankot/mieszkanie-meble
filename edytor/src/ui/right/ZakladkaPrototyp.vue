@@ -6,7 +6,8 @@ import { computed, ref } from 'vue'
 
 import { obiekty } from '@/data/mieszkanie'
 import { $silnik } from '@/silnik/most'
-import { swiatlaMebli, swiatlaPokoi, ustawSwiatloMebla, ustawSwiatloPokoju } from '@/silnik/swiatla'
+import { zmienProjekt } from '@/projekt/projekt'
+import { parametrySwiatla, swiatlaMebli, swiatlaPokoi } from '@/silnik/swiatla'
 import { $tryb, $zaznaczenie } from '@/stan'
 import GrupaF from '@/ui/figma/GrupaF.vue'
 import GrupaIkonF from '@/ui/figma/GrupaIkonF.vue'
@@ -56,11 +57,11 @@ function wszystkie(ruchy: { ruch: unknown }[], otwarte: boolean) {
   setTimeout(() => odswiez.value++, 60)
 }
 function swiatloMebla(sw: Grupa['swiatla'][number], wlaczone: boolean) {
-  ustawSwiatloMebla(silnik.value, sw, wlaczone)
+  zmienProjekt(`${wlaczone ? 'Turn on' : 'Turn off'} ${sw.etykieta}`, (d) => (d.swiatla[sw.id] = { ...parametrySwiatla(sw), wlaczone }))
   przelicz()
 }
 function lampa(l: ReturnType<typeof swiatlaPokoi>[number], wlaczone: boolean) {
-  ustawSwiatloPokoju(silnik.value, l, wlaczone)
+  zmienProjekt(`${wlaczone ? 'Turn on' : 'Turn off'} ${l.etykieta}`, (d) => (d.swiatla[l.id] = { ...parametrySwiatla(l), wlaczone }))
   przelicz()
 }
 </script>

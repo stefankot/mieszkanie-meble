@@ -4,10 +4,10 @@ import { kopiaUstawien, nowyMaterial, type UstawieniaMaterialu } from '@/meble/m
 
 import { aktualizujUniformy, kluczStruktury, zbudujMaterial } from './budowaMaterialu'
 import type { Silnik } from './most'
-import { zglosDuzaZmiane } from './zmiany'
 
 /* Grupy materiałów w zaznaczonym meblu (jak Figma „Selection colors”): siatki o wspólnym materiale edytuje się razem.
-   Klucz grupy = uuid materiału z silnika, zachowany po podmianie na materiał edytora. Edycja dotyczy tylko
+   Klucz grupy jest stabilny między uruchomieniami (uuid materiału losuje się przy każdym wczytaniu):
+   nazwa materiału + nazwa pierwszej siatki grupy; zachowany po podmianie na materiał edytora. Edycja dotyczy tylko
    tego mebla — nawet jeśli silnik współdzieli materiał z innymi meblami, podmieniamy go wyłącznie na tych siatkach. */
 export interface GrupaMaterialu {
   klucz: string
@@ -46,12 +46,12 @@ export function grupyMaterialow(s: Silnik | null, mebel: string): GrupaMaterialu
   korzen.traverse((o: any) => {
     if (!o.isMesh || Array.isArray(o.material) || POMIJANE.test(`${o.name} ${o.material?.name}`)) return
     const m = o.material
-    const klucz = m.userData?.grupaEdytora ?? m.uuid
-    let g = grupy.get(klucz)
+    let g = grupy.get(m.uuid)
     if (!g) {
       const zrodlo = m.userData?.zrodloEdytora ?? m
+      const klucz = m.userData?.grupaEdytora ?? `${zrodlo.name || 'Material'}@${o.name || o.uuid}`
       g = { klucz, nazwa: m.name || 'Material', siatki: [], material: m, zrodlo, ustawienia: m.userData?.ustawieniaEdytora ?? zSilnika(s, zrodlo), powierzchnia: 0 }
-      grupy.set(klucz, g)
+      grupy.set(m.uuid, g)
     }
     g.siatki.push(o)
     o.geometry.boundingBox ?? o.geometry.computeBoundingBox()
@@ -61,7 +61,7 @@ export function grupyMaterialow(s: Silnik | null, mebel: string): GrupaMaterialu
   return [...grupy.values()].sort((a, b) => b.powierzchnia - a.powierzchnia)
 }
 
-export function ustawGrupe(s: Silnik | null, mebel: string, klucz: string, u: UstawieniaMaterialu, { duza = false } = {}) {
+export function ustawGrupe(s: Silnik | null, mebel: string, klucz: string, u: UstawieniaMaterialu) {
   const g = grupyMaterialow(s, mebel).find((x) => x.klucz === klucz)
   if (!s || !g) return
   const kopia = kopiaUstawien(u)
@@ -76,7 +76,16 @@ export function ustawGrupe(s: Silnik | null, mebel: string, klucz: string, u: Us
   }
   s.oznaczZmiane?.()
   $wersjaMaterialow.set($wersjaMaterialow.get() + 1)
-  if (duza) zglosDuzaZmiane()
+}
+
+/* Przywraca grupie materiał z silnika (cofnięcie do stanu sprzed edycji). */
+export function przywrocGrupe(s: Silnik | null, mebel: string, klucz: string) {
+  const g = grupyMaterialow(s, mebel).find((x) => x.klucz === klucz)
+  if (!s || !g || !g.material.userData?.grupaEdytora) return
+  for (const siatka of g.siatki) siatka.material = g.zrodlo
+  g.material.dispose()
+  s.oznaczZmiane?.()
+  $wersjaMaterialow.set($wersjaMaterialow.get() + 1)
 }
 
 /* Selection colors: kolory wszystkich grup (także drugi kolor wzoru), scalone po wartości. */
@@ -99,14 +108,17 @@ export function koloryZaznaczenia(grupy: GrupaMaterialu[]): KolorZaznaczenia[] {
   return [...wynik.values()]
 }
 
-export function zmienKolor(s: Silnik | null, mebel: string, kolor: KolorZaznaczenia, hex: string, opcje = { duza: false }) {
+/* Nowe ustawienia grup po zmianie koloru (do dokumentu projektu): klucz grupy → ustawienia. */
+export function ustawieniaPoZmianieKoloru(s: Silnik | null, mebel: string, kolor: KolorZaznaczenia, hex: string) {
   const grupy = grupyMaterialow(s, mebel)
+  const wynik: Record<string, UstawieniaMaterialu> = {}
   for (const { klucz, pole } of kolor.uzycia) {
     const g = grupy.find((x) => x.klucz === klucz)
     if (!g) continue
-    const u = kopiaUstawien(g.ustawienia)
+    const u = wynik[klucz] ?? kopiaUstawien(g.ustawienia)
     if (pole === 'kolor') u.kolor = hex
     else u.wzor.kolor2 = hex
-    ustawGrupe(s, mebel, klucz, u, opcje)
+    wynik[klucz] = u
   }
+  return wynik
 }

@@ -8,6 +8,8 @@ export const $panelLewy = atom<'agent' | 'scene' | 'palettes' | 'file' | 'enviro
 export const $bibliotekaOtwarta = atom(false)
 export const $paletaPolecenOtwarta = atom(false)
 export const $zaznaczenie = atom<string | null>('regal-salon')
+/* Część mebla wskazana kliknięciem w scenie (`<mebel>:<część>`), gdy klik trafił w konkretną formatkę. */
+export const $czescZaznaczona = atom<string | null>(null)
 export const $aktywnyWidok = atom('SALON')
 export const $narzedzie = atom<'zaznacz' | 'przesun' | 'obroc'>('zaznacz')
 export const $przyciaganie = atom(true)

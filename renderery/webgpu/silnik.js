@@ -53,7 +53,7 @@ import { zmiekczTkaniny } from './miekkie-bryly.js';
 import { wczytajTeksturyUzytkownika } from './tekstury-uzytkownika.js';
 import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
-import { utworzHoverOutline } from './hover-outline.js?silhouette-v1';
+import { utworzHoverOutline } from './hover-outline.js?silhouette-v2';
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 import {modelSwiatlaDziennego} from './model-swiatla-dziennego.mjs';
 

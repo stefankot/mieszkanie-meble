@@ -7,8 +7,13 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `main.ts` — montuje aplikację Vue, ładuje style.
 - `App.vue` — start w trybie spaceru (scena na cały ekran); tryb edycji = układ Figma UI3: szyna 56, lewy panel 264, scena, prawa kolumna 240. Jedna ramka renderera dla obu trybów.
 - `stan.ts` — atomy nanostores: tryb walk/edit, zakładki, zaznaczenie, widok, kropki, panele.
-- `skroty.ts` — skróty powłoki (tinykeys), rejestrowane też w ramce renderera.
+- `skroty.ts` — skróty powłoki (tinykeys) także w ramce: ⌘K, ⌘Z/⇧⌘Z, V/G/R, F, Esc; litery nie działają w polach.
 - `styles/app.css` — Tailwind 4, tokeny D5 (kolory, metryki odstępów), font Avenir; rozmiar tekstu na body (rem liczone od html).
+
+## Projekt (dokument, historia, zapis)
+- `projekt/dokument.ts` — schemat dokumentu projektu (nadpisania: układy, materiały grup, światła, widoczność), `zmienioneKlucze`.
+- `projekt/historia.ts` — Cofnij/Ponów ze scalaniem przeciągnięć; czyste, testy `historia.test.ts`.
+- `projekt/projekt.ts` — `zmienProjekt`, rzutowanie na silnik, autozapis IndexedDB, Open/Export JSON, wersje.
 
 ## Silnik (most do renderera w ramce)
 - `silnik/most.ts` — `$silnik` (markRaw — obiekty three.js poza proxy Vue), teleport do widoku, sterowanie ukrytym starym panelem (`ustawKontrolke`, `kliknij`, `opcjeKontrolki`).
@@ -21,6 +26,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `silnik/materialyMebla.ts` — grupy elementów o wspólnym materiale w meblu, `ustawGrupe`, Selection colors (`koloryZaznaczenia`, `zmienKolor`).
 - `silnik/rzutZGory.ts` — granice planu z wielokątów pokoi, render ortograficzny pod sufitem.
 - `silnik/kulki.ts` — kulki materiałów (kula 30 cm, studio + mapa otoczenia sceny), kolejka i pamięć.
+- `silnik/zaznaczanie.ts` — klik w scenie → mebel i część (`biblioteka:<id>`, `<id>:<część>`), przeciągnięcie ≠ klik.
 - `silnik/hotspoty.ts` — źródła białych kropek (ruchome części, meble `biblioteka:*`, lampy), rzut co klatkę, zasłonięcie Raycasterem → `$kropki`.
 
 ## AI
@@ -101,7 +107,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ui/rail/Skroty.vue` — lista skrótów klawiszowych.
 - `ui/left/LewyPanel.vue` — przełącza panel wg szyny (Environment = `ZakladkaOtoczenie`).
 - `ui/left/PanelPalet.vue` — palety kolorów (role, import).
-- `ui/left/PanelProjektu.vue` — Save, Open, Export JSON, historia wersji (makieta).
+- `ui/left/PanelProjektu.vue` — Undo/Redo, stan szkicu, Open/Export JSON, Version history (zapis i przywracanie).
 - `ui/left/ListaWidokow.vue` — Scene List (miniatura, nazwa, ikona monitora).
 - `ui/left/ListaWarstw.vue` — Layer („✓ ⊜ nazwa”).
 - `ui/left/ListaObiektow.vue` — Object/Imported: szukaj + drzewo.

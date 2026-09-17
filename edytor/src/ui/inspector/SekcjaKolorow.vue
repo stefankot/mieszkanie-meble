@@ -5,7 +5,8 @@ import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka
 import { computed, ref } from 'vue'
 
 import { palety } from '@/data/mieszkanie'
-import { $wersjaMaterialow, grupyMaterialow, koloryZaznaczenia, zmienKolor, type KolorZaznaczenia } from '@/silnik/materialyMebla'
+import { zmienProjekt } from '@/projekt/projekt'
+import { $wersjaMaterialow, grupyMaterialow, koloryZaznaczenia, ustawieniaPoZmianieKoloru, type KolorZaznaczenia } from '@/silnik/materialyMebla'
 import { $silnik } from '@/silnik/most'
 import SekcjaF from '@/ui/figma/SekcjaF.vue'
 import WyborKoloru from '@/ui/kolor/WyborKoloru.vue'
@@ -21,17 +22,22 @@ const widoczne = computed(() => (wszystkie.value ? kolory.value : kolory.value.s
 
 // Podgląd na żywo podczas przeciągania; duża zmiana (miniatury, mapa) dopiero po zatwierdzeniu.
 const edytowany = ref<KolorZaznaczenia | null>(null)
+// Zmiana koloru = nowe ustawienia każdej grupy, która go używa, w jednym kroku historii.
+function zmienKolor(k: KolorZaznaczenia, hex: string, scal?: string) {
+  const nowe = ustawieniaPoZmianieKoloru(silnik.value, props.mebel, k, hex)
+  zmienProjekt('Selection color', (d) => Object.entries(nowe).forEach(([klucz, u]) => (d.materialy[`${props.mebel}/${klucz}`] = u)), { scal })
+}
 function podglad(k: KolorZaznaczenia, hex: string) {
-  zmienKolor(silnik.value, props.mebel, edytowany.value ?? k, hex)
+  zmienKolor(edytowany.value ?? k, hex, `kolor:${props.mebel}:${k.hex}`)
   edytowany.value = koloryZaznaczenia(grupyMaterialow(silnik.value, props.mebel)).find((x) => x.hex === hex.toLowerCase()) ?? null
 }
 function zatwierdz(hex: string) {
-  if (edytowany.value) zmienKolor(silnik.value, props.mebel, edytowany.value, hex, { duza: true })
+  if (edytowany.value) zmienKolor(edytowany.value, hex, `kolor:${props.mebel}:${edytowany.value.hex}`)
 }
 function zastosujPalete(id: string) {
   const paleta = palety.find((p) => p.id === id)
   if (!paleta) return
-  kolory.value.forEach((k, i) => zmienKolor(silnik.value, props.mebel, k, paleta.kolory[i % paleta.kolory.length].hex, { duza: true }))
+  kolory.value.forEach((k, i) => zmienKolor(k, paleta.kolory[i % paleta.kolory.length].hex, `paleta:${id}`))
 }
 </script>
 

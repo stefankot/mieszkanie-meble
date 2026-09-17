@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { useStore } from '@nanostores/vue'
 import { tinykeys } from 'tinykeys'
+import { watch } from 'vue'
 
 import { uruchomKropki } from '@/silnik/hotspoty'
-import { podlaczRamke } from '@/silnik/most'
+import { $silnik, podlaczRamke } from '@/silnik/most'
+import { uruchomZaznaczanie } from '@/silnik/zaznaczanie'
 import { skrotyPowloki } from '@/skroty'
-import { $tryb } from '@/stan'
+import { $czescZaznaczona, $tryb, $zaznaczenie } from '@/stan'
 import Kropki from '@/ui/hotspots/Kropki.vue'
 import PasekNarzedzi from '@/ui/toolbar/PasekNarzedzi.vue'
 import TrybSpaceru from '@/ui/walk/TrybSpaceru.vue'
@@ -16,6 +18,8 @@ import UchwytyPolek from './UchwytyPolek.vue'
 /* Jedna ramka renderera dla obu trybów (bez przeładowania przy przełączaniu).
    Stary panel renderera jest ukryty; mapa i pasek to komponenty powłoki. */
 const tryb = useStore($tryb)
+const silnik = useStore($silnik)
+const zaznaczenie = useStore($zaznaczenie)
 const zrodlo = `${import.meta.env.DEV ? '/' : '../'}renderery/webgpu/mieszkanie-webgpu-v1.html`
 
 // Stary panel, joystick i stara mini-mapa renderera są zastąpione przez powłokę (pasek, MiniMapa).
@@ -34,6 +38,24 @@ function poZaladowaniu(e: Event) {
   uruchomKropki(ramka)
 }
 
+// Klik w scenie w trybie edycji zaznacza mebel (i część); obrys zaznaczenia rysuje OutlineNode silnika.
+let zatrzymajZaznaczanie: (() => void) | undefined
+watch(silnik, (s) => {
+  zatrzymajZaznaczanie?.()
+  if (s) zatrzymajZaznaczanie = uruchomZaznaczanie(s, {
+    aktywne: () => $tryb.get() === 'edit',
+    wybierz: (z) => {
+      $zaznaczenie.set(z?.mebel ?? null)
+      $czescZaznaczona.set(z?.czesc ? `${z.mebel}:${z.czesc}` : null)
+    }
+  })
+}, { immediate: true })
+watch([silnik, zaznaczenie, tryb], ([s, id, t]) => {
+  const obrys = (s as any)?.hoverOutline
+  if (!obrys?.ustawTrwaly) return
+  obrys.ustawTrwaly(t === 'edit' && id ? s!.scene.getObjectByName(`biblioteka:${id}`) : null)
+  s!.oznaczZmiane?.()
+}, { immediate: true })
 </script>
 
 <template>

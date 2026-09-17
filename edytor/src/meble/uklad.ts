@@ -1,5 +1,7 @@
 import { map } from 'nanostores'
 
+import { zmienProjekt } from '@/projekt/projekt'
+
 import type { Rozklad } from './rozklad'
 
 /* Stan parametryczny mebla (makieta; docelowo schemat v2 `definitions` + `instances` i operacje rejestru).
@@ -47,6 +49,8 @@ export function uklad(id: string): UkladMebla {
   return nowy
 }
 
+/* Zmiana układu idzie przez dokument projektu (Cofnij/Ponów, zapis); przeciąganie suwaka = jeden krok. */
 export function zmienUklad(id: string, zmiana: Partial<UkladMebla>) {
-  $uklady.setKey(id, { ...uklad(id), ...zmiana })
+  const nowy = { ...uklad(id), ...zmiana }
+  zmienProjekt('Shelf layout', (d) => (d.uklady[id] = structuredClone(nowy)), { scal: `uklad:${id}` })
 }

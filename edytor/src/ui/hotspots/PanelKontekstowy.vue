@@ -6,7 +6,8 @@ import { computed, ref } from 'vue'
 import { palety } from '@/data/mieszkanie'
 import { $kropki, $zrodlaKropek } from '@/silnik/hotspoty'
 import { $silnik } from '@/silnik/most'
-import { parametrySwiatla, ustawParametrySwiatla, znajdzSwiatlo, type ParametrySwiatla } from '@/silnik/swiatla'
+import { zmienProjekt } from '@/projekt/projekt'
+import { parametrySwiatla, znajdzSwiatlo, type ParametrySwiatla } from '@/silnik/swiatla'
 import SuwakMaterialu from '@/ui/material/SuwakMaterialu.vue'
 import { $tryb, $zakladkaPrawa, $zaznaczenie } from '@/stan'
 
@@ -31,7 +32,8 @@ function zmienSwiatlo(zmiana: Partial<ParametrySwiatla>) {
   const z = zrodlo.value?.swiatlo && znajdzSwiatlo($silnik.get(), zrodlo.value.swiatlo.id)
   if (!z || !swiatlo.value) return
   Object.assign(swiatlo.value, zmiana)
-  ustawParametrySwiatla($silnik.get(), z, { ...swiatlo.value })
+  const p = { ...swiatlo.value }
+  zmienProjekt(`Light · ${kropka.value?.etykieta ?? z.id}`, (d) => (d.swiatla[z.id] = p), { scal: `swiatlo:${z.id}` })
 }
 
 const pozycja = computed(() => {

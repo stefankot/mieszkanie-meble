@@ -6,7 +6,8 @@ import { TabsContent, TabsList, TabsRoot, TabsTrigger } from 'reka-ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 
 import { kopiaUstawien, type UstawieniaMaterialu } from '@/meble/material'
-import { grupyMaterialow, ustawGrupe } from '@/silnik/materialyMebla'
+import { zmienProjekt } from '@/projekt/projekt'
+import { grupyMaterialow } from '@/silnik/materialyMebla'
 import { $silnik } from '@/silnik/most'
 import { $oknoMaterialu } from '@/stan'
 
@@ -31,13 +32,15 @@ watch(u, (v) => {
   if (!v || !okno.value) return
   cancelAnimationFrame(klatka)
   const { mebel, klucz } = okno.value
-  klatka = requestAnimationFrame(() => ustawGrupe(silnik.value, mebel, klucz, v))
+  const kopia = kopiaUstawien(v)
+  klatka = requestAnimationFrame(() => zmienProjekt(`Material · ${kopia.nazwa}`, (d) => (d.materialy[`${mebel}/${klucz}`] = kopia), { scal: `material:${mebel}/${klucz}` }))
 }, { deep: true })
 
 function wybierzPreset(p: UstawieniaMaterialu) {
   if (!okno.value) return
   u.value = kopiaUstawien(p)
-  ustawGrupe(silnik.value, okno.value.mebel, okno.value.klucz, p, { duza: true })
+  const { mebel, klucz } = okno.value
+  zmienProjekt(`Preset · ${p.nazwa}`, (d) => (d.materialy[`${mebel}/${klucz}`] = kopiaUstawien(p)))
 }
 
 const ramka = useTemplateRef<HTMLElement>('ramka')
