@@ -2,7 +2,7 @@
 import { NumberFieldInput, NumberFieldRoot } from 'reka-ui'
 import { computed, ref } from 'vue'
 
-/* Pole liczby D5: wartość po lewej, jaśniejsze wypełnienie do wartości (gdy znany zakres).
+/* Pole liczby D5: ciemny tor 21 px, jaśniejsze wypełnienie do wartości (gdy znany zakres), tekst 10 px od lewej.
    Przeciągnięcie w poziomie zmienia wartość (scrub), klik bez ruchu — wpisywanie (Reka NumberField). */
 const props = defineProps<{ min?: number; max?: number; krok?: number; jednostka?: string; os?: string }>()
 const wartosc = defineModel<number>({ required: true })
@@ -42,14 +42,14 @@ function scrub(e: PointerEvent) {
 <template>
   <NumberFieldRoot v-model="wartosc" :min="min" :max="max" :step="krok" :format-options="{ maximumFractionDigits: 3, useGrouping: false }" class="min-w-0 flex-1">
     <div
-      class="relative flex h-[22px] items-center overflow-hidden rounded-d5 bg-field text-xs focus-within:ring-1 focus-within:ring-accent"
+      class="relative flex h-(--wys-pola) items-center overflow-hidden rounded-d5 bg-field text-xs focus-within:ring-1 focus-within:ring-accent"
       :class="przeciaganie ? 'cursor-ew-resize' : 'cursor-text'"
       @pointerdown="scrub"
     >
       <div v-if="wypelnienie !== null" class="pointer-events-none absolute inset-y-0 left-0 bg-fill" :style="{ width: wypelnienie + '%' }" />
-      <span v-if="os" class="relative pl-1.5 text-2xs text-muted">{{ os }}</span>
-      <NumberFieldInput class="relative min-w-0 flex-1 bg-transparent px-1.5 tabular-nums text-text outline-none" />
-      <span v-if="jednostka" class="relative pr-1.5 text-2xs text-muted">{{ jednostka }}</span>
+      <span v-if="os" class="relative pl-[5px] text-2xs text-muted">{{ os }}</span>
+      <NumberFieldInput class="relative min-w-0 flex-1 bg-transparent tabular-nums text-text outline-none" :class="os ? 'px-1 text-[10.5px]' : 'px-2.5'" />
+      <span v-if="jednostka" class="relative pr-2 text-2xs text-muted">{{ jednostka }}</span>
     </div>
   </NumberFieldRoot>
 </template>

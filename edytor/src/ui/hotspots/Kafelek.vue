@@ -7,9 +7,9 @@ defineEmits<{ wybierz: [] }>()
 </script>
 
 <template>
-  <button type="button" class="flex w-[46px] flex-col items-center gap-1 outline-none" @click="$emit('wybierz')">
+  <button type="button" class="flex w-12 flex-col items-center gap-[7px] outline-none" @click="$emit('wybierz')">
     <span
-      class="flex size-[46px] items-center justify-center overflow-hidden rounded-d5 bg-[#2a2c31] text-[#c3c6cc]"
+      class="flex size-12 items-center justify-center overflow-hidden rounded-d5 bg-[#2a2c31] text-[#c3c6cc]"
       :class="wybrany ? 'ring-2 ring-[#dfe6ff] ring-offset-1 ring-offset-[#2f6bff]' : 'ring-1 ring-white/5'"
       :style="tlo ? { background: tlo } : undefined"
     >

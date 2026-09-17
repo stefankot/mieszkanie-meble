@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ChevronDown, Globe, Magnet, MousePointer2, Move3d, Pipette, Rotate3d } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui'
 import { tinykeys } from 'tinykeys'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 
 import { uruchomKropki } from '@/silnik/hotspoty'
 import { $silnik, kontrolka, podlaczRamke } from '@/silnik/most'
@@ -74,6 +75,7 @@ const narzedzia = [
   { id: 'przesun', ikona: Move3d, opis: 'Move (G)' },
   { id: 'obroc', ikona: Rotate3d, opis: 'Rotate (R)' }
 ] as const
+const aktywneNarzedzie = computed(() => narzedzia.find((n) => n.id === narzedzie.value) ?? narzedzia[0])
 </script>
 
 <template>
@@ -83,26 +85,24 @@ const narzedzia = [
 
     <TrybSpaceru v-if="tryb === 'walk'" />
     <template v-else>
-      <div class="absolute left-1.5 top-1.5 z-20 flex items-center gap-1">
-        <div class="flex h-[22px] items-center rounded-d5 bg-[#2b2e35]/90 px-[2px]">
-          <button
-            v-for="n in narzedzia"
-            :key="n.id"
-            type="button"
-            :title="n.opis"
-            class="flex size-[18px] items-center justify-center rounded-[2px]"
-            :class="narzedzie === n.id ? 'bg-accent text-white' : 'text-[#c3c6cc] hover:text-white'"
-            @click="$narzedzie.set(n.id)"
-          >
-            <component :is="n.ikona" :size="12" :stroke-width="1.75" />
-          </button>
-          <ChevronDown :size="9" class="mx-0.5 text-muted" />
-        </div>
-        <button type="button" title="Local / global" class="flex size-[22px] items-center justify-center rounded-d5 bg-[#2b2e35]/90 text-[#c3c6cc]"><Globe :size="12" /></button>
-        <button type="button" title="Snap to walls" class="flex size-[22px] items-center justify-center rounded-d5" :class="przyciaganie ? 'bg-accent text-white' : 'bg-[#2b2e35]/90 text-[#c3c6cc]'" @click="$przyciaganie.set(!przyciaganie)"><Magnet :size="12" /></button>
-        <button type="button" title="Material picker" class="flex size-[22px] items-center justify-center rounded-d5 bg-[#2b2e35]/90 text-[#c3c6cc]"><Pipette :size="12" /></button>
+      <div class="absolute left-2 top-2 z-20 flex items-center gap-[5px]">
+        <DropdownMenuRoot>
+          <DropdownMenuTrigger title="Transform tool" class="flex h-5 w-9 items-center justify-center gap-0.5 rounded-[3px] bg-[#3d4046]/90 text-[#e0e2e6] outline-none">
+            <component :is="aktywneNarzedzie.ikona" :size="12" :stroke-width="1.75" /><ChevronDown :size="9" />
+          </DropdownMenuTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuContent align="start" :side-offset="4" class="z-50 w-36 rounded-d5 bg-panel-2 p-1 shadow-2xl ring-1 ring-black/40">
+              <DropdownMenuItem v-for="n in narzedzia" :key="n.id" class="flex h-6 items-center gap-2 rounded-[2px] px-2.5 text-xs text-text outline-none data-[highlighted]:bg-accent" @select="$narzedzie.set(n.id)">
+                <component :is="n.ikona" :size="12" /> {{ n.opis }}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenuPortal>
+        </DropdownMenuRoot>
+        <button type="button" title="Local / Global" class="flex size-5 items-center justify-center rounded-[3px] bg-[#3d4046]/90 text-[#e0e2e6]"><Globe :size="12" /></button>
+        <button type="button" title="Snap to Walls" class="flex size-5 items-center justify-center rounded-[3px]" :class="przyciaganie ? 'bg-accent text-white' : 'bg-[#3d4046]/90 text-[#e0e2e6]'" @click="$przyciaganie.set(!przyciaganie)"><Magnet :size="12" /></button>
+        <button type="button" title="Material Picker" class="flex size-5 items-center justify-center rounded-[3px] bg-[#3d4046]/90 text-[#e0e2e6]"><Pipette :size="12" /></button>
       </div>
-      <div class="absolute right-1.5 top-1.5 z-20 flex items-center gap-1">
+      <div class="absolute right-2 top-2 z-20 flex items-center gap-[7px]">
         <MenuSceny rodzaj="kamera" />
         <MenuSceny rodzaj="wyswietlanie" />
       </div>

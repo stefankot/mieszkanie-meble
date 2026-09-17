@@ -1,26 +1,46 @@
 @import 'tailwindcss';
 
-/* Tokeny wyglądu D5 Render (ciemny, granatowo-grafitowy). Wartości odczytane ze zrzutów D5 3.x;
-   szerokości kolumn ~178 px przy 1920 px. Zmiany wyglądu zaczynać tutaj. */
+/* Tokeny wyglądu i metryki D5 Render 3.x, zmierzone na zrzutach (obraz 2000 px ≈ okno 1920 px, skala 0,96).
+   Zmiany wyglądu zaczynać tutaj; komponenty używają ich przez h-(--…), w-(--…), gap-(--…).
+   Pomiary: etykieta→środek pola 25 px, skok grupy etykieta+pole 50, wiersze z ikoną 34, nagłówek sekcji 43/32,
+   lista 25, Scene List 44, kolumny 206/187, pasek 32, ikony paska co 41. */
 @theme {
   --color-app: #0f1013;
-  --color-panel: #1b1d22;
+  --color-panel: #1c1e23;
   --color-panel-2: #22252b;
-  --color-field: #2b2e35;
-  --color-fill: #41454e;
-  --color-hover: #30333b;
-  --color-line: #272a31;
-  --color-text: #e4e6ea;
-  --color-label: #b3b7bf;
-  --color-muted: #8d9199;
-  --color-faint: #62666e;
+  --color-field: #25272c;
+  --color-fill: #3a3d44;
+  --color-hover: #2d3036;
+  --color-line: #26282d;
+  --color-text: #e8e9ec;
+  --color-label: #c5c8ce;
+  --color-muted: #858991;
+  --color-faint: #5f636b;
   --color-accent: #2f6bff;
   --color-accent-soft: #2f6bff33;
   --color-dot: #f4f4f2;
   --font-sans: 'Inter', 'Segoe UI', ui-sans-serif, system-ui, -apple-system, sans-serif;
   --text-2xs: 10px;
-  --text-xs: 11px;
-  --radius-d5: 3px;
+  --text-xs: 10.5px;
+  --radius-d5: 2px;
+}
+
+:root {
+  --pasek: 32px;
+  --kolumna-lewa: 198px;
+  --kolumna-prawa: 180px;
+  --zakladki: 32px;
+  --naglowek-sekcji: 32px;
+  --pad-x: 12px;
+  --pad-prawy: 14px;
+  --odstep: 6px;
+  --etykieta: 14px;
+  --wys-pola: 21px;
+  --wys-listy: 22px;
+  --wiersz: 18px;
+  --wiersz-ikona: 28px;
+  --wiersz-listy: 25px;
+  --wiersz-sceny: 44px;
 }
 
 html,
@@ -31,7 +51,7 @@ body,
   background: var(--color-app);
   color: var(--color-text);
   font-family: var(--font-sans);
-  font-size: 11px;
+  font-size: 10.5px;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }

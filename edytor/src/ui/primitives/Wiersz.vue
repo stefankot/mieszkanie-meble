@@ -1,12 +1,13 @@
 <script setup lang="ts">
-/* D5: wiersz z etykietą po lewej i kontrolką po prawej (UV: Stretch/Offset/Rotate, przełączniki). */
+/* D5: etykieta po lewej, kontrolka po prawej. Bez ikony (checkbox, UV) wiersz 18 px (skok ~24);
+   z ikoną (Sun, Fog, Wind, Precipitation) wiersz 28 px (skok ~34). */
 defineProps<{ etykieta: string; ikona?: object }>()
 </script>
 
 <template>
-  <div class="flex min-h-[22px] items-center gap-1.5">
-    <component :is="ikona" v-if="ikona" :size="12" :stroke-width="1.75" class="shrink-0 text-muted" />
-    <span class="min-w-0 flex-1 truncate text-xs text-label">{{ etykieta }}</span>
+  <div class="flex items-center gap-[7px]" :class="ikona ? 'h-(--wiersz-ikona)' : 'min-h-(--wiersz)'">
+    <component :is="ikona" v-if="ikona" :size="12" :stroke-width="1.75" class="shrink-0 text-label" />
+    <span class="min-w-0 flex-1 truncate text-xs leading-none text-label">{{ etykieta }}</span>
     <slot />
   </div>
 </template>

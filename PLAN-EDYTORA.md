@@ -1,7 +1,7 @@
 # PLAN-EDYTORA — plan działania i stan przekazania
 
 Plik dla modelu, który przejmuje pracę. Aktualizowany przyrostowo w trakcie prac.
-**Ostatnia aktualizacja:** 2026-09-17 — makieta 2 (styl D5, tryb spaceru, białe kropki) zakończona i wypchnięta na gałąź `edytor-vue`.
+**Ostatnia aktualizacja:** 2026-09-17 — makieta 3: odstępy i kontrolki według pomiarów zrzutów D5 (tokeny w `edytor/src/styles/app.css`).
 
 ## 1. Cel
 Edytor aranżacji wnętrz 3D (przeglądarka, WebGPU) na bazie istniejącego renderera
@@ -116,6 +116,12 @@ Pomiar FPS tylko na widocznym oknie przeglądarki (ukryta karta daje fałszywe c
 - Tryb spaceru: renderer na cały ekran, Views z prawdziwymi miniaturami (Salon, Kuchnia), Settings ▾ czyta i ustawia stary panel (projekt, wersja, pora dnia, ciepło, priorytet), pager, mini-mapa ze stylami, kropka „Regał w salonie” → panel Doors & drawers / Palette → More… przechodzi do Inspectora.
 - Tryb edycji: układ D5 (178 px), Environment zgodny ze zrzutem D5 3.x, Inspector (12 akcji, Basic, Parameters, Version, Mechanisms, Material), Assets, ⌘K; `npx vite build` OK.
 - Znane ograniczenia: (1) po edycji `silnik/*.ts` w trakcie `npm run dev` HMR tworzy drugą instancję modułu — kropki znikają do pełnego przeładowania strony; (2) miniatura widoku powstaje dopiero po jego odwiedzeniu; (3) warianty uchwytów, palety na kropkach, barwa światła, parametry i materiały w Inspectorze to makieta (bez wpływu na scenę); (4) kropki świateł tylko dla `lampy.zarowki`/`lampySufitowe`, ledy pominięte; (5) porównanie pixel-perfect z D5 zrobione wzrokowo, bez nakładania zrzutów.
+
+### Makieta 3 — metryki D5 (17.09, po uwadze „za małe odległości”)
+Pomiary na zrzutach D5 3.x (obraz 2000 px ≈ okno 1920 px) → tokeny CSS w `styles/app.css` (`--pasek`, `--kolumna-lewa` 198, `--kolumna-prawa` 180, `--zakladki` 32, `--naglowek-sekcji` 32, `--pad-x` 12, `--pad-prawy` 14, `--odstep` 6, `--etykieta` 14, `--wys-pola` 21, `--wys-listy` 22, `--wiersz` 18, `--wiersz-ikona` 28, `--wiersz-listy` 25, `--wiersz-sceny` 44), czcionka 10,5 px.
+Zweryfikowane w DOM przy 1440×900: grupa etykieta+pole co 47–48 px (D5 50), wiersze z ikoną co 34 (D5 34–35), nagłówek sekcji → pierwszy wiersz 30 (D5 32), Scene List 44 (D5 44), drzewo 25 (D5 25), kolumny 198/180, pasek 32, pole 21.
+Zmiany wzorca: Altitude/Azimuth w bloku opcji „Custom” (slot w `Radio.vue`); lista slajdów w trybie spaceru bez podpisów (numer + miniatura, jak D5 3.1); przełącznik transformacji jako jedna lista rozwijana (D5), okno Assets ~632×876.
+Otwarte: dokładne kolory i czcionka Windows (Segoe UI) vs Inter na macOS; ikony D5 są własne (tu lucide) — do decyzji, jeśli użytkownik wskaże różnice.
 
 ## 8a. Zadania zgłoszone na „po UI”
 - **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.

@@ -15,8 +15,8 @@ const zakladka = useStore($zakladkaLewa)
 
 <template>
   <TabsRoot :model-value="zakladka" class="flex min-h-0 flex-col bg-panel" @update:model-value="$zakladkaLewa.set($event as 'scene' | 'agent')">
-    <TabsList class="flex h-7 shrink-0 items-center gap-3 px-2.5">
-      <TabsTrigger v-for="z in ['scene', 'agent'] as const" :key="z" :value="z" class="text-xs capitalize text-muted data-[state=active]:text-white">{{ z }}</TabsTrigger>
+    <TabsList class="flex h-(--zakladki) shrink-0 items-center gap-[15px] px-(--pad-x)">
+      <TabsTrigger v-for="z in ['scene', 'agent'] as const" :key="z" :value="z" class="text-xs capitalize text-muted data-[state=active]:font-semibold data-[state=active]:text-white">{{ z }}</TabsTrigger>
     </TabsList>
     <TabsContent value="scene" class="flex min-h-0 flex-1 flex-col">
       <ListaWidokow class="min-h-0 flex-[1.2]" />

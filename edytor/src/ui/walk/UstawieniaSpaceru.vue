@@ -75,7 +75,7 @@ const przycisk = 'flex h-[22px] items-center justify-center gap-1.5 rounded-d5 p
 </script>
 
 <template>
-  <div class="max-h-[calc(100vh-80px)] w-[220px] overflow-y-auto rounded-[4px] bg-[#16181c] pb-1 shadow-2xl ring-1 ring-white/5">
+  <div class="max-h-[calc(100vh-80px)] w-[240px] overflow-y-auto rounded-[4px] bg-[#16181c] pb-1 shadow-2xl ring-1 ring-white/5">
     <Sekcja tytul="Furniture">
       <Pole etykieta="Project"><Wybor :model-value="stan.projekt" :opcje="stan.projekty" @update:model-value="ustaw('#mebelWybor', $event)" /></Pole>
       <Pole etykieta="Version">

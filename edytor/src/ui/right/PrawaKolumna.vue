@@ -24,9 +24,9 @@ watch(zaznaczenie, (z) => $zakladkaPrawa.set(z ? 'inspector' : 'environment'))
   <aside class="flex min-h-0 flex-col bg-panel">
     <PanelZdjecia v-if="tryb === 'zdjecie'" />
     <TabsRoot v-else :model-value="zakladka" class="flex min-h-0 flex-1 flex-col" @update:model-value="$zakladkaPrawa.set($event as typeof zakladka)">
-      <TabsList class="flex h-7 shrink-0 items-center gap-3 px-2.5">
-        <TabsTrigger v-for="z in zakladki" :key="z" :value="z" class="text-xs capitalize text-muted data-[state=active]:font-medium data-[state=active]:text-white">{{ z }}</TabsTrigger>
-        <Sparkles :size="12" class="ml-auto text-muted" />
+      <TabsList class="flex h-(--zakladki) shrink-0 items-center gap-2.5 pl-2.5 pr-2.5">
+        <TabsTrigger v-for="z in zakladki" :key="z" :value="z" class="text-[10.5px] capitalize text-muted data-[state=active]:font-semibold data-[state=active]:text-white">{{ z }}</TabsTrigger>
+        <Sparkles :size="12" class="ml-auto shrink-0 text-label" />
       </TabsList>
       <TabsContent value="environment" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaOtoczenie /></TabsContent>
       <TabsContent value="effect" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaEfekty /></TabsContent>

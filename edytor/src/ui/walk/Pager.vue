@@ -6,7 +6,7 @@ import { computed } from 'vue'
 import { widoki } from '@/data/mieszkanie'
 import { $aktywnyWidok, $kropkiWidoczne } from '@/stan'
 
-/* D5 3.1: dolny pager „◈ ‹ 1/5 ›”. ◈ włącza/wyłącza białe kropki (3D triggers). */
+/* D5 3.1: dolny pager (~117×28 px) „◈ ‹ 1/5 ›”. ◈ włącza/wyłącza białe kropki (3D triggers). */
 const aktywny = useStore($aktywnyWidok)
 const kropki = useStore($kropkiWidoczne)
 const indeks = computed(() => widoki.findIndex((w) => w.id === aktywny.value))
@@ -14,7 +14,7 @@ const idz = (krok: number) => $aktywnyWidok.set(widoki[(indeks.value + krok + wi
 </script>
 
 <template>
-  <div class="absolute bottom-4 left-1/2 z-20 flex h-6 -translate-x-1/2 items-center gap-1 rounded-d5 bg-[#16181c]/95 px-1.5 text-[10.5px] text-text shadow-xl">
+  <div class="absolute bottom-5 left-1/2 z-20 flex h-7 -translate-x-1/2 items-center gap-1.5 rounded-[3px] bg-[#16181c]/95 px-2.5 text-[10.5px] text-text shadow-xl">
     <button type="button" aria-label="Toggle triggers" :class="kropki ? 'text-white' : 'text-faint'" class="flex size-5 items-center justify-center" @click="$kropkiWidoczne.set(!kropki)">
       <Diamond :size="11" :fill="kropki ? 'currentColor' : 'none'" />
     </button>

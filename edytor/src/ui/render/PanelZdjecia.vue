@@ -26,9 +26,9 @@ const chip = (on: boolean) => (on ? 'bg-accent text-white' : 'bg-field text-mute
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <div class="flex h-7 shrink-0 items-center gap-1.5 px-1.5">
+    <div class="flex h-(--zakladki) shrink-0 items-center gap-1.5 pl-1.5 pr-(--pad-prawy)">
       <button type="button" aria-label="Back to edit" class="flex size-5 items-center justify-center rounded-d5 text-muted hover:bg-hover hover:text-white" @click="$trybPrawejKolumny.set('edycja')"><ArrowLeft :size="12" /></button>
-      <span class="text-xs font-medium text-white">Image</span>
+      <span class="text-xs font-semibold text-white">Image</span>
     </div>
     <div class="min-h-0 flex-1 overflow-y-auto">
       <Sekcja tytul="Frame">
@@ -60,6 +60,6 @@ const chip = (on: boolean) => (on ? 'bg-accent text-white' : 'bg-field text-mute
         </div>
       </Sekcja>
     </div>
-    <div class="shrink-0 p-2"><button type="button" class="h-6 w-full rounded-d5 bg-accent text-xs font-medium text-white">Render</button></div>
+    <div class="shrink-0 pb-3 pl-(--pad-x) pr-(--pad-prawy) pt-2"><button type="button" class="h-7 w-full rounded-d5 bg-accent text-xs font-medium text-white">Render</button></div>
   </div>
 </template>

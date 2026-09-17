@@ -53,15 +53,15 @@ const szachownica = 'repeating-conic-gradient(#4a4d55 0 25%, #2b2e35 0 50%) 0 0 
     </Pole>
     <Wiersz etykieta="Invisible in raytracing"><CircleHelp :size="10" class="text-muted" /><Pudelko v-model="niewidoczny" /></Wiersz>
 
-    <div class="pt-1 text-xs text-muted">Map</div>
+    <div class="flex h-(--etykieta) items-center pt-1 text-xs text-label">Map</div>
     <Segmenty v-model="zrodlo" :opcje="[{ wartosc: 'color', etykieta: 'Base Color' }, { wartosc: 'map', etykieta: 'Base Color Map' }]" />
     <div class="flex items-center gap-1">
-      <span class="size-[22px] shrink-0 rounded-[2px] ring-1 ring-white/10" :style="{ background: aktualny()?.kolor }" />
+      <span class="size-5 shrink-0 rounded-[2px] ring-1 ring-white/10" :style="{ background: aktualny()?.kolor }" />
       <span class="flex-1" />
       <PrzyciskIkona :ikona="SlidersHorizontal" opis="Map settings" :rozmiar="12" :kwadrat="22" />
     </div>
     <Pole v-for="m in mapy" :key="m.nazwa" :etykieta="m.nazwa">
-      <span class="size-[22px] shrink-0 rounded-[2px] ring-1 ring-white/10" :style="{ background: m.probka === 'szachownica' ? szachownica : m.probka }" />
+      <span class="size-5 shrink-0 rounded-[2px] ring-1 ring-white/10" :style="{ background: m.probka === 'szachownica' ? szachownica : m.probka }" />
       <PoleLiczby v-model="m.wartosc" :min="0" :max="1" :krok="0.01" />
       <PrzyciskIkona :ikona="SlidersHorizontal" :opis="`${m.nazwa} settings`" :rozmiar="12" :kwadrat="22" :aktywny="m.aktywna" @click="m.aktywna = !m.aktywna" />
     </Pole>
@@ -72,12 +72,12 @@ const szachownica = 'repeating-conic-gradient(#4a4d55 0 25%, #2b2e35 0 50%) 0 0 
     <Wiersz etykieta="Individual UV"><CircleHelp :size="10" class="text-muted" /><Przelacznik v-model="osobneUV" /></Wiersz>
     <Wiersz etykieta="Emissive"><Przelacznik v-model="emisja" /></Wiersz>
 
-    <div class="pt-1 text-xs text-muted">UV</div>
-    <Wiersz etykieta="Stretch"><Link2 :size="10" class="text-muted" /><div class="grid w-[98px] grid-cols-2 gap-1"><PoleLiczby v-model="uv.sx" os="X" :krok="0.05" /><PoleLiczby v-model="uv.sy" os="Y" :krok="0.05" /></div></Wiersz>
-    <Wiersz etykieta="Offset"><div class="grid w-[98px] grid-cols-2 gap-1"><PoleLiczby v-model="uv.ox" os="X" :krok="0.01" /><PoleLiczby v-model="uv.oy" os="Y" :krok="0.01" /></div></Wiersz>
-    <Wiersz etykieta="Rotate"><div class="w-[98px]"><PoleLiczby v-model="uv.obrot" jednostka="°" /></div></Wiersz>
+    <div class="flex h-(--etykieta) items-center pt-1 text-xs text-label">UV</div>
+    <Wiersz etykieta="Stretch"><Link2 :size="10" class="shrink-0 text-muted" /><div class="grid w-[84px] shrink-0 grid-cols-2 gap-[3px]"><PoleLiczby v-model="uv.sx" os="X" :krok="0.05" /><PoleLiczby v-model="uv.sy" os="Y" :krok="0.05" /></div></Wiersz>
+    <Wiersz etykieta="Offset"><div class="grid w-[84px] shrink-0 grid-cols-2 gap-[3px]"><PoleLiczby v-model="uv.ox" os="X" :krok="0.01" /><PoleLiczby v-model="uv.oy" os="Y" :krok="0.01" /></div></Wiersz>
+    <Wiersz etykieta="Rotate"><div class="w-[84px] shrink-0"><PoleLiczby v-model="uv.obrot" jednostka="°" /></div></Wiersz>
     <Wiersz etykieta="Triplanar"><CircleHelp :size="10" class="text-muted" /><Przelacznik v-model="trojplanarne" /></Wiersz>
-    <Wiersz etykieta="Blend Amount"><div class="w-[98px]"><PoleLiczby v-model="mieszanie" :min="0" :max="1" :krok="0.01" /></div></Wiersz>
+    <Wiersz etykieta="Blend Amount"><div class="w-[64px] shrink-0"><PoleLiczby v-model="mieszanie" :min="0" :max="1" :krok="0.01" /></div></Wiersz>
   </Sekcja>
   <Sekcja tytul="Advanced" :otwarta="false"><p class="text-2xs text-faint">Displacement, clear coat, sheen.</p></Sekcja>
 </template>

@@ -16,7 +16,7 @@ import Wybor from '@/ui/primitives/Wybor.vue'
 import SekcjaMaterialu from './SekcjaMaterialu.vue'
 import SekcjaPalety from './SekcjaPalety.vue'
 
-/* D5 Inspector obiektu: nazwa, Layer, dwa rzędy akcji, Basic (Location/Rotation/Size).
+/* D5 Inspector obiektu (pomiar: zakładki→nazwa 32, →Layer 31, →ikony 35, ikony co 28, →Basic 42).
    Parameters wg Spline (brak w D5). Dane przykładowe: Regał w kuchni. */
 const warstwa = ref('furniture')
 const polozenie = ref<[number, number, number]>([1840, 0, -2260])
@@ -29,18 +29,19 @@ const uchwyt = ref('groove')
 const otwieranie = ref('left')
 const wersja = ref('v0002')
 const stany = ref(mechanizmy.map((nazwa, i) => ({ nazwa, otwarty: i === 1 })))
-const akcje1 = [[Copy, 'Duplicate'], [FlipHorizontal2, 'Mirror'], [Crosshair, 'Focus (F)'], [Lock, 'Lock'], [EyeOff, 'Hide'], [SquareDashed, 'Select same']] as const
-const akcje2 = [[RotateCcw, 'Reset to base version'], [Scissors, 'Detach'], [Group, 'Group'], [Ungroup, 'Ungroup'], [Save, 'Save to Local assets'], [Trash2, 'Delete']] as const
+const akcje = [
+  [Copy, 'Duplicate'], [FlipHorizontal2, 'Mirror'], [Crosshair, 'Focus (F)'], [Lock, 'Lock'], [EyeOff, 'Hide'], [SquareDashed, 'Select same'],
+  [RotateCcw, 'Reset to base version'], [Scissors, 'Detach'], [Group, 'Group'], [Ungroup, 'Ungroup'], [Save, 'Save to Local assets'], [Trash2, 'Delete']
+] as const
 </script>
 
 <template>
   <div>
-    <div class="flex flex-col gap-1.5 px-2.5 pb-2 pt-0.5">
-      <span class="truncate text-xs text-muted">Regał w kuchni</span>
-      <Wybor v-model="warstwa" :opcje="[{ wartosc: 'furniture', etykieta: 'Furniture' }, { wartosc: 'apartment', etykieta: 'Apartment' }]" />
-      <div class="grid grid-cols-6 justify-items-center">
-        <PrzyciskIkona v-for="[ikona, opis] in akcje1" :key="opis" :ikona="ikona" :opis="opis" :rozmiar="13" :kwadrat="22" />
-        <PrzyciskIkona v-for="[ikona, opis] in akcje2" :key="opis" :ikona="ikona" :opis="opis" :rozmiar="13" :kwadrat="22" />
+    <div class="flex flex-col pb-1.5 pl-(--pad-x) pr-(--pad-prawy)">
+      <span class="flex h-5 items-center truncate text-xs text-muted">Regał w kuchni</span>
+      <div class="mt-2 flex"><Wybor v-model="warstwa" :opcje="[{ wartosc: 'furniture', etykieta: 'Furniture' }, { wartosc: 'apartment', etykieta: 'Apartment' }]" /></div>
+      <div class="mt-2.5 grid grid-cols-6 justify-items-center">
+        <PrzyciskIkona v-for="[ikona, opis] in akcje" :key="opis" :ikona="ikona" :opis="opis" :rozmiar="14" :kwadrat="28" />
       </div>
     </div>
 
@@ -60,7 +61,7 @@ const akcje2 = [[RotateCcw, 'Reset to base version'], [Scissors, 'Detach'], [Gro
     </Sekcja>
 
     <Sekcja tytul="Version">
-      <Wybor v-model="wersja" :opcje="[{ wartosc: 'v0002', etykieta: 'v0002 · current' }, { wartosc: 'v0001', etykieta: 'v0001' }]" />
+      <div class="flex"><Wybor v-model="wersja" :opcje="[{ wartosc: 'v0002', etykieta: 'v0002 · current' }, { wartosc: 'v0001', etykieta: 'v0001' }]" /></div>
     </Sekcja>
 
     <Sekcja tytul="Mechanisms">
