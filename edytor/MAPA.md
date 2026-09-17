@@ -5,10 +5,10 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 
 ## Wejście i stan
 - `main.ts` — montuje aplikację Vue, ładuje style.
-- `App.vue` — start w trybie spaceru (scena na cały ekran); tryb edycji = siatka D5 (pasek 32 px, kolumny 178 px). Jedna ramka renderera dla obu trybów.
+- `App.vue` — start w trybie spaceru (scena na cały ekran); tryb edycji = siatka D5 (pasek 32 px, kolumny 198 px i 240 px — tokeny w styles/app.css). Jedna ramka renderera dla obu trybów.
 - `stan.ts` — atomy nanostores: tryb walk/edit, zakładki, zaznaczenie, widok, kropki, panele.
 - `skroty.ts` — skróty powłoki (tinykeys), rejestrowane też w ramce renderera.
-- `styles/app.css` — Tailwind 4 i tokeny D5 (kolory, promień 3 px, rozmiary tekstu).
+- `styles/app.css` — Tailwind 4, tokeny D5 (kolory, metryki odstępów), font Avenir; rozmiar tekstu na body (rem liczone od html).
 
 ## Silnik (most do renderera w ramce)
 - `silnik/most.ts` — `$silnik`, teleport do widoku, miniatury widoków z płótna WebGPU, sterowanie ukrytym starym panelem (`ustawKontrolke`, `kliknij`, `opcjeKontrolki`).
