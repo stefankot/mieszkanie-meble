@@ -2,7 +2,7 @@
 import { Blinds, DoorOpen, RefreshCw, Scan } from '@lucide/vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-import { kliknij, kontrolka, opcjeKontrolki, ustawKontrolke, wartoscKontrolki, wcisniety } from '@/silnik/most'
+import { kliknij, opcjeKontrolki, ustawKontrolke, wartoscKontrolki, wcisniety } from '@/silnik/most'
 import PoleLiczby from '@/ui/primitives/PoleLiczby.vue'
 import Pole from '@/ui/primitives/Pole.vue'
 import Sekcja from '@/ui/primitives/Sekcja.vue'
@@ -18,7 +18,7 @@ const stan = ref({
   projekt: '', wersja: '', drzwi: false, zaslony: false, gora: false,
   preset: 'lato-14', cieplo: 45, rozproszenie: 90,
   priorytety: [] as { wartosc: string; etykieta: string }[], priorytet: 'wysoka', ekspozycja: 0.72,
-  perspektywa: 'interactive', przesuniecie: 8, mapa: true
+  perspektywa: 'interactive', przesuniecie: 8
 })
 const pora = ref('lato')
 
@@ -49,7 +49,6 @@ function odczytaj() {
   s.ekspozycja = Number(wartoscKontrolki('#ekspozycja') || s.ekspozycja)
   s.perspektywa = wartoscKontrolki('#trybKamery') || s.perspektywa
   s.przesuniecie = Number(wartoscKontrolki('#lensShiftY') || s.przesuniecie)
-  s.mapa = kontrolka<HTMLElement>('#miniMapa')?.dataset.edytorWidoczna !== 'nie'
 }
 let zegar = 0
 onMounted(() => {
@@ -67,11 +66,6 @@ const nacisnij = (sel: string) => {
   setTimeout(odczytaj, 60)
 }
 const godzina = (h: string) => nacisnij(`[data-preset-swiatla="${pora.value}-${h}"]`)
-function przelaczMape() {
-  const el = kontrolka<HTMLElement>('#miniMapa')
-  if (el) el.dataset.edytorWidoczna = el.dataset.edytorWidoczna === 'nie' ? 'tak' : 'nie'
-  odczytaj()
-}
 const przycisk = 'flex h-[22px] items-center justify-center gap-1.5 rounded-d5 px-2 text-[10.5px]'
 </script>
 
