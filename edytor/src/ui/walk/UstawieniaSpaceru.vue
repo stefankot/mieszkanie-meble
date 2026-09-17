@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Blinds, DoorOpen, Map, RefreshCw, Scan } from '@lucide/vue'
+import { Blinds, DoorOpen, RefreshCw, Scan } from '@lucide/vue'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
 import { kliknij, kontrolka, opcjeKontrolki, ustawKontrolke, wartoscKontrolki, wcisniety } from '@/silnik/most'
@@ -9,7 +9,8 @@ import Sekcja from '@/ui/primitives/Sekcja.vue'
 import Segmenty from '@/ui/primitives/Segmenty.vue'
 import Wybor from '@/ui/primitives/Wybor.vue'
 
-/* Podstawowe funkcje renderera (tryb bez DEV) w wyglądzie D5. Źródło prawdy: ukryty stary panel
+/* Podstawowe funkcje renderera (tryb bez DEV) w wyglądzie D5: Furniture i Light. Image → okno Render quality,
+   widok z góry i mapa → pływający pasek. Źródło prawdy: ukryty stary panel
    renderera (#sterowanie) — odczyt co 500 ms, zapis zdarzeniami input/change/click. */
 const stan = ref({
   projekty: [] as { wartosc: string; etykieta: string }[],
@@ -100,17 +101,5 @@ const przycisk = 'flex h-[22px] items-center justify-center gap-1.5 rounded-d5 p
       <button type="button" :class="[przycisk, stan.zaslony ? 'bg-accent text-white' : 'bg-field text-text hover:bg-hover']" @click="nacisnij('#zaslonyToggle')"><Blinds :size="12" /> Close curtains</button>
     </Sekcja>
 
-    <Sekcja tytul="Image">
-      <Pole etykieta="Render priority"><Wybor :model-value="stan.priorytet" :opcje="stan.priorytety" @update:model-value="ustaw('#jakoscPoziom', $event)" /></Pole>
-      <Pole etykieta="Exposure"><PoleLiczby :model-value="stan.ekspozycja" :min="0.35" :max="2.2" :krok="0.01" @update:model-value="ustaw('#ekspozycja', $event)" /></Pole>
-      <Pole etykieta="Perspective">
-        <Segmenty :model-value="stan.perspektywa" :opcje="[{ wartosc: 'interactive', etykieta: 'Free' }, { wartosc: 'arch_photo', etykieta: 'Straight verticals' }]" @update:model-value="ustaw('#trybKamery', $event)" />
-      </Pole>
-      <Pole v-if="stan.perspektywa === 'arch_photo'" etykieta="Lens shift"><PoleLiczby :model-value="stan.przesuniecie" :min="-20" :max="20" jednostka="%" @update:model-value="ustaw('#lensShiftY', $event)" /></Pole>
-      <div class="grid grid-cols-2 gap-1">
-        <button type="button" :class="[przycisk, stan.gora ? 'bg-accent text-white' : 'bg-field text-text hover:bg-hover']" @click="nacisnij('#widokToggle')">Top view</button>
-        <button type="button" :class="[przycisk, stan.mapa ? 'bg-accent text-white' : 'bg-field text-text hover:bg-hover']" @click="przelaczMape"><Map :size="12" /> Map</button>
-      </div>
-    </Sekcja>
   </div>
 </template>

@@ -9,14 +9,14 @@ import PrzyciskF from '@/ui/figma/PrzyciskF.vue'
 import PanelZdjecia from '@/ui/render/PanelZdjecia.vue'
 
 import ZakladkaInspektor from './ZakladkaInspektor.vue'
-import ZakladkaOtoczenie from './ZakladkaOtoczenie.vue'
+import ZakladkaPrototyp from './ZakladkaPrototyp.vue'
 
-/* Figma UI3: u góry akcje (Walk ▶ — tryb spaceru, Image — tryb zdjęcia), pod nimi zakładki Inspector → Environment.
-   Effect przeniesiony poza prawy panel (docelowo osobna ikona jakości renderu na pływającym pasku). */
+/* Figma UI3: u góry akcje (Image, Walk ▶), pod nimi zakładki Inspector → Prototype (ruchy drzwi i szuflad).
+   Environment jest w lewym panelu (szyna, pod Assets); jakość renderu — ikona na pływającym pasku. */
 const tryb = useStore($trybPrawejKolumny)
 const zakladka = useStore($zakladkaPrawa)
 const zaznaczenie = useStore($zaznaczenie)
-const zakladki = ['inspector', 'environment'] as const
+const zakladki = ['inspector', 'prototype'] as const
 watch(zaznaczenie, (z) => z && $zakladkaPrawa.set('inspector'))
 </script>
 
@@ -41,7 +41,7 @@ watch(zaznaczenie, (z) => z && $zakladkaPrawa.set('inspector'))
         </TabsTrigger>
       </TabsList>
       <TabsContent value="inspector" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaInspektor /></TabsContent>
-      <TabsContent value="environment" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaOtoczenie /></TabsContent>
+      <TabsContent value="prototype" class="min-h-0 flex-1 overflow-y-auto"><ZakladkaPrototyp /></TabsContent>
     </TabsRoot>
   </aside>
 </template>

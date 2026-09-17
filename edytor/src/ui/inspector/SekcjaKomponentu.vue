@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Component, Diamond, DoorClosed, DoorOpen, Grid3x3 } from '@lucide/vue'
+import { ChevronDown, Component, Diamond, DoorClosed, DoorOpen, Grid3x3 } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
-import { SwitchRoot, SwitchThumb } from 'reka-ui'
+import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger, SwitchRoot, SwitchThumb } from 'reka-ui'
 import { computed, ref } from 'vue'
 
 import { zmienUklad, type KomponentPowtarzany, type UkladMebla } from '@/meble/uklad'
@@ -60,10 +60,15 @@ function ustawStan(ruch: unknown, otwarta: boolean) {
       </SwitchRoot>
     </div>
 
-    <div class="mt-2 flex h-5 items-center justify-between text-[11px] text-[#a4a7ae]">
-      <span>Instances</span><span class="tabular-nums">{{ kopie.length }}</span>
-    </div>
-    <ul class="-mx-[13px] flex flex-col">
+    <CollapsibleRoot v-slot="{ open }" class="mt-1">
+      <CollapsibleTrigger class="flex h-8 w-full items-center gap-2 rounded-[5px] bg-[#2c2e34] px-2 text-[12px] text-white outline-none hover:ring-1 hover:ring-[#3d4047]">
+        <Diamond :size="13" class="text-[#a78bfa]" />
+        <span class="flex-1 text-left">Instances</span>
+        <span class="tabular-nums text-[#a4a7ae]">{{ kopie.length }}</span>
+        <ChevronDown :size="13" class="text-[#c9ccd2] transition-transform" :class="open ? 'rotate-180' : ''" />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+    <ul class="-mx-[13px] mt-1 flex flex-col">
       <li v-for="k in kopie" :key="k.id" class="flex h-9 items-center gap-2.5 px-[13px] hover:bg-white/[0.04]">
         <Diamond :size="14" :stroke-width="1.75" class="shrink-0 text-[#a78bfa]" />
         <span class="min-w-0 flex-1 truncate text-[12px] text-white">{{ k.nazwa }}</span>
@@ -75,5 +80,7 @@ function ustawStan(ruch: unknown, otwarta: boolean) {
         />
       </li>
     </ul>
+      </CollapsibleContent>
+    </CollapsibleRoot>
   </SekcjaF>
 </template>

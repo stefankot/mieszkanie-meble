@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Box, CircleHelp, Folder, Layers, LibraryBig, Palette, Sparkle } from '@lucide/vue'
+import { Box, CircleHelp, Folder, Layers, LibraryBig, Palette, Sparkle, SunMedium } from '@lucide/vue'
 import { useStore } from '@nanostores/vue'
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 
@@ -46,6 +46,17 @@ const pozycje = [
         <LibraryBig :size="16" :stroke-width="1.6" />
       </span>
       Assets
+    </button>
+    <button
+      type="button"
+      class="group flex w-full flex-col items-center gap-1 py-1.5 text-[10px]"
+      :class="panel === 'environment' ? 'text-white' : 'text-[#a4a7ae] hover:text-white'"
+      @click="$panelLewy.set('environment')"
+    >
+      <span class="flex size-8 items-center justify-center rounded-[8px]" :class="panel === 'environment' ? 'bg-[#34406a] text-[#8cc8ff]' : 'group-hover:bg-white/5'">
+        <SunMedium :size="16" :stroke-width="1.6" />
+      </span>
+      Environment
     </button>
     <PopoverRoot>
       <PopoverTrigger class="mt-auto flex size-8 items-center justify-center rounded-[8px] text-[#a4a7ae] outline-none hover:bg-white/5 hover:text-white" aria-label="Keyboard shortcuts">
