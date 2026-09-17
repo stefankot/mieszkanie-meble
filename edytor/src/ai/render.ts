@@ -21,6 +21,28 @@ export interface OpcjeRenderu {
 export interface WynikAI { id: string; url: string; opis: string; model: string; orientacja: Orientacja; czas: number }
 
 export const $wynikiAI = atom<WynikAI[]>([])
+
+/* Modele, które odrzuciły `input_fidelity` (np. gpt-image-2.5) — zapamiętane w przeglądarce,
+   żeby kolejne rendery nie traciły zapytania na błąd 400. */
+const BEZ_WIERNOSCI = 'edytor:ai:bez-input-fidelity'
+export const $modeleBezWiernosci = atom<string[]>(wczytajListe())
+function wczytajListe(): string[] {
+  try {
+    return JSON.parse(localStorage.getItem(BEZ_WIERNOSCI) ?? '[]')
+  } catch {
+    return []
+  }
+}
+function zapamietajBezWiernosci(model: string) {
+  const lista = [...new Set([...$modeleBezWiernosci.get(), model])]
+  $modeleBezWiernosci.set(lista)
+  try {
+    localStorage.setItem(BEZ_WIERNOSCI, JSON.stringify(lista))
+  } catch {
+    /* lista zostaje w pamięci */
+  }
+}
+const odrzucilWiernosc = (e: unknown) => (e as { status?: number })?.status === 400 && /input_fidelity/.test(String((e as Error)?.message))
 export const $nakladkaAI = atom<{ id: string; krycie: number; mieszanie: 'normal' | 'luminosity'; porownanie: boolean; podzial: number } | null>(null)
 
 const ZASADY = [
@@ -41,16 +63,28 @@ export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]>
   const maska = o.chronMebel ? maskaOchrony(s, o.chronMebel, o.orientacja) : null
   if (maska) zasady.push('The masked furniture must stay pixel-identical.')
   const [W, H] = ROZMIARY[o.orientacja]
-  const odpowiedz = await openai().images.edit({
-    model,
-    image: obrazy,
-    ...(maska ? { mask: await toFile(await maska, 'maska.png', { type: 'image/png' }) } : {}),
-    prompt: `${zasady.join(' ')}\n${o.opis}`.trim(),
-    size: `${W}x${H}` as '1536x1024',
-    quality: o.jakosc,
-    n: o.ile,
-    ...(o.wiernosc ? { input_fidelity: 'high' as const } : {})
-  })
+  const plikMaski = maska ? await toFile(await maska, 'maska.png', { type: 'image/png' }) : null
+  const wyslij = (wiernosc: boolean) =>
+    openai().images.edit({
+      model,
+      image: obrazy,
+      ...(plikMaski ? { mask: plikMaski } : {}),
+      prompt: `${zasady.join(' ')}\n${o.opis}`.trim(),
+      size: `${W}x${H}` as '1536x1024',
+      quality: o.jakosc,
+      n: o.ile,
+      ...(wiernosc ? { input_fidelity: 'high' as const } : {})
+    })
+  const wiernosc = o.wiernosc && !$modeleBezWiernosci.get().includes(model)
+  let odpowiedz
+  try {
+    odpowiedz = await wyslij(wiernosc)
+  } catch (e) {
+    // Model bez obsługi input_fidelity: powtarzamy bez parametru i zapamiętujemy to dla modelu.
+    if (!wiernosc || !odrzucilWiernosc(e)) throw e
+    zapamietajBezWiernosci(model)
+    odpowiedz = await wyslij(false)
+  }
   const czas = Date.now()
   const nowe = (odpowiedz.data ?? []).flatMap((d, i) => (d.b64_json ? [{ id: `${czas}-${i}`, url: `data:image/png;base64,${d.b64_json}`, opis: o.opis, model, orientacja: o.orientacja, czas }] : []))
   if (!nowe.length) throw new Error('The image model returned no images.')

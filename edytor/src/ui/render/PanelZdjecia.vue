@@ -7,7 +7,7 @@ import { computed, ref, watch } from 'vue'
 import type { Orientacja } from '@/ai/kadr'
 import { modeleObrazow, najnowszyModelObrazow } from '@/ai/klient'
 import { $kluczOpenAI } from '@/ai/klucz'
-import { $nakladkaAI, $wynikiAI, renderujAI } from '@/ai/render'
+import { $modeleBezWiernosci, $nakladkaAI, $wynikiAI, renderujAI } from '@/ai/render'
 import { $silnik } from '@/silnik/most'
 import { $trybPrawejKolumny, $zaznaczenie } from '@/stan'
 import SekcjaF from '@/ui/figma/SekcjaF.vue'
@@ -23,6 +23,7 @@ const klucz = useStore($kluczOpenAI)
 const zaznaczenie = useStore($zaznaczenie)
 const wyniki = useStore($wynikiAI)
 const nakladka = useStore($nakladkaAI)
+const bezWiernosci = useStore($modeleBezWiernosci)
 const model = ref('latest')
 const modele = ref<string[]>([])
 const najnowszy = ref('')
@@ -43,6 +44,9 @@ watch(klucz, (k) => {
 }, { immediate: true })
 
 const opcjeModelu = computed(() => [{ wartosc: 'latest', etykieta: `Latest${najnowszy.value ? ` · ${najnowszy.value}` : ''}` }, ...modele.value.map((m) => ({ wartosc: m, etykieta: m }))])
+// Wybrany model (także „Latest”) nie obsługuje input_fidelity — przełącznik jest wtedy nieaktywny.
+const wybranyModel = computed(() => (model.value === 'latest' ? najnowszy.value : model.value))
+const wiernoscNiedostepna = computed(() => bezWiernosci.value.includes(wybranyModel.value))
 const STYLE = ['Soft daylight', 'Golden hour', 'Evening lamps', 'Overcast']
 
 async function generuj() {
@@ -98,7 +102,8 @@ const kciuk = 'block size-3 translate-x-0.5 rounded-full bg-white transition-tra
       </SekcjaF>
 
       <SekcjaF tytul="Accuracy">
-        <label class="flex h-7 items-center justify-between gap-2 text-[11px] text-[#c9ccd2]" title="Keeps details and faces of the input image (input_fidelity: high)">High input fidelity<SwitchRoot v-model="wiernosc" :class="przelacznik"><SwitchThumb :class="kciuk" /></SwitchRoot></label>
+        <label class="flex h-7 items-center justify-between gap-2 text-[11px] text-[#c9ccd2]" title="Keeps details of the input image (input_fidelity: high)">High input fidelity<SwitchRoot :model-value="wiernosc && !wiernoscNiedostepna" :disabled="wiernoscNiedostepna" :class="przelacznik" @update:model-value="wiernosc = $event"><SwitchThumb :class="kciuk" /></SwitchRoot></label>
+        <p v-if="wiernoscNiedostepna" class="-mt-1 text-[10.5px] leading-snug text-[#a4a7ae]">Not supported by {{ wybranyModel }} — renders without it; Edge guide still keeps geometry.</p>
         <label class="flex h-7 items-center justify-between gap-2 text-[11px] text-[#c9ccd2]" title="Sends an edge map of the view as a second reference image">Edge guide<SwitchRoot v-model="krawedzie" :class="przelacznik"><SwitchThumb :class="kciuk" /></SwitchRoot></label>
         <label class="flex h-7 items-center justify-between gap-2 text-[11px] text-[#c9ccd2]" title="Masks the selected furniture so the model leaves it unchanged">Protect selected furniture<SwitchRoot v-model="chron" :disabled="!zaznaczenie" :class="przelacznik"><SwitchThumb :class="kciuk" /></SwitchRoot></label>
       </SekcjaF>
