@@ -8,7 +8,8 @@ import { poDuzejZmianie } from '@/silnik/zmiany'
 import { $aktywnyWidok, $mapaWidoczna } from '@/stan'
 
 /* Mapa: tło to rzut z góry z silnika (co minutę i po dużej zmianie), na nim pokoje (klik = scena),
-   małe znaczniki mebli (klik = kadr mebla) i stale aktualna pozycja oraz kierunek patrzenia. */
+   małe znaczniki mebli (klik = kadr mebla) i stale aktualna pozycja oraz kierunek patrzenia.
+   Bez ramki: rzut jest przycięty maską do obrysu mieszkania (pokoje + grubość ścian), a cień rzuca sam kształt. */
 const silnik = useStore($silnik)
 const widoczna = useStore($mapaWidoczna)
 const aktywny = useStore($aktywnyWidok)
@@ -87,22 +88,30 @@ const kadruj = (korzen: unknown) => (silnik.value as any)?.nawigacja.kadrujMebel
 </script>
 
 <template>
-  <div v-if="widoczna && g" class="pointer-events-auto absolute bottom-4 right-4 z-10 w-[220px] overflow-hidden rounded-[10px] bg-[#1b1d22]/90 p-1 shadow-[0_8px_24px_rgba(0,0,0,.35)] ring-1 ring-white/10 backdrop-blur">
-    <svg :viewBox="viewBox" class="block w-full" role="img" aria-label="Apartment map">
-      <image v-if="tlo" :href="tlo" :x="g.minX" :y="g.minZ" :width="g.szer" :height="g.wys" preserveAspectRatio="none" />
+  <div v-if="widoczna && g" class="pointer-events-none absolute bottom-4 right-4 z-10 w-[220px]">
+    <svg :viewBox="viewBox" class="block w-full overflow-visible drop-shadow-[0_6px_10px_rgba(0,0,0,.45)]" role="img" aria-label="Apartment map">
+      <defs>
+        <mask id="obrys-mieszkania" maskUnits="userSpaceOnUse" :x="g.minX" :y="g.minZ" :width="g.szer" :height="g.wys">
+          <polygon v-for="p in pokoje" :key="p.id" :points="p.punkty" fill="#fff" stroke="#fff" stroke-width="26" stroke-linejoin="miter" />
+        </mask>
+      </defs>
+      <g mask="url(#obrys-mieszkania)">
+        <rect :x="g.minX" :y="g.minZ" :width="g.szer" :height="g.wys" fill="#d9d6d0" />
+        <image v-if="tlo" :href="tlo" :x="g.minX" :y="g.minZ" :width="g.szer" :height="g.wys" preserveAspectRatio="none" />
+      </g>
       <polygon
         v-for="p in pokoje"
         :key="p.id"
         :points="p.punkty"
-        class="cursor-pointer outline-none"
-        :fill="p.id === aktywny ? 'rgba(13,153,255,.14)' : tlo ? 'transparent' : '#2a2c31'"
-        :stroke="p.id === aktywny ? '#0d99ff' : 'rgba(255,255,255,.28)'"
+        class="pointer-events-auto cursor-pointer outline-none"
+        :fill="p.id === aktywny ? 'rgba(13,153,255,.14)' : 'transparent'"
+        :stroke="p.id === aktywny ? '#0d99ff' : 'transparent'"
         :stroke-width="px"
         @click="$aktywnyWidok.set(p.id)"
       >
         <title>{{ p.nazwa }}</title>
       </polygon>
-      <circle v-for="m in meble" :key="m.id" :cx="m.x" :cy="m.z" :r="px * 3.5" fill="#fff" :stroke="'#1b1d22'" :stroke-width="px" class="cursor-pointer" @click="kadruj(m.korzen)">
+      <circle v-for="m in meble" :key="m.id" :cx="m.x" :cy="m.z" :r="px * 3.5" fill="#fff" :stroke="'#1b1d22'" :stroke-width="px" class="pointer-events-auto cursor-pointer" @click="kadruj(m.korzen)">
         <title>{{ m.nazwa }}</title>
       </circle>
       <g :transform="`translate(${ja.x} ${ja.z}) rotate(${ja.kat})`" class="pointer-events-none">
