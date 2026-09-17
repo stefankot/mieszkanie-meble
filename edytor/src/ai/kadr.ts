@@ -1,37 +1,60 @@
 import type { Silnik } from '@/silnik/most'
 
-/* Wejście renderu AI z bieżącego kadru silnika: obraz (z GI i post-processingiem, bez nakładek powłoki),
-   mapa krawędzi (Sobel) jako wzorzec geometrii i maska chroniąca zaznaczony mebel.
-   Kadr jest przycinany centralnie do proporcji rozmiaru wyjściowego — nakładka używa tego samego prostokąta. */
+/* Wejście renderu AI z kadru silnika. Kadr obejmuje CAŁY EKRAN (jakby nie było paneli) plus margines:
+   na czas przechwycenia ramka renderera dostaje proporcje obrazu wyjściowego, a kąt widzenia kamery
+   rośnie tak, żeby zmieścić ostrosłup pełnego okna z zapasem. Potem wszystko wraca.
+   `ekran` = jaka część obrazu (szerokość, wysokość) odpowiada oknu — nakładka wpasowuje ją w cały ekran. */
 export const ROZMIARY = { landscape: [1536, 1024], square: [1024, 1024], portrait: [1024, 1536] } as const
 export type Orientacja = keyof typeof ROZMIARY
+export interface Przechwycenie { kadr: HTMLCanvasElement; blob: Blob; maska: Blob | null; ekran: { fx: number; fy: number } }
 
-export function przyciecie(szer: number, wys: number, proporcja: number) {
-  const w = Math.min(szer, wys * proporcja)
-  const h = w / proporcja
-  return { x: (szer - w) / 2, y: (wys - h) / 2, w, h }
-}
-
+const MARGINES = 0.1
 const doBloba = (k: HTMLCanvasElement) => new Promise<Blob>((ok, blad) => k.toBlob((b) => (b ? ok(b) : blad(new Error('Canvas export failed'))), 'image/png'))
+const czekaj = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
-export async function przechwycKadr(s: Silnik, orientacja: Orientacja, proba = 0): Promise<{ kadr: HTMLCanvasElement; blob: Blob }> {
+export async function przechwycKadr(s: Silnik, orientacja: Orientacja, chronMebel: string | null = null): Promise<Przechwycenie> {
   const plotno = s.renderer.domElement as HTMLCanvasElement
   const okno = plotno.ownerDocument.defaultView as Window
+  const ramka = okno.frameElement as HTMLIFrameElement | null
+  const kamera = s.camera
   const [W, H] = ROZMIARY[orientacja]
-  // Silnik w bezruchu nie rysuje, a płótno WebGPU po prezentacji jest puste: wymuszamy klatkę i kopiujemy po niej.
-  s.oznaczZmiane?.()
-  await new Promise((r) => okno.requestAnimationFrame(() => okno.requestAnimationFrame(r)))
-  const p = przyciecie(plotno.width, plotno.height, W / H)
-  const kadr = document.createElement('canvas')
-  kadr.width = W
-  kadr.height = H
-  const g = kadr.getContext('2d', { willReadFrequently: true })!
-  g.drawImage(plotno, p.x, p.y, p.w, p.h, 0, 0, W, H)
-  const probka = g.getImageData(0, 0, W, H).data
-  let jasnosc = 0
-  for (let i = 0; i < probka.length; i += 4000) jasnosc += probka[i] + probka[i + 1] + probka[i + 2]
-  if (jasnosc < 500 && proba < 4) return przechwycKadr(s, orientacja, proba + 1)
-  return { kadr, blob: await doBloba(kadr) }
+  const Ai = W / H
+  const ekranW = window.innerWidth
+  const ekranH = window.innerHeight
+  const stary = { fov: kamera.fov, styl: ramka?.getAttribute('style') ?? '' }
+  // Ostrosłup okna: pionowy kąt kamery dotyczy wysokości ramki, przeliczamy go na wysokość całego okna.
+  const ty = Math.tan((kamera.fov * Math.PI) / 360) * (ekranH / Math.max(1, ramka?.clientHeight ?? ekranH))
+  const sx = ty * (ekranW / ekranH) * (1 + MARGINES)
+  const sy = ty * (1 + MARGINES)
+  const cy = sx / sy > Ai ? sx / Ai : sy
+  try {
+    if (ramka) {
+      const h = ramka.parentElement?.clientHeight ?? ekranH
+      ramka.style.cssText = `position:absolute;left:50%;top:50%;width:${Math.round(h * Ai)}px;height:${h}px;transform:translate(-50%,-50%);border:0`
+    }
+    kamera.fov = (Math.atan(cy) * 360) / Math.PI
+    kamera.updateProjectionMatrix()
+    s.oznaczZmiane?.()
+    // Zmiana rozmiaru czyści historię TAA i GI — dajemy silnikowi czas na dopracowanie obrazu.
+    await czekaj(1800)
+    s.oznaczZmiane?.()
+    await new Promise((r) => okno.requestAnimationFrame(() => okno.requestAnimationFrame(r)))
+    const kadr = document.createElement('canvas')
+    kadr.width = W
+    kadr.height = H
+    const g = kadr.getContext('2d', { willReadFrequently: true })!
+    g.drawImage(plotno, 0, 0, W, H)
+    // Tryb Arch Photo może przyciąć kąt widzenia (maks. 60°) — ułamki ekranu liczymy z faktycznego kąta.
+    const tyFakt = Math.tan((kamera.fov * Math.PI) / 360)
+    const ekran = { fx: Math.min(1.5, (ty * (ekranW / ekranH)) / (tyFakt * (plotno.width / plotno.height))), fy: Math.min(1.5, ty / tyFakt) }
+    const maska = chronMebel ? await maskaOchrony(s, chronMebel, W, H) : null
+    return { kadr, blob: await doBloba(kadr), maska, ekran }
+  } finally {
+    kamera.fov = stary.fov
+    kamera.updateProjectionMatrix()
+    if (ramka) ramka.setAttribute('style', stary.styl)
+    s.oznaczZmiane?.()
+  }
 }
 
 function rozmyj(z: Float32Array, w: number, h: number) {
@@ -81,26 +104,25 @@ export function mapaKrawedzi(kadr: HTMLCanvasElement): Promise<Blob> {
   return doBloba(k)
 }
 
-/* Maska dla images.edit: przezroczyste = do edycji, nieprzezroczyste = chronione (obrys mebla na ekranie). */
-export function maskaOchrony(s: Silnik, mebel: string, orientacja: Orientacja): Promise<Blob> | null {
+/* Maska dla images.edit: przezroczyste = do edycji, nieprzezroczyste = chronione (obrys mebla w kadrze).
+   Wywoływana w trakcie przechwycenia, więc rzutuje przez kamerę kadru. */
+function maskaOchrony(s: Silnik, mebel: string, W: number, H: number): Promise<Blob> | null {
   const korzen = s.scene.getObjectByName(`biblioteka:${mebel}`)
   if (!korzen) return null
   const T = s.THREE
-  const plotno = s.renderer.domElement as HTMLCanvasElement
-  const [W, H] = ROZMIARY[orientacja]
-  const p = przyciecie(plotno.clientWidth, plotno.clientHeight, W / H)
   const b = new T.Box3().setFromObject(korzen)
   const naroza = [0, 1].flatMap((i) => [0, 1].flatMap((j) => [0, 1].map((k) => new T.Vector3(i ? b.max.x : b.min.x, j ? b.max.y : b.min.y, k ? b.max.z : b.min.z))))
   const punkty = naroza.map((v: any) => v.project(s.camera)).filter((v: any) => v.z < 1)
   if (!punkty.length) return null
-  const ekran = punkty.map((v: any) => ({ x: (((v.x + 1) / 2) * plotno.clientWidth - p.x) * (W / p.w), y: (((1 - v.y) / 2) * plotno.clientHeight - p.y) * (H / p.h) }))
+  const xs = punkty.map((v: any) => ((v.x + 1) / 2) * W)
+  const ys = punkty.map((v: any) => ((1 - v.y) / 2) * H)
   const k = document.createElement('canvas')
   k.width = W
   k.height = H
   const g = k.getContext('2d')!
-  const minX = Math.max(0, Math.min(...ekran.map((e) => e.x)))
-  const minY = Math.max(0, Math.min(...ekran.map((e) => e.y)))
+  const x0 = Math.max(0, Math.min(...xs))
+  const y0 = Math.max(0, Math.min(...ys))
   g.fillStyle = '#000'
-  g.fillRect(minX, minY, Math.min(W, Math.max(...ekran.map((e) => e.x))) - minX, Math.min(H, Math.max(...ekran.map((e) => e.y))) - minY)
+  g.fillRect(x0, y0, Math.min(W, Math.max(...xs)) - x0, Math.min(H, Math.max(...ys)) - y0)
   return doBloba(k)
 }

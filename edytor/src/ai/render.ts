@@ -3,7 +3,7 @@ import { toFile } from 'openai'
 
 import type { Silnik } from '@/silnik/most'
 
-import { mapaKrawedzi, maskaOchrony, przechwycKadr, ROZMIARY, type Orientacja } from './kadr'
+import { mapaKrawedzi, przechwycKadr, ROZMIARY, type Orientacja } from './kadr'
 import { najnowszyModelObrazow, openai } from './klient'
 
 /* Render AI na bazie kadru silnika (images.edit). Ograniczenie zniekształceń: wysoka wierność wejścia,
@@ -18,7 +18,7 @@ export interface OpcjeRenderu {
   krawedzie: boolean
   chronMebel: string | null
 }
-export interface WynikAI { id: string; url: string; opis: string; model: string; orientacja: Orientacja; czas: number }
+export interface WynikAI { id: string; url: string; zrodlo: string; ekran: { fx: number; fy: number }; opis: string; model: string; orientacja: Orientacja; czas: number }
 
 export const $wynikiAI = atom<WynikAI[]>([])
 
@@ -46,24 +46,24 @@ const odrzucilWiernosc = (e: unknown) => (e as { status?: number })?.status === 
 export const $nakladkaAI = atom<{ id: string; krycie: number; mieszanie: 'normal' | 'luminosity'; porownanie: boolean; podzial: number } | null>(null)
 
 const ZASADY = [
-  'Photorealistic interior photograph of exactly this view.',
+  'Photorealistic interior photograph of exactly this view, filling the whole frame edge to edge.',
   'Keep the camera position, perspective, framing, walls, openings and every piece of furniture exactly where and how they are: same sizes, proportions, counts and straight lines.',
   'Do not add, remove or move objects. Improve only materials, lighting, reflections and photographic quality.'
 ]
 
 export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]> {
   const model = o.model === 'latest' ? await najnowszyModelObrazow() : o.model
-  const { kadr, blob } = await przechwycKadr(s, o.orientacja)
+  const { kadr, blob, maska, ekran } = await przechwycKadr(s, o.orientacja, o.chronMebel)
+  const zrodlo = kadr.toDataURL('image/jpeg', 0.9)
   const obrazy = [await toFile(blob, 'kadr.png', { type: 'image/png' })]
   const zasady = [...ZASADY]
   if (o.krawedzie) {
     obrazy.push(await toFile(await mapaKrawedzi(kadr), 'krawedzie.png', { type: 'image/png' }))
     zasady.push('The second image is an edge map of the same view: every edge in the result must match it.')
   }
-  const maska = o.chronMebel ? maskaOchrony(s, o.chronMebel, o.orientacja) : null
   if (maska) zasady.push('The masked furniture must stay pixel-identical.')
   const [W, H] = ROZMIARY[o.orientacja]
-  const plikMaski = maska ? await toFile(await maska, 'maska.png', { type: 'image/png' }) : null
+  const plikMaski = maska ? await toFile(maska, 'maska.png', { type: 'image/png' }) : null
   const wyslij = (wiernosc: boolean) =>
     openai().images.edit({
       model,
@@ -86,7 +86,7 @@ export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]>
     odpowiedz = await wyslij(false)
   }
   const czas = Date.now()
-  const nowe = (odpowiedz.data ?? []).flatMap((d, i) => (d.b64_json ? [{ id: `${czas}-${i}`, url: `data:image/png;base64,${d.b64_json}`, opis: o.opis, model, orientacja: o.orientacja, czas }] : []))
+  const nowe = (odpowiedz.data ?? []).flatMap((d, i) => (d.b64_json ? [{ id: `${czas}-${i}`, url: `data:image/png;base64,${d.b64_json}`, zrodlo, ekran, opis: o.opis, model, orientacja: o.orientacja, czas }] : []))
   if (!nowe.length) throw new Error('The image model returned no images.')
   $wynikiAI.set([...nowe, ...$wynikiAI.get()].slice(0, 24))
   $nakladkaAI.set({ id: nowe[0].id, krycie: 1, mieszanie: 'normal', porownanie: true, podzial: 0.5 })

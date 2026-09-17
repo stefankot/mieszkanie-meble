@@ -17,8 +17,8 @@ import SuwakMaterialu from '@/ui/material/SuwakMaterialu.vue'
 import KluczAPI from './KluczAPI.vue'
 
 /* Image: render AI z bieżącego kadru (układ jak panel ustawień obrazu: Model, Size & orientation, Quality,
-   Number of images). Model „Latest” = najnowszy gpt-image-* z konta. Sekcja Accuracy — opcje przeciw
-   zniekształceniom; wyniki jako nakładka na scenie (krycie, mieszanie, porównanie A/B). */
+   Number of images). Model „Latest” = najnowszy gpt-image-* z konta. Kadr = cały ekran bez paneli + margines.
+   Sekcja Accuracy — opcje przeciw zniekształceniom; wynik jako podgląd pełnoekranowy (krycie, mieszanie, A/B). */
 const klucz = useStore($kluczOpenAI)
 const zaznaczenie = useStore($zaznaczenie)
 const wyniki = useStore($wynikiAI)
@@ -135,7 +135,7 @@ const kciuk = 'block size-3 translate-x-0.5 rounded-full bg-white transition-tra
           <label class="flex h-7 items-center justify-between text-[11px] text-[#c9ccd2]">Compare A/B<SwitchRoot :model-value="nakladka.porownanie" :class="przelacznik" @update:model-value="zmienNakladke({ porownanie: $event })"><SwitchThumb :class="kciuk" /></SwitchRoot></label>
           <div class="grid grid-cols-2 gap-1">
             <a :href="wyniki.find((w) => w.id === nakladka?.id)?.url" download="ai-render.png" class="flex h-7 items-center justify-center rounded-[6px] bg-[#2c2e34] text-[11px] text-white hover:bg-[#3a3d44]">Download</a>
-            <button type="button" class="h-7 rounded-[6px] bg-[#2c2e34] text-[11px] text-white hover:bg-[#3a3d44]" @click="$nakladkaAI.set(null)">Hide overlay</button>
+            <button type="button" class="h-7 rounded-[6px] bg-[#2c2e34] text-[11px] text-white hover:bg-[#3a3d44]" @click="$nakladkaAI.set(null)">Close preview</button>
           </div>
         </template>
       </SekcjaF>

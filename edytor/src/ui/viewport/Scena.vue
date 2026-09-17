@@ -7,7 +7,6 @@ import { podlaczRamke } from '@/silnik/most'
 import { skrotyPowloki } from '@/skroty'
 import { $tryb } from '@/stan'
 import Kropki from '@/ui/hotspots/Kropki.vue'
-import NakladkaAI from '@/ui/render/NakladkaAI.vue'
 import PasekNarzedzi from '@/ui/toolbar/PasekNarzedzi.vue'
 import TrybSpaceru from '@/ui/walk/TrybSpaceru.vue'
 
@@ -40,7 +39,6 @@ function poZaladowaniu(e: Event) {
 <template>
   <section class="relative min-h-0 min-w-0 overflow-hidden bg-[#e3e5e6]">
     <iframe :src="zrodlo" title="Apartment renderer" class="absolute inset-0 size-full border-0" @load="poZaladowaniu" />
-    <NakladkaAI />
     <Kropki />
     <UchwytyPolek />
 
