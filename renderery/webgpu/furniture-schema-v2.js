@@ -1,3 +1,5 @@
+import {rozwinParametryczny, sprawdzParametryczny} from './parametryczne.js?param-v1';
+
 const ID=/^[A-Za-z0-9_.:-]{1,120}$/;
 const clone=v=>structuredClone(v);
 const object=v=>v && typeof v==='object' && !Array.isArray(v);
@@ -27,6 +29,7 @@ export function validateFurnitureV2(doc){
   if(doc.runtimeState!==undefined) throw Error('v2: runtimeState nie może być zapisany w furniture.json');
   if(doc.runtimeStatePolicy?.persist!=='named-states-only') throw Error('v2: wymagane persist=named-states-only');
 
+  if(doc.parametric!==undefined) sprawdzParametryczny(doc.parametric);
   const parts=ids(doc.geometry.parts,'geometry.parts');
   const mechanics=ids(doc.mechanics,'mechanics');
   const interactions=ids(doc.interactions,'interactions');
@@ -74,12 +77,21 @@ export function normalizeFurnitureDocument(doc){
   if(doc?.schemaVersion===1) return {document:doc,sourceSchemaVersion:1,notes:[]};
   validateFurnitureV2(doc);
   const joints=doc.mechanics.map(({id,states,...joint})=>clone(joint));
-  const parts=clone(doc.geometry.parts);
+  /* Mebel parametryczny: korpus, półki i powtarzane komponenty są liczone z `parametric`
+     (plus nadpisania edytora w `parametricOverrides`), a jawne części z geometry.parts zostają. */
+  const notes=[];
+  let parametryczne=null;
+  if(doc.parametric){
+    parametryczne=rozwinParametryczny(doc.parametric,doc.parametricOverrides||{});
+    joints.push(...parametryczne.joints);
+    notes.push(`parametric: ${parametryczne.parts.length} części z ${parametryczne.komorki.length} komórek`);
+  }
+  const parts=[...(parametryczne?.parts||[]),...clone(doc.geometry.parts)];
   const edgeRadius=doc.customParameters?.edgeProfile?.defaultRadiusMm;
   if(Number.isFinite(edgeRadius) && edgeRadius>=0)
     for(const part of parts) if(part.type==='box' && part.edgeRadiusMm===undefined)
       part.edgeRadiusMm=Math.min(edgeRadius,Math.min(...part.sizeMm)*.49);
-  return {sourceSchemaVersion:2,notes:[],document:{
+  return {sourceSchemaVersion:2,notes,document:{
     schemaVersion:1,assetId:doc.assetId,version:doc.version,summary:doc.summary,placement:clone(doc.placement),
     extensions:clone(doc.extensions),model:{name:doc.name,units:'mm',
       materials:clone(doc.materials.definitions),parts,joints,
@@ -87,6 +99,8 @@ export function normalizeFurnitureDocument(doc){
       notes:clone(doc.notes||[]),v2:{states:clone(doc.states),interactions:clone(doc.interactions),
         constraints:clone(doc.constraints),assets:clone(doc.assets),anchors:clone(doc.anchors),
         customParameters:clone(doc.customParameters),designTime:clone(doc.designTime),
+        parametric:clone(doc.parametric||null),parametricOverrides:clone(doc.parametricOverrides||null),
+        komorki:parametryczne?clone(parametryczne.komorki):null,
         rendererDefaults:clone(doc.rendererDefaults),rendererOverrides:clone(doc.rendererOverrides)}}
   }};
 }

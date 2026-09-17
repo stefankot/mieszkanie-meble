@@ -29,7 +29,7 @@ import { STATUS_MODELU, odrzucDuplikatyId, sprawdzRozszerzenia,
          wybierzPotwierdzoneUmiejscowienie, utworzBramkePokolen,
          czyWersjaPotwierdzona, singleFlight, statusPoZbudowaniu,
          odrzuconyStan } from './furniture-sync.js?p7reload1';
-import { normalizeFurnitureDocument } from './furniture-schema-v2.js?p8b';
+import { normalizeFurnitureDocument } from './furniture-schema-v2.js?parametric-v1';
 
 const BAZA = new URLSearchParams(globalThis.location?.search || '').get('furnitureSource')==='local'
   ? new URL('../../',import.meta.url).href
@@ -435,6 +435,8 @@ export async function uruchomBiblioteke(api){
           throw Error('Identyfikator albo wersja modelu nie pasuje do katalogu.');
         const uwagi = [];
         if(!SCHEMATY_ZNANE.has(dane.schemaVersion)) throw Error(`Nieobsługiwane schemaVersion ${dane.schemaVersion}.`);
+        // Nadpisania parametryczne edytora przeżywają odświeżenie tej samej wersji.
+        if(dane.parametric && poprzedni.wersja===wybrana.id && poprzedni.nadpisania) dane.parametricOverrides=poprzedni.nadpisania;
         const znormalizowane=normalizeFurnitureDocument(dane);
         uwagi.push(...sprawdzRozszerzenia(dane,dane.schemaVersion===2?ROZSZERZENIA_V2:undefined));
         const umiejscowienie = wybierzPotwierdzoneUmiejscowienie(manifest, wybrana, dane);
@@ -455,7 +457,9 @@ export async function uruchomBiblioteke(api){
                     pominiete: zbudowane.pominiete || [],
                     status, aktywnyStatus: status,
                     postep: zbudowane.postep, zaczepy: zbudowane.zaczepy,
-                    przypieta: wybrana.id, umiejscowienie});
+                    przypieta: wybrana.id, umiejscowienie,
+                    dokument: dane ? structuredClone(dane) : null,
+                    nadpisania: dane?.parametric ? (dane.parametricOverrides || null) : null});
       zapiszWybranaWersje(id, wybrana.id);
       return true;
     }catch(e){
@@ -466,6 +470,34 @@ export async function uruchomBiblioteke(api){
       return false;
     }
   }
+
+  /* Mebel parametryczny: przebudowa z tej samej wersji, z nowymi nadpisaniami (edytor: układ półek,
+     liczba komponentów). Zamiast wczytywać wersję od nowa budujemy model lokalnie i podmieniamy korzeń. */
+  function przebudujParametryczny(id, nadpisania){
+    const w = stan.get(id);
+    if(!w?.dokument?.parametric) return false;
+    const dane = structuredClone(w.dokument);
+    dane.parametricOverrides = nadpisania || {};
+    let zbudowane;
+    try{
+      zbudowane = zbudujModel(normalizeFurnitureDocument(dane).document, {THREE, materialBazowy, boxGeo});
+    }catch(e){
+      stan.set(id, {...w, blad: 'Nie przebudowano mebla: ' + e.message});
+      powiadom();
+      return false;
+    }
+    ustaw(zbudowane.korzen, w.umiejscowienie, THREE);
+    if(w.korzen) usun(scena, w);
+    scena.add(zbudowane.korzen);
+    stan.set(id, {...w, korzen: zbudowane.korzen, ruchy: zbudowane.ruchy || [],
+                  pominiete: zbudowane.pominiete || [], nadpisania: dane.parametricOverrides, blad: undefined});
+    wynik.ruchy = [...stan.values()].flatMap(x => x.ruchy || []);
+    przyZmianie?.(wynik);
+    powiadom();
+    return true;
+  }
+  wynik.przebudujParametryczny = przebudujParametryczny;
+  wynik.parametryczny = id => stan.get(id)?.dokument?.parametric || null;
 
   /* Przypięcie konkretnej wersji jest trwałym wyborem użytkownika. */
   async function przypnij(id, wersja){

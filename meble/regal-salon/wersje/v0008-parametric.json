@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 2,
+  "assetId": "regal-salon",
+  "version": "v0008-parametric",
+  "name": "Regał w salonie — parametryczny (POC)",
+  "summary": "POC mebla parametrycznego: korpus 3074×2430×423 mm o stałym rozmiarze, siatka kolumn i rzędów z rozkładem, drzwiczki jako jeden komponent powtarzany w komórkach. Geometria liczona z sekcji parametric.",
+  "units": "mm",
+  "placement": {
+    "confirmed": true,
+    "roomId": "SALON",
+    "wallId": "SALON-W1",
+    "positionMm": [
+      2033,
+      0,
+      361.5
+    ],
+    "rotationDeg": 0,
+    "confirmationSvg": "plan/rozmieszczenie-zp3.svg",
+    "description": "Salon ZP3. Plecy regału przylegają do SALON-W1, a prawy bok x=3570 mm do SALON-W2, ściany dzielonej z łazienką. Lewy bok x=496 mm; do ściany okiennej pozostaje 256 mm."
+  },
+  "geometry": {
+    "parts": []
+  },
+  "materials": {
+    "definitions": {
+      "maple-0375": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.58,
+        "metalness": 0.0,
+        "assets": {
+          "albedo": "oak-albedo-etc1s",
+          "normal": "oak-normal-uastc",
+          "arm": "oak-arm-uastc"
+        }
+      },
+      "maple-0375-front": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.54,
+        "metalness": 0.0
+      },
+      "maple-0375-back": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.62,
+        "metalness": 0.0
+      }
+    }
+  },
+  "lights": {
+    "recesses": []
+  },
+  "mechanics": [],
+  "interactions": [
+    {
+      "id": "inspect-recess-lighting",
+      "type": "select",
+      "target": "lights.recesses"
+    }
+  ],
+  "states": {
+    "default": "installed",
+    "named": [
+      {
+        "id": "installed",
+        "mechanics": {},
+        "description": "Zatwierdzony stan projektowy; brak zapisanego runtime state."
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "wall-placement",
+      "type": "anchor-to-wall",
+      "anchorId": "wall-back-center",
+      "targetId": "SALON-W1",
+      "clearanceMm": 0
+    },
+    {
+      "id": "curtain-clearance",
+      "type": "minimum-clearance",
+      "anchorId": "right-edge",
+      "targetId": "SALON-W2",
+      "distanceMm": 256
+    }
+  ],
+  "assets": [
+    {
+      "id": "oak-albedo-etc1s",
+      "type": "texture",
+      "uri": "renderery/webgpu/experymenty/P10-ktx2/oak_albedo_etc1s.ktx2",
+      "encoding": "KTX2_ETC1S",
+      "colorSpace": "srgb"
+    },
+    {
+      "id": "oak-normal-uastc",
+      "type": "texture",
+      "uri": "renderery/webgpu/experymenty/P10-ktx2/oak_normal_uastc.ktx2",
+      "encoding": "KTX2_UASTC",
+      "colorSpace": "linear"
+    },
+    {
+      "id": "oak-arm-uastc",
+      "type": "texture",
+      "uri": "renderery/webgpu/experymenty/P10-ktx2/oak_arm_uastc.ktx2",
+      "encoding": "KTX2_UASTC",
+      "colorSpace": "linear"
+    },
+    {
+      "id": "placement-proof",
+      "type": "document",
+      "uri": "meble/regal-salon/plany/v0003.svg"
+    }
+  ],
+  "anchors": [
+    {
+      "id": "wall-back-center",
+      "type": "placement",
+      "positionMm": [
+        0,
+        0,
+        -211.5
+      ]
+    },
+    {
+      "id": "right-edge",
+      "type": "clearance",
+      "positionMm": [
+        1537,
+        0,
+        0
+      ]
+    }
+  ],
+  "customParameters": {
+    "edgeProfile": {
+      "type": "round",
+      "defaultRadiusMm": 2.2
+    },
+    "frontGapMm": 2,
+    "frontRecessMm": 10,
+    "softGeometry": null,
+    "sourceRealizerVersion": null
+  },
+  "extensions": {
+    "pl.mieszkanie.webgpu": {
+      "required": false,
+      "qualityHints": {
+        "baseline": "srednia",
+        "photo": "photo_raster"
+      },
+      "materialPilot": {
+        "albedo": "etc1s",
+        "normal": "uastc",
+        "arm": "uastc"
+      },
+      "lightingPoolSize": 6
+    }
+  },
+  "designTime": {
+    "activeNamedState": "installed",
+    "placementApproved": true
+  },
+  "runtimeStatePolicy": {
+    "persist": "named-states-only",
+    "implicitRuntimeStateAllowed": false
+  },
+  "rendererDefaults": {
+    "qualityProfile": "srednia",
+    "toneMapping": "aces",
+    "antiAliasing": "smaa"
+  },
+  "rendererOverrides": {
+    "webgpu": {
+      "desktopGI": "current-ssgi",
+      "desktopSSR": "current",
+      "photoRasterSamples": 64
+    }
+  },
+  "notes": [
+    "Wersja nieaktywna (POC). Geometria powstaje z sekcji `parametric`; edytor nadpisuje layout przez parametricOverrides."
+  ],
+  "parametric": {
+    "carcass": {
+      "sizeMm": [
+        3074,
+        2430,
+        423
+      ],
+      "boardMm": 18,
+      "material": "maple-0375",
+      "backMm": 8,
+      "backMaterial": "maple-0375-back",
+      "shelfMaterial": "maple-0375"
+    },
+    "layout": {
+      "rows": {
+        "count": 6,
+        "distribution": "fibonacci",
+        "reverse": false
+      },
+      "columns": {
+        "count": 4,
+        "distribution": "equal"
+      }
+    },
+    "definitions": {
+      "drzwi": {
+        "label": "Drzwiczki",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "maple-0375-front",
+            "label": "Front",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -4
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              0,
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          },
+          {
+            "id": "uchwyt",
+            "type": "box",
+            "material": "maple-0375",
+            "label": "Uchwyt — frez",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -80
+              },
+              18,
+              8
+            ],
+            "positionMm": [
+              0,
+              {
+                "cell": "h",
+                "mul": 0.5,
+                "addMm": -60
+              },
+              22
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "joint": {
+          "type": "hinge",
+          "pivotMm": [
+            {
+              "cell": "w",
+              "mul": -0.5
+            },
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "angleDeg": 100
+        }
+      }
+    },
+    "instances": [
+      {
+        "id": "drzwi",
+        "definition": "drzwi",
+        "label": "Drzwiczki",
+        "cells": {
+          "count": 8,
+          "order": "bottom-up"
+        }
+      }
+    ]
+  }
+}

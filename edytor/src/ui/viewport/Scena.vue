@@ -3,6 +3,7 @@ import { useStore } from '@nanostores/vue'
 import { tinykeys } from 'tinykeys'
 import { watch } from 'vue'
 
+import { $przebudowaMebli } from '@/projekt/projekt'
 import { uruchomKropki } from '@/silnik/hotspoty'
 import { $silnik, podlaczRamke } from '@/silnik/most'
 import { uruchomZaznaczanie } from '@/silnik/zaznaczanie'
@@ -20,7 +21,17 @@ import UchwytyPolek from './UchwytyPolek.vue'
 const tryb = useStore($tryb)
 const silnik = useStore($silnik)
 const zaznaczenie = useStore($zaznaczenie)
-const zrodlo = `${import.meta.env.DEV ? '/' : '../'}renderery/webgpu/mieszkanie-webgpu-v1.html`
+const przebudowa = useStore($przebudowaMebli)
+/* Parametry diagnostyczne silnika (źródło mebli, wersja POC, rewizja three, wyłączone warstwy)
+   przekazujemy z adresu edytora do ramki — np. ?furnitureSource=local&furnitureV2=regal-salon:v0008-parametric */
+const PRZEKAZYWANE = ['furnitureSource', 'furnitureV2', 'three', 'bez', 'quality', 'tone']
+const zrodlo = (() => {
+  const adres = new URLSearchParams(location.search)
+  const przekaz = new URLSearchParams()
+  for (const klucz of PRZEKAZYWANE) if (adres.has(klucz)) przekaz.set(klucz, adres.get(klucz)!)
+  const pytanie = przekaz.size ? `?${przekaz}` : ''
+  return `${import.meta.env.DEV ? '/' : '../'}renderery/webgpu/mieszkanie-webgpu-v1.html${pytanie}`
+})()
 
 // Stary panel, joystick i stara mini-mapa renderera są zastąpione przez powłokę (pasek, MiniMapa).
 const CSS_RAMKI = `#sterowanie,#joystickRuchu,#miniMapa{display:none!important}`
@@ -50,7 +61,7 @@ watch(silnik, (s) => {
     }
   })
 }, { immediate: true })
-watch([silnik, zaznaczenie, tryb], ([s, id, t]) => {
+watch([silnik, zaznaczenie, tryb, przebudowa], ([s, id, t]) => {
   const obrys = (s as any)?.hoverOutline
   if (!obrys?.ustawTrwaly) return
   obrys.ustawTrwaly(t === 'edit' && id ? s!.scene.getObjectByName(`biblioteka:${id}`) : null)

@@ -1,6 +1,7 @@
 import { get, set } from 'idb-keyval'
 import { atom } from 'nanostores'
 
+import { czyParametryczny, przebudujMebel } from '@/meble/parametryczneEdytor'
 import { $uklady, type UkladMebla } from '@/meble/uklad'
 import { przywrocGrupe, ustawGrupe } from '@/silnik/materialyMebla'
 import { $silnik } from '@/silnik/most'
@@ -23,7 +24,9 @@ function projektuj(przed: DokumentProjektu, po: DokumentProjektu) {
     const baza = bazaUkladow()
     if (!baza.has(id) && $uklady.get()[id]) baza.set(id, structuredClone($uklady.get()[id]))
     const cel = po.uklady[id] ?? baza.get(id)
-    if (cel) $uklady.setKey(id, cel)
+    if (!cel) continue
+    $uklady.setKey(id, cel)
+    if (czyParametryczny($silnik.get(), id)) zaplanujPrzebudowe(id)
   }
   const s = $silnik.get()
   if (!s) return // silnik jeszcze się wczytuje — całość zostanie naniesiona po starcie
@@ -50,6 +53,34 @@ function projektuj(przed: DokumentProjektu, po: DokumentProjektu) {
   }
   s.oznaczZmiane?.()
   if (duza) zglosDuzaZmiane()
+}
+
+/* Przebudowa bryły mebla parametrycznego jest kosztowna — zbieramy zmiany z przeciągania suwaka. */
+export const $przebudowaMebli = atom(0)
+const doPrzebudowy = new Set<string>()
+let czasomierzPrzebudowy: ReturnType<typeof setTimeout> | undefined
+function zaplanujPrzebudowe(mebel: string) {
+  doPrzebudowy.add(mebel)
+  clearTimeout(czasomierzPrzebudowy)
+  czasomierzPrzebudowy = setTimeout(() => {
+    const s = $silnik.get()
+    const meble = [...doPrzebudowy]
+    doPrzebudowy.clear()
+    if (!s) return
+    let zmiana = false
+    for (const mebel of meble) {
+      if (!przebudujMebel(s, mebel, $uklady.get()[mebel])) continue
+      zmiana = true
+      // Nowe siatki: materiały grup nanosimy ponownie z dokumentu.
+      for (const [klucz, u] of Object.entries(historia.dokument.materialy)) {
+        if (klucz.startsWith(`${mebel}/`)) ustawGrupe(s, mebel, klucz.slice(mebel.length + 1), u)
+      }
+    }
+    if (zmiana) {
+      $przebudowaMebli.set($przebudowaMebli.get() + 1)
+      zglosDuzaZmiane()
+    }
+  }, 220)
 }
 
 export const $historia = atom({ moznaCofnac: false, moznaPonowic: false, cofnij: null as string | null, ponow: null as string | null, krokow: 0 })
