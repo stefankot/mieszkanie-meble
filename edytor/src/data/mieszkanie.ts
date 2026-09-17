@@ -15,11 +15,11 @@ export const widoki: Widok[] = [
 
 export interface Warstwa { id: string; nazwa: string; widoczna: boolean }
 export const warstwy: Warstwa[] = [
-  { id: 'mieszkanie', nazwa: 'Mieszkanie', widoczna: true },
-  { id: 'meble', nazwa: 'Meble', widoczna: true },
-  { id: 'swiatla', nazwa: 'Światła', widoczna: true },
-  { id: 'zaslony', nazwa: 'Zasłony', widoczna: true },
-  { id: 'otoczenie', nazwa: 'Drzewa za oknem', widoczna: true }
+  { id: 'mieszkanie', nazwa: 'Apartment', widoczna: true },
+  { id: 'meble', nazwa: 'Furniture', widoczna: true },
+  { id: 'swiatla', nazwa: 'Lights', widoczna: true },
+  { id: 'zaslony', nazwa: 'Curtains', widoczna: true },
+  { id: 'otoczenie', nazwa: 'Outdoor trees', widoczna: true }
 ]
 
 export interface Wezel { id: string; nazwa: string; typ: 'mebel' | 'modul' | 'mechanizm' | 'swiatlo'; dzieci?: Wezel[]; opis?: string }
@@ -27,21 +27,21 @@ export const obiekty: Wezel[] = [
   {
     id: 'regal-salon', nazwa: 'Regał w salonie', typ: 'mebel', opis: 'v0006',
     dzieci: [
-      { id: 'rs-modul', nazwa: 'Moduł półki × 12', typ: 'modul' },
-      { id: 'rs-plecy', nazwa: 'Plecy', typ: 'modul' }
+      { id: 'rs-modul', nazwa: 'Shelf module × 12', typ: 'modul' },
+      { id: 'rs-plecy', nazwa: 'Back panel', typ: 'modul' }
     ]
   },
   {
     id: 'kuchnia', nazwa: 'Nowa kuchnia', typ: 'mebel', opis: 'v0002',
     dzieci: [
-      { id: 'k-szuflada', nazwa: 'Szuflada × 6', typ: 'modul' },
+      { id: 'k-szuflada', nazwa: 'Drawer × 6', typ: 'modul' },
       { id: 'k-lodowka', nazwa: 'Front chłodziarki', typ: 'mechanizm' },
       { id: 'k-zmywarka', nazwa: 'Front zmywarki', typ: 'mechanizm' }
     ]
   },
   {
     id: 'regal-kuchnia', nazwa: 'Regał w kuchni', typ: 'mebel', opis: 'v0002',
-    dzieci: [{ id: 'rk-drzwiczki', nazwa: 'Drzwiczki × 6', typ: 'modul' }]
+    dzieci: [{ id: 'rk-drzwiczki', nazwa: 'Door × 6', typ: 'modul' }]
   },
   { id: 'regal-przy-lozku', nazwa: 'Regał przy łóżku', typ: 'mebel', opis: 'v0020' },
   { id: 'lozko', nazwa: 'Łóżko pod oknem', typ: 'mebel', opis: 'v0018' },
@@ -68,15 +68,15 @@ export const materialy: Material[] = [
 export interface KolorPalety { rola: string; hex: string }
 export interface Paleta { id: string; nazwa: string; kolory: KolorPalety[] }
 export const palety: Paleta[] = [
-  { id: 'kuchnia-burgund', nazwa: 'Kuchnia · burgund', kolory: [
-    { rola: 'Korpus', hex: '#ece2cf' }, { rola: 'Front', hex: '#6f2230' }, { rola: 'Blat', hex: '#3a3b3e' },
-    { rola: 'Uchwyt', hex: '#a9abad' }, { rola: 'Tekstylia', hex: '#c9b79c' }] },
-  { id: 'klon-kobalt', nazwa: 'Klon i kobalt', kolory: [
-    { rola: 'Korpus', hex: '#c9a27a' }, { rola: 'Front', hex: '#2e4fa0' }, { rola: 'Blat', hex: '#f1efe9' },
-    { rola: 'Uchwyt', hex: '#1d1d1f' }, { rola: 'Tekstylia', hex: '#e2b5a3' }] },
-  { id: 'skandynawska', nazwa: 'Skandynawska', kolory: [
-    { rola: 'Korpus', hex: '#f3f1ec' }, { rola: 'Front', hex: '#d9d4c7' }, { rola: 'Blat', hex: '#b48a5f' },
-    { rola: 'Uchwyt', hex: '#2b2b2b' }, { rola: 'Tekstylia', hex: '#8a9a86' }] }
+  { id: 'kuchnia-burgund', nazwa: 'Kitchen burgundy', kolory: [
+    { rola: 'Carcass', hex: '#ece2cf' }, { rola: 'Front', hex: '#6f2230' }, { rola: 'Top', hex: '#3a3b3e' },
+    { rola: 'Handle', hex: '#a9abad' }, { rola: 'Textile', hex: '#c9b79c' }] },
+  { id: 'klon-kobalt', nazwa: 'Maple & cobalt', kolory: [
+    { rola: 'Carcass', hex: '#c9a27a' }, { rola: 'Front', hex: '#2e4fa0' }, { rola: 'Top', hex: '#f1efe9' },
+    { rola: 'Handle', hex: '#1d1d1f' }, { rola: 'Textile', hex: '#e2b5a3' }] },
+  { id: 'skandynawska', nazwa: 'Nordic', kolory: [
+    { rola: 'Carcass', hex: '#f3f1ec' }, { rola: 'Front', hex: '#d9d4c7' }, { rola: 'Top', hex: '#b48a5f' },
+    { rola: 'Handle', hex: '#2b2b2b' }, { rola: 'Textile', hex: '#8a9a86' }] }
 ]
 
 export const presetySwiatla = {
@@ -86,9 +86,9 @@ export const presetySwiatla = {
 
 export interface Kategoria { nazwa: string; liczba: number; dzieci?: Kategoria[] }
 export const kategorieBiblioteki: Kategoria[] = [
-  { nazwa: 'Meble', liczba: 7, dzieci: [
-    { nazwa: 'Regały', liczba: 3 }, { nazwa: 'Kuchnia', liczba: 1 }, { nazwa: 'Łóżka', liczba: 2 }, { nazwa: 'Moduły', liczba: 1 }] },
-  { nazwa: 'Oświetlenie', liczba: 4 },
-  { nazwa: 'Tekstylia', liczba: 3 },
-  { nazwa: 'Rośliny', liczba: 2 }
+  { nazwa: 'Furniture', liczba: 7, dzieci: [
+    { nazwa: 'Shelving', liczba: 3 }, { nazwa: 'Kitchen', liczba: 1 }, { nazwa: 'Beds', liczba: 2 }, { nazwa: 'Modules', liczba: 1 }] },
+  { nazwa: 'Lighting', liczba: 4 },
+  { nazwa: 'Textiles', liczba: 3 },
+  { nazwa: 'Plants', liczba: 2 }
 ]

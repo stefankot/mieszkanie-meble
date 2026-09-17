@@ -1,73 +1,75 @@
 <script setup lang="ts">
-import { Box, ChevronRight, Clock, Heart, LayoutGrid, Maximize2, Pin, Search, X } from '@lucide/vue'
+import { Box, ChevronDown, ChevronRight, Clock, Heart, LayoutGrid, Maximize2, Pin, Search, X } from '@lucide/vue'
 import { useDraggable } from '@vueuse/core'
 import { computed, ref, useTemplateRef } from 'vue'
 
 import { kategorieBiblioteki, materialy, obiekty, palety } from '@/data/mieszkanie'
 import { $bibliotekaOtwarta } from '@/stan'
+import Pudelko from '@/ui/primitives/Pudelko.vue'
 
-/* D5 Assets: pływające okno (przypnij, powiększ, zamknij), Online/Lokalne, Model/Materiał/Paleta,
-   Wszystkie/Ostatnie/Ulubione, kategorie z licznikami, siatka miniatur. Przeciągany za nagłówek. */
+/* D5 Assets: pływające okno z tytułem, Online/Local, „Dynamic only”, „Medium Icons”; lewa nawigacja
+   (Model/Material/Palette, szukaj, All/Recent/Favourite, kategorie z licznikami); siatka kwadratowych kart. */
 const uchwyt = useTemplateRef<HTMLElement>('uchwyt')
-const { style } = useDraggable(uchwyt, { initialValue: { x: 300, y: 96 }, preventDefault: true })
-const zrodlo = ref<'online' | 'lokalne'>('lokalne')
-const typ = ref<'modele' | 'materialy' | 'palety'>('modele')
+const { style } = useDraggable(uchwyt, { initialValue: { x: 420, y: 70 }, preventDefault: true })
+const zrodlo = ref<'online' | 'local'>('local')
+const typ = ref<'model' | 'material' | 'palette'>('model')
+const dynamiczne = ref(false)
+const wybrana = ref('regal-salon')
 const meble = computed(() => obiekty.filter((o) => o.typ === 'mebel'))
+const karta = (id: string) => (wybrana.value === id ? 'ring-[1.5px] ring-accent' : 'ring-1 ring-transparent hover:ring-[#3a3d45]')
 </script>
 
 <template>
-  <div class="fixed z-40 flex h-[460px] w-[640px] flex-col overflow-hidden rounded-lg border border-line bg-panel shadow-2xl" :style="style">
-    <div ref="uchwyt" class="flex h-8 shrink-0 cursor-grab items-center gap-2 border-b border-line bg-panel-2 px-2 select-none">
-      <span class="text-2xs font-medium tracking-wide text-muted">BIBLIOTEKA</span>
-      <div class="ml-auto flex items-center gap-1 text-faint">
-        <button type="button" aria-label="Przypnij" class="p-1 hover:text-text"><Pin :size="12" /></button>
-        <button type="button" aria-label="Powiększ" class="p-1 hover:text-text"><Maximize2 :size="12" /></button>
-        <button type="button" aria-label="Zamknij" class="p-1 hover:text-text" @click="$bibliotekaOtwarta.set(false)"><X :size="13" /></button>
+  <div class="fixed z-40 flex h-[560px] w-[600px] flex-col overflow-hidden rounded-[4px] bg-panel shadow-[0_16px_48px_rgba(0,0,0,.6)] ring-1 ring-black/50" :style="style">
+    <div ref="uchwyt" class="flex h-7 shrink-0 cursor-grab items-center gap-2 bg-[#16181c] px-2 select-none">
+      <span class="size-3 rounded-full bg-[#6c4bff]" />
+      <span class="text-[9.5px] font-semibold tracking-wide text-label">ASSETS</span>
+      <div class="ml-auto flex items-center gap-2 text-muted">
+        <button type="button" aria-label="Pin" class="hover:text-white"><Pin :size="11" /></button>
+        <button type="button" aria-label="Maximize" class="hover:text-white"><Maximize2 :size="11" /></button>
+        <button type="button" aria-label="Close" class="hover:text-white" @click="$bibliotekaOtwarta.set(false)"><X :size="12" /></button>
       </div>
     </div>
-    <div class="flex h-9 shrink-0 items-center gap-4 border-b border-line px-3">
-      <button v-for="z in (['online', 'lokalne'] as const)" :key="z" type="button" class="text-xs" :class="zrodlo === z ? 'font-medium text-text' : 'text-faint'" @click="zrodlo = z">
-        {{ z === 'online' ? 'Online' : 'Lokalne' }}
-      </button>
-      <label class="ml-auto flex items-center gap-1.5 text-2xs text-muted"><LayoutGrid :size="12" /> Średnie ikony</label>
+    <div class="flex h-8 shrink-0 items-center gap-4 px-3">
+      <button v-for="z in ['online', 'local'] as const" :key="z" type="button" class="text-xs capitalize" :class="zrodlo === z ? 'font-semibold text-white' : 'text-muted'" @click="zrodlo = z">{{ z }}</button>
+      <label class="ml-auto flex items-center gap-1.5 text-2xs text-label"><Pudelko v-model="dynamiczne" /> Dynamic only</label>
+      <button type="button" class="flex h-5 items-center gap-1 rounded-d5 bg-field px-1.5 text-2xs text-text">Medium Icons <ChevronDown :size="10" class="text-muted" /></button>
     </div>
-    <div class="grid min-h-0 flex-1 grid-cols-[180px_1fr]">
-      <nav class="flex min-h-0 flex-col gap-1 overflow-y-auto border-r border-line p-2">
-        <div class="flex gap-3 px-1 pb-1">
-          <button v-for="t in (['modele', 'materialy', 'palety'] as const)" :key="t" type="button" class="text-xs" :class="typ === t ? 'text-text' : 'text-faint'" @click="typ = t">
-            {{ { modele: 'Model', materialy: 'Materiał', palety: 'Paleta' }[t] }}
-          </button>
+    <div class="grid min-h-0 flex-1 grid-cols-[150px_1fr]">
+      <nav class="flex min-h-0 flex-col gap-1 overflow-y-auto px-1.5 pb-2">
+        <div class="flex gap-2.5 px-1 pb-1">
+          <button v-for="t in ['model', 'material', 'palette'] as const" :key="t" type="button" class="text-2xs capitalize" :class="typ === t ? 'text-white' : 'text-muted'" @click="typ = t">{{ t }}</button>
         </div>
-        <label class="flex h-6 items-center gap-1.5 rounded-[5px] bg-field px-2 text-faint"><Search :size="12" /><input class="min-w-0 flex-1 bg-transparent text-xs text-text outline-none placeholder:text-faint" placeholder="Szukaj zasobów" /></label>
-        <ul class="mt-1 text-xs">
-          <li class="flex h-6 items-center gap-2 rounded px-1.5 text-text"><LayoutGrid :size="12" class="text-faint" /> Wszystkie <span class="ml-auto text-faint">16</span></li>
-          <li class="flex h-6 items-center gap-2 rounded px-1.5 text-muted"><Clock :size="12" class="text-faint" /> Ostatnie <span class="ml-auto text-faint">4</span></li>
-          <li class="flex h-6 items-center gap-2 rounded px-1.5 text-muted"><Heart :size="12" class="text-faint" /> Ulubione <span class="ml-auto text-faint">2</span></li>
+        <label class="flex h-[22px] items-center gap-1.5 rounded-d5 bg-field px-1.5 text-muted"><Search :size="11" /><input class="min-w-0 flex-1 bg-transparent text-2xs text-text outline-none placeholder:text-faint" placeholder="Search Assets" /></label>
+        <ul class="mt-1 text-2xs">
+          <li class="flex h-[22px] items-center gap-1.5 px-1.5 text-text"><LayoutGrid :size="11" class="text-muted" /> All <span class="ml-auto text-muted">16</span></li>
+          <li class="flex h-[22px] items-center gap-1.5 px-1.5 text-text"><Clock :size="11" class="text-muted" /> Recent <span class="ml-auto text-muted">4</span></li>
+          <li class="flex h-[22px] items-center gap-1.5 px-1.5 text-text"><Heart :size="11" class="text-muted" /> Favourite <span class="ml-auto text-muted">2</span></li>
         </ul>
-        <ul class="mt-1 border-t border-line pt-1 text-xs">
+        <ul class="text-2xs">
           <template v-for="k in kategorieBiblioteki" :key="k.nazwa">
-            <li class="flex h-6 items-center gap-1 rounded px-1.5 text-muted"><ChevronRight :size="11" :class="k.dzieci ? 'rotate-90' : 'opacity-0'" /> {{ k.nazwa }} <span class="ml-auto text-faint">{{ k.liczba }}</span></li>
-            <li v-for="(d, i) in k.dzieci" :key="d.nazwa" class="flex h-6 items-center rounded pl-6 pr-1.5" :class="i === 0 ? 'bg-accent text-white' : 'text-muted'">{{ d.nazwa }} <span class="ml-auto" :class="i === 0 ? 'text-white/70' : 'text-faint'">{{ d.liczba }}</span></li>
+            <li class="flex h-[22px] items-center gap-1 px-1 text-text"><ChevronRight :size="10" :class="k.dzieci ? 'rotate-90 text-muted' : 'opacity-0'" /> {{ k.nazwa }} <span class="ml-auto text-muted">{{ k.liczba }}</span></li>
+            <li v-for="(d, i) in k.dzieci" :key="d.nazwa" class="flex h-[22px] items-center rounded-d5 pl-5 pr-1.5" :class="i === 0 ? 'bg-accent text-white' : 'text-text'">{{ d.nazwa }} <span class="ml-auto" :class="i === 0 ? 'text-white' : 'text-muted'">{{ d.liczba }}</span></li>
           </template>
         </ul>
       </nav>
-      <div class="grid min-h-0 auto-rows-[132px] grid-cols-3 gap-2 overflow-y-auto p-2">
-        <template v-if="typ === 'modele'">
-          <button v-for="(m, i) in meble" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-md bg-panel-2 text-left ring-1" :class="i === 0 ? 'ring-accent' : 'ring-transparent hover:ring-line'">
-            <span class="flex flex-1 items-center justify-center bg-gradient-to-b from-[#26262b] to-[#1b1b1e] text-faint"><Box :size="34" :stroke-width="1" /></span>
-            <span class="truncate px-2 py-1.5 text-2xs text-muted">{{ m.nazwa }}</span>
+      <div class="grid min-h-0 auto-rows-[128px] grid-cols-3 content-start gap-1.5 overflow-y-auto p-1.5 pl-0">
+        <template v-if="typ === 'model'">
+          <button v-for="m in meble" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-d5 bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id">
+            <span class="flex flex-1 items-center justify-center text-[#5b5f67]"><Box :size="40" :stroke-width="0.9" /></span>
+            <span class="truncate px-1.5 pb-1.5 text-[10px] text-text">{{ m.nazwa }}</span>
           </button>
         </template>
-        <template v-else-if="typ === 'materialy'">
-          <button v-for="m in materialy" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-md bg-panel-2 text-left ring-1 ring-transparent hover:ring-line">
-            <span class="flex-1 bg-cover bg-center" :style="{ backgroundColor: m.kolor, backgroundImage: m.miniatura ? `url(${m.miniatura})` : undefined }" />
-            <span class="truncate px-2 py-1.5 text-2xs text-muted">{{ m.nazwa }}</span>
+        <template v-else-if="typ === 'material'">
+          <button v-for="m in materialy" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-d5 bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id">
+            <span class="m-1.5 flex-1 rounded-full bg-cover bg-center" :style="{ backgroundColor: m.kolor, backgroundImage: m.miniatura ? `url(${m.miniatura})` : undefined }" />
+            <span class="truncate px-1.5 pb-1.5 text-[10px] text-text">{{ m.nazwa }}</span>
           </button>
         </template>
         <template v-else>
-          <button v-for="p in palety" :key="p.id" type="button" class="flex flex-col overflow-hidden rounded-md bg-panel-2 text-left ring-1 ring-transparent hover:ring-line">
-            <span class="flex flex-1"><i v-for="k in p.kolory" :key="k.rola" class="flex-1" :style="{ background: k.hex }" /></span>
-            <span class="truncate px-2 py-1.5 text-2xs text-muted">{{ p.nazwa }}</span>
+          <button v-for="p in palety" :key="p.id" type="button" class="flex flex-col overflow-hidden rounded-d5 bg-[#16181c] text-left" :class="karta(p.id)" @click="wybrana = p.id">
+            <span class="m-1.5 flex flex-1 overflow-hidden rounded-[2px]"><i v-for="k in p.kolory" :key="k.rola" class="flex-1" :style="{ background: k.hex }" /></span>
+            <span class="truncate px-1.5 pb-1.5 text-[10px] text-text">{{ p.nazwa }}</span>
           </button>
         </template>
       </div>

@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import { CommandPaletteRoot, type CommandPaletteGroup } from '@open-pencil/vue'
 import { useStore } from '@nanostores/vue'
-import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
-import { computed } from 'vue'
+import Fuse from 'fuse.js'
+import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, ListboxContent, ListboxGroup, ListboxGroupLabel, ListboxItem, ListboxRoot } from 'reka-ui'
+import { computed, ref } from 'vue'
 
 import { lista, wykonaj } from '@/ops/rejestr'
 import '@/ops/operacje'
 import { $paletaPolecenOtwarta } from '@/stan'
 
-/* ⌘K: lista operacji z rejestru (te same, które wywołuje AI). */
+/* ⌘K (wzór Spline/openpencil): operacje z rejestru — te same, które wywołuje AI.
+   Reka Listbox (nawigacja klawiaturą) + fuse.js (wyszukiwanie rozmyte). */
 const otwarta = useStore($paletaPolecenOtwarta)
-const grupy = computed<CommandPaletteGroup[]>(() => {
-  const mapa = new Map<string, CommandPaletteGroup>()
-  for (const op of lista()) {
-    const g = mapa.get(op.grupa) ?? { id: op.grupa, label: op.grupa, items: [] }
-    g.items.push({ id: op.nazwa, label: op.tytul, description: op.nazwa, keywords: [op.nazwa] })
-    mapa.set(op.grupa, g)
-  }
-  return [...mapa.values()]
+const zapytanie = ref('')
+const fuse = new Fuse(lista(), { keys: ['tytul', 'nazwa', 'grupa'], threshold: 0.4 })
+const grupy = computed(() => {
+  const wyniki = zapytanie.value ? fuse.search(zapytanie.value).map((r) => r.item) : lista()
+  const mapa = new Map<string, typeof wyniki>()
+  for (const op of wyniki) mapa.set(op.grupa, [...(mapa.get(op.grupa) ?? []), op])
+  return [...mapa]
 })
-const etykiety = { searchPlaceholder: 'Szukaj poleceń…', searchLabel: 'Szukaj poleceń', paletteLabel: 'Paleta poleceń', empty: 'Brak poleceń.', back: 'Wstecz' }
-function wybierz(e: { id: string }) {
+function wybierz(nazwa: unknown) {
   $paletaPolecenOtwarta.set(false)
-  if (e.id === 'scene.describe') wykonaj(e.id, {})
+  zapytanie.value = ''
+  if (nazwa === 'scene.describe') wykonaj(nazwa, {})
 }
 </script>
 
@@ -30,23 +30,21 @@ function wybierz(e: { id: string }) {
   <DialogRoot :open="otwarta" @update:open="$paletaPolecenOtwarta.set($event)">
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 z-50 bg-black/40" />
-      <DialogContent class="fixed left-1/2 top-[14%] z-50 w-[min(560px,90vw)] -translate-x-1/2 outline-none">
-        <DialogTitle class="sr-only">Paleta poleceń</DialogTitle>
-        <CommandPaletteRoot
-          :groups="grupy"
-          :labels="etykiety"
-          :ui="{
-            root: 'overflow-hidden rounded-xl border border-line bg-panel-2 text-text shadow-2xl',
-            search: 'h-11 w-full border-b border-line bg-transparent px-4 text-[13px] outline-none placeholder:text-faint',
-            content: 'max-h-80 overflow-y-auto p-1.5',
-            label: 'px-2 pb-1 pt-2 text-2xs text-faint',
-            item: 'flex h-8 items-center gap-2 rounded-md px-2 text-xs data-[highlighted]:bg-accent data-[highlighted]:text-white',
-            itemLabel: 'flex-1 truncate',
-            itemDescription: 'font-mono text-2xs opacity-60',
-            empty: 'p-4 text-center text-xs text-faint'
-          }"
-          @select="wybierz"
-        />
+      <DialogContent class="fixed left-1/2 top-[14%] z-50 w-[min(520px,90vw)] -translate-x-1/2 overflow-hidden rounded-[4px] bg-panel-2 shadow-2xl ring-1 ring-black/50 outline-none">
+        <DialogTitle class="sr-only">Commands</DialogTitle>
+        <ListboxRoot @update:model-value="wybierz">
+          <input v-model="zapytanie" autofocus class="h-9 w-full border-b border-line bg-transparent px-3 text-[12px] text-text outline-none placeholder:text-faint" placeholder="Search commands…" />
+          <ListboxContent class="max-h-80 overflow-y-auto p-1">
+            <ListboxGroup v-for="[grupa, ops] in grupy" :key="grupa">
+              <ListboxGroupLabel class="px-2 pb-0.5 pt-1.5 text-2xs text-muted">{{ grupa }}</ListboxGroupLabel>
+              <ListboxItem v-for="op in ops" :key="op.nazwa" :value="op.nazwa" class="flex h-[26px] items-center gap-2 rounded-d5 px-2 text-xs text-text outline-none data-[highlighted]:bg-accent data-[highlighted]:text-white">
+                <span class="flex-1 truncate">{{ op.tytul }}</span>
+                <code class="font-mono text-2xs opacity-60">{{ op.nazwa }}</code>
+              </ListboxItem>
+            </ListboxGroup>
+            <p v-if="!grupy.length" class="p-3 text-center text-xs text-muted">No commands.</p>
+          </ListboxContent>
+        </ListboxRoot>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

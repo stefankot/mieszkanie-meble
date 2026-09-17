@@ -4,76 +4,62 @@ import { ref } from 'vue'
 
 import { $trybPrawejKolumny } from '@/stan'
 import PoleLiczby from '@/ui/primitives/PoleLiczby.vue'
+import Pole from '@/ui/primitives/Pole.vue'
 import Sekcja from '@/ui/primitives/Sekcja.vue'
 import Segmenty from '@/ui/primitives/Segmenty.vue'
-import Wiersz from '@/ui/primitives/Wiersz.vue'
 import Wybor from '@/ui/primitives/Wybor.vue'
 
-/* D5: tryb zdjęcia (ikona aparatu) podmienia prawą kolumnę. Sekcja Render AI wg „Plugin X”:
-   kanały z renderera + maski obszarów → OpenAI/Gemini → nakładka z kryciem. */
+/* D5: ikona Image podmienia prawą kolumnę. Sekcja AI Render wg „Plugin X”:
+   kanały renderera + maski obszarów → OpenAI/Gemini → nakładka z kryciem. */
 const proporcje = ref('16:9')
 const rozdzielczosc = ref('2k')
 const fov = ref(42)
 const dostawca = ref('openai')
 const model = ref('gpt-image-1')
-const kanaly = ref(new Set(['obraz', 'albedo', 'glebia', 'normalne', 'maska']))
-const maski = ref(new Set(['swiatlo', 'okno']))
-const preset = ref('foto')
-const krycie = ref(70)
-const wszystkieKanaly = [['obraz', 'Obraz'], ['albedo', 'Albedo'], ['glebia', 'Głębia'], ['normalne', 'Normalne'], ['maska', 'Maska']]
-const wszystkieMaski = [['swiatlo', 'Światło'], ['okno', 'Widok za oknem'], ['rosliny', 'Rośliny'], ['tekstylia', 'Tekstylia']]
+const kanaly = ref(new Set(['beauty', 'albedo', 'depth', 'normal', 'mask']))
+const maski = ref(new Set(['light', 'window']))
+const styl = ref('photo')
+const krycie = ref(0.7)
 const przelacz = (zbior: Set<string>, id: string) => (zbior.has(id) ? zbior.delete(id) : zbior.add(id))
+const chip = (on: boolean) => (on ? 'bg-accent text-white' : 'bg-field text-muted hover:text-white')
 </script>
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <div class="flex h-9 shrink-0 items-center gap-2 border-b border-line px-2">
-      <button type="button" class="flex size-6 items-center justify-center rounded text-muted hover:bg-hover" aria-label="Wróć do edycji" @click="$trybPrawejKolumny.set('edycja')">
-        <ArrowLeft :size="14" />
-      </button>
-      <span class="text-xs font-medium">Zdjęcie</span>
+    <div class="flex h-7 shrink-0 items-center gap-1.5 px-1.5">
+      <button type="button" aria-label="Back to edit" class="flex size-5 items-center justify-center rounded-d5 text-muted hover:bg-hover hover:text-white" @click="$trybPrawejKolumny.set('edycja')"><ArrowLeft :size="12" /></button>
+      <span class="text-xs font-medium text-white">Image</span>
     </div>
     <div class="min-h-0 flex-1 overflow-y-auto">
-      <Sekcja tytul="Kadr">
-        <Wiersz etykieta="Proporcje">
-          <Segmenty v-model="proporcje" :opcje="['16:9', '4:3', '1:1', '4:5'].map((p) => ({ wartosc: p, etykieta: p }))" />
-        </Wiersz>
-        <Wiersz etykieta="Rozdzielczość">
-          <Segmenty v-model="rozdzielczosc" :opcje="[{ wartosc: '1k', etykieta: '1K' }, { wartosc: '2k', etykieta: '2K' }, { wartosc: '4k', etykieta: '4K' }]" />
-        </Wiersz>
-        <Wiersz etykieta="Perspektywa"><PoleLiczby v-model="fov" :min="30" :max="60" jednostka="°" pasek /></Wiersz>
+      <Sekcja tytul="Frame">
+        <Pole etykieta="Aspect Ratio"><Segmenty v-model="proporcje" :opcje="['16:9', '4:3', '1:1', '4:5'].map((p) => ({ wartosc: p, etykieta: p }))" /></Pole>
+        <Pole etykieta="Resolution"><Segmenty v-model="rozdzielczosc" :opcje="[{ wartosc: '1k', etykieta: '1K' }, { wartosc: '2k', etykieta: '2K' }, { wartosc: '4k', etykieta: '4K' }]" /></Pole>
+        <Pole etykieta="Field of View"><PoleLiczby v-model="fov" :min="30" :max="60" jednostka="°" /></Pole>
       </Sekcja>
-
-      <Sekcja tytul="Render AI">
-        <Wiersz etykieta="Dostawca">
-          <Segmenty v-model="dostawca" :opcje="[{ wartosc: 'openai', etykieta: 'OpenAI' }, { wartosc: 'gemini', etykieta: 'Gemini' }]" />
-        </Wiersz>
-        <Wiersz etykieta="Model">
+      <Sekcja tytul="AI Render">
+        <Pole etykieta="Provider"><Segmenty v-model="dostawca" :opcje="[{ wartosc: 'openai', etykieta: 'OpenAI' }, { wartosc: 'gemini', etykieta: 'Gemini' }]" /></Pole>
+        <Pole etykieta="Model">
           <Wybor v-model="model" :opcje="dostawca === 'openai' ? [{ wartosc: 'gpt-image-1', etykieta: 'gpt-image-1' }] : [{ wartosc: 'gemini-3-pro-image', etykieta: 'gemini-3-pro-image' }]" />
-        </Wiersz>
-        <Wiersz etykieta="Kanały" pionowo>
+        </Pole>
+        <Pole etykieta="Channels">
           <div class="flex flex-wrap gap-1">
-            <button v-for="[id, nazwa] in wszystkieKanaly" :key="id" type="button" class="h-5 rounded-full px-2 text-2xs" :class="kanaly.has(id) ? 'bg-accent text-white' : 'bg-field text-muted'" @click="przelacz(kanaly, id)">{{ nazwa }}</button>
+            <button v-for="[id, nazwa] in [['beauty', 'Beauty'], ['albedo', 'Albedo'], ['depth', 'Depth'], ['normal', 'Normal'], ['mask', 'Mask']]" :key="id" type="button" class="h-[18px] rounded-d5 px-1.5 text-2xs" :class="chip(kanaly.has(id))" @click="przelacz(kanaly, id)">{{ nazwa }}</button>
           </div>
-        </Wiersz>
-        <Wiersz etykieta="AI zmienia tylko" pionowo>
+        </Pole>
+        <Pole etykieta="AI Changes Only">
           <div class="flex flex-wrap gap-1">
-            <button v-for="[id, nazwa] in wszystkieMaski" :key="id" type="button" class="h-5 rounded-full px-2 text-2xs" :class="maski.has(id) ? 'bg-accent-soft text-accent ring-1 ring-accent' : 'bg-field text-muted'" @click="przelacz(maski, id)">{{ nazwa }}</button>
+            <button v-for="[id, nazwa] in [['light', 'Light'], ['window', 'Window view'], ['plants', 'Plants'], ['textiles', 'Textiles']]" :key="id" type="button" class="h-[18px] rounded-d5 px-1.5 text-2xs" :class="chip(maski.has(id))" @click="przelacz(maski, id)">{{ nazwa }}</button>
           </div>
-        </Wiersz>
-        <Wiersz etykieta="Styl">
-          <Segmenty v-model="preset" :opcje="[{ wartosc: 'foto', etykieta: 'Fotorealizm' }, { wartosc: 'wieczor', etykieta: 'Wieczór' }, { wartosc: 'ludzie', etykieta: 'Ludzie' }]" />
-        </Wiersz>
-        <textarea rows="3" class="mt-1 w-full resize-none rounded-[5px] bg-field p-2 text-xs text-text outline-none placeholder:text-faint" placeholder="Dodatkowy opis, np. miękkie popołudniowe światło, lniane zasłony" />
-        <Wiersz etykieta="Krycie nakładki"><PoleLiczby v-model="krycie" :min="0" :max="100" jednostka="%" pasek /></Wiersz>
-        <div class="flex gap-1 pt-1">
-          <button type="button" class="h-7 flex-1 rounded-md bg-field text-xs text-text hover:bg-hover">Podgląd miksu</button>
-          <button type="button" class="flex h-7 flex-1 items-center justify-center gap-1.5 rounded-md bg-accent text-xs text-white"><Sparkles :size="13" /> Generuj AI</button>
+        </Pole>
+        <Pole etykieta="Style"><Segmenty v-model="styl" :opcje="[{ wartosc: 'photo', etykieta: 'Photoreal' }, { wartosc: 'evening', etykieta: 'Evening' }, { wartosc: 'people', etykieta: 'People' }]" /></Pole>
+        <Pole etykieta="Custom Prompt"><textarea rows="3" class="w-full resize-none rounded-d5 bg-field p-1.5 text-xs text-text outline-none placeholder:text-faint" placeholder="Soft afternoon light, linen curtains" /></Pole>
+        <Pole etykieta="Overlay Opacity"><PoleLiczby v-model="krycie" :min="0" :max="1" :krok="0.01" /></Pole>
+        <div class="grid grid-cols-2 gap-1 pt-0.5">
+          <button type="button" class="h-[22px] rounded-d5 bg-field text-2xs text-text hover:bg-hover">Preview Mix</button>
+          <button type="button" class="flex h-[22px] items-center justify-center gap-1 rounded-d5 bg-accent text-2xs text-white"><Sparkles :size="11" /> Generate</button>
         </div>
       </Sekcja>
     </div>
-    <div class="shrink-0 border-t border-line p-2">
-      <button type="button" class="h-8 w-full rounded-md bg-text text-xs font-medium text-app hover:bg-white">Renderuj zdjęcie</button>
-    </div>
+    <div class="shrink-0 p-2"><button type="button" class="h-6 w-full rounded-d5 bg-accent text-xs font-medium text-white">Render</button></div>
   </div>
 </template>

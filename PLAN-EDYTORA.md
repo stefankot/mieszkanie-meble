@@ -1,7 +1,7 @@
 # PLAN-EDYTORA — plan działania i stan przekazania
 
 Plik dla modelu, który przejmuje pracę. Aktualizowany przyrostowo w trakcie prac.
-**Ostatnia aktualizacja:** 2026-09-17 — makieta UI gotowa do oceny (dev działa, build zablokowany przez @open-pencil/vue — patrz krok 5).
+**Ostatnia aktualizacja:** 2026-09-17 — makieta 2 (styl D5, tryb spaceru, białe kropki) zakończona i wypchnięta na gałąź `edytor-vue`.
 
 ## 1. Cel
 Edytor aranżacji wnętrz 3D (przeglądarka, WebGPU) na bazie istniejącego renderera
@@ -40,7 +40,7 @@ Użytkownik pracuje sam, na laptopie z gładzikiem. Język UI: polski.
 
 ## 5. Architektura docelowa
 - Silnik: istniejący vanilla JS + three r185 (WebGPU, TSL) — **nie przepisywać**.
-- UI: **Vue 3 + @open-pencil/vue 0.15 (headless: NumberField, PropertySection, SegmentedControl, CommandPalette) + Reka UI + Tailwind 4**.
+- UI: **Vue 3 + Reka UI + Tailwind 4** (@open-pencil/vue odrzucony 17.09 — blokował build, patrz krok 5).
 - Stan UI↔silnik: nanostores. Historia/cofnij: logika E1 z kopii Codex.
 - **Rejestr operacji** (`edytor/src/ops/`): każda zmiana = operacja {nazwa, opis, schemat zod, wykonanie, cofnięcie}. Z rejestru korzystają: przyciski UI, ⌘K, polecenia tekstowe (structured outputs OpenAI/Gemini) i głos (`@openai/agents-realtime`, narzędzia z `z.toJSONSchema`). Operacje odczytu (`scene.describe`) dają modelowi stan.
 - Pozostały stack (wdrażany w kolejnych krokach): three-mesh-bvh (zaznaczanie, przyciąganie), @recast-navigation/three (trasa przejść), tinykeys, fuse.js, culori (palety), idb, dockview (zapisane układy), virtua (siatka assetów), lucide, `ai` + `openai` + `@google/genai`, vitest/Playwright. Efekty filmowe: węzły TSL z three (MotionBlur, DepthOfFieldNode, FilmNode, Lut3DNode, TRAA, RecurrentDenoise).
@@ -60,6 +60,23 @@ Użytkownik pracuje sam, na laptopie z gładzikiem. Język UI: polski.
 | Biblioteka (pływające okno) | Online/Lokalne; Modele/Materiały/Palety; szukaj; Wszystkie/Ostatnie/Ulubione; kategorie z licznikami; siatka miniatur | D5 |
 | Tryb Zdjęcie | prawa kolumna zamienia się na ustawienia obrazu + **Render AI** (kanały, maski, dostawca, model, prompt, krycie nakładki) | D5 + Plugin X |
 | ⌘K | lista operacji z rejestru | Spline/openpencil |
+
+## 6a. Wymagania po pierwszej makiecie (17.09)
+- Wygląd kontrolek **1:1 pixel perfect jak D5** (nie „w stylu”); przy niewiadomych dopytać użytkownika.
+- **Najważniejsze:** białe kropki (hotspoty) przy aktywnych elementach sceny → otwierają Inspektor lub pływający panel kontekstowy obok kropki. Wzór: D5 3.1 **Interactive Presentation** — białe kółka „3D triggers” (przełączają materiały, światło, warianty) + pływający panel **All Variable Sets** (grupy: Material / Environment / element; opcje jako miniatury „Option A/B/C”, wybrana z jasną ramką i pogrubionym podpisem).
+- Tryb prezentacji D5 3.1: lewa lista slajdów z numerami i miniaturami (wybrany = niebieska karta), lewy górny róg „wyjście + Demo”, prawy górny „Settings ▾”, dolny środek pager „◈ ‹ 1/5 ›”.
+- D5 3.x (zrzut „Houses on Hare”): nagłówki sekcji z chevronem PO LEWEJ („⌄ Weather”), etykiety NAD polami (Sunlight Intensity → pole 0.4 z wypełnieniem), radio „Follow HDRI / Custom”, checkboxy kwadratowe (Volume Light), zakładka Inspector tylko przy zaznaczeniu, pasek podpowiedzi skrótów na dole sceny („Scroll + RMB Adjust Movement Speed”, „Shift+WSADQE Accelerate”…), kolumny boczne ~178 px przy 1920 px.
+- Kontrolki przepisać z @open-pencil/vue na **Reka UI + własny scrub** (decyzja 17.09).
+- Ankieta 17.09: nazwy **angielskie 1:1 jak D5**; agent AI = zakładka „Agent” w lewej kolumnie (Spline); kropki przy **ruchomych częściach, meblach, światłach**; klik = panel obok kropki + „More…” otwiera Inspector.
+- **Start w trybie spaceru** (bez edycji) z podstawowymi funkcjami jak stary panel renderera bez DEV; panel przepisany w stylu D5 (wzór: D5 3.1 Presentation). Edycja dopiero przyciskiem „Edit”.
+- Po zakończeniu etapu: podać użytkownikowi listę komend terminala do samodzielnego scalenia repo z GitHubem.
+
+### Makieta 2 (w toku 17.09) — co zrobiono
+- `@open-pencil/*` i `canvaskit-wasm` usunięte; prymitywy na Reka UI (`Sekcja`=Collapsible, `Segmenty`=ToggleGroup, `PoleLiczby`=NumberField+scrub, `Pudelko`=Checkbox, `Radio`=RadioGroup, ⌘K=Listbox+fuse.js). `npx vite build` przechodzi (506 KB).
+- Tokeny D5 w `styles/app.css`; kolumny 178 px; górny pasek 32 px.
+- Tryb spaceru: `ui/walk/*` (Edit/Views, lista widoków z miniaturami z renderera, Settings ▾, pager ◈ ‹ n/7 ›). Settings steruje UKRYTYM starym panelem renderera przez `silnik/most.ts` (`ustawKontrolke`, `kliknij`) — tymczasowy most do czasu rejestru operacji.
+- Kropki: `silnik/hotspoty.ts` (źródła: `__silnik.interakcje.ruchy()` 46 części, `scene.getObjectByName('biblioteka:<id>')` meble, `lampy.zarowki` + `lampySufitowe`; rzut co klatkę, zasłonięcie Raycasterem co ~280 ms; zasięg cm: części 320, meble 900, światła 700). `ui/hotspots/*` — panel „All Variable Sets”; stan drzwi/szuflad działa (`interakcje.ustaw`), uchwyt/paleta/barwa światła to makieta.
+- Miniatury widoków: `drawImage` z płótna WebGPU w `requestAnimationFrame` ramki ~1,6 s po teleporcie → localStorage `edytor:miniatury`.
 
 ## 7. Stan prac
 ### Etap 1–4 (analiza) — ZAKOŃCZONE
@@ -94,6 +111,14 @@ npm run dev          # http://localhost:5173/
 npm run test:silnik  # dotychczasowe testy node --test
 ```
 Pomiar FPS tylko na widocznym oknie przeglądarki (ukryta karta daje fałszywe czasy).
+
+### Makieta 2 — weryfikacja (17.09, przeglądarka 1440×900)
+- Tryb spaceru: renderer na cały ekran, Views z prawdziwymi miniaturami (Salon, Kuchnia), Settings ▾ czyta i ustawia stary panel (projekt, wersja, pora dnia, ciepło, priorytet), pager, mini-mapa ze stylami, kropka „Regał w salonie” → panel Doors & drawers / Palette → More… przechodzi do Inspectora.
+- Tryb edycji: układ D5 (178 px), Environment zgodny ze zrzutem D5 3.x, Inspector (12 akcji, Basic, Parameters, Version, Mechanisms, Material), Assets, ⌘K; `npx vite build` OK.
+- Znane ograniczenia: (1) po edycji `silnik/*.ts` w trakcie `npm run dev` HMR tworzy drugą instancję modułu — kropki znikają do pełnego przeładowania strony; (2) miniatura widoku powstaje dopiero po jego odwiedzeniu; (3) warianty uchwytów, palety na kropkach, barwa światła, parametry i materiały w Inspectorze to makieta (bez wpływu na scenę); (4) kropki świateł tylko dla `lampy.zarowki`/`lampySufitowe`, ledy pominięte; (5) porównanie pixel-perfect z D5 zrobione wzrokowo, bez nakładania zrzutów.
+
+## 8a. Zadania zgłoszone na „po UI”
+- **Znacznik Point & Go** (`renderery/webgpu/nawigacja.js`, dysk SVG „znacznik podejścia”): niebieskie koło ma się pojawiać **tylko na podłodze**; na meblach i ścianach jest za duże → tam zamiast koła zmienić **kursor** (np. wskazujący „podejdź”), bez rysowania dysku.
 
 ## 9. Następne kroki (kolejność po makiecie)
 1. Akceptacja wyglądu przez użytkownika → poprawki makiety.
