@@ -169,7 +169,11 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
    - Panel przy kropce obsługuje światła silnika i własne przez `silnik/swiatlaPanel.ts`.
    - Sprawdzone na scenie: wstawienie kopii regału (przyciągnięcie do ściany), gizmo, przeniesienie, usunięcie i cofnięcie; własne światło (SpotLight, zmiana lumenów i skupienia, usunięcie, cofnięcie).
    - Kalibracja jasności (pomiar w kadrze salonu): tło 0,230; lampa silnika +0,028; własne 1600 lm bez kalibracji +1,399 → stała 1/6,3 daje +0,225, czyli podwojenie jasności w pobliżu.
-8. Profil filmowy 25 FPS (najpierw pomiar).
+8. ✅ Profil filmowy (`renderery/webgpu/film.js`, `__silnik.film`, sekcja Cinematic Motion w panelu jakości, operacja `quality.setCinematic`):
+   - tempo 25 kl./s (pacing z zapasem 10% i akumulatorem — proste „co 40 ms” gubiło klatki przez rytm ekranu: 17 zamiast 25),
+   - rozmycie ruchu: własny węzeł TSL po wektorze prędkości z MRT (three r185 nie ma MotionBlurNode),
+   - głębia ostrości: `dof` z addonów (ogniskowa i przysłona w cm), ziarno: `film`; efekty na gotowej kompozycji.
+   - **Pomiary (17.09, salon, 1280×800, jakość „wysoka”)**: bez profilu 55–56 kl./s; koszt pojedynczych efektów: ziarno 52,4; rozmycie ruchu 49,4; głębia ostrości 33,7. Z pełnym profilem i limitem 25 → **24,5–24,8 kl./s**. Pierwsze sekundy po włączeniu są wolniejsze (kompilacja shaderów), potem tempo jest równe. Ostrość obrazu (średnia różnica sąsiednich pikseli) spada z 7,78 na 5,72, czyli efekty faktycznie działają.
 9. AI: polecenia tekstowe + rozmowa Realtime na rejestrze operacji.
 10. Render AI (kanały, maski, nakładka); warianty A/B; eksport JSON projektu.
 Później: VR, ControlNet, kolizje, CSG, fizyka.

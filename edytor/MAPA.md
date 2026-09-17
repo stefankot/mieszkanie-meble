@@ -86,7 +86,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 ## UI — pływający pasek (Figma UI3) i tryb spaceru
 - `ui/toolbar/PasekNarzedzi.vue` — pasek na dole sceny; edycja: narzędzia, Assets, światło, kamera, Image, AI; spacer: Edit, Views, kropki, pager, Settings; zawsze: Top view, mapa, Render quality.
 - `ui/toolbar/PrzyciskPaska.vue` — przycisk 32 px (jeden <button>, działa z as-child).
-- `ui/toolbar/JakoscRenderu.vue` — popover Render quality: Image, Global Light, Cinematic Motion.
+- `ui/toolbar/JakoscRenderu.vue` — popover Render quality: Image (most), Cinematic Motion (profil filmowy silnika), Global Light (makieta).
 - `ui/walk/TrybSpaceru.vue` — tylko panel widoków.
 - `ui/walk/PanelWidokow.vue` — lista widoków z numerami i miniaturami.
 - `ui/walk/UstawieniaSpaceru.vue` — Furniture i Light przez most do starego panelu.

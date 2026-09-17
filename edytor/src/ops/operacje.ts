@@ -283,6 +283,18 @@ zdefiniuj({
   wykonaj: ({ profil }) => ustawKontrolke('#jakoscPoziom', profil)
 })
 zdefiniuj({
+  nazwa: 'quality.setCinematic', tytul: 'Profil filmowy (tempo, rozmycie, głębia, ziarno)', grupa: 'Obraz',
+  wejscie: z.object({
+    wlaczony: z.boolean(),
+    fps: z.number().int().min(12).max(60).default(25),
+    rozmycieRuchu: z.boolean().default(true),
+    glebiaOstrosci: z.boolean().default(true),
+    ziarno: z.boolean().default(true),
+    ostroscCm: z.number().min(50).max(1200).optional()
+  }),
+  wykonaj: (dane) => (silnik() as any)?.film?.ustaw(dane)
+})
+zdefiniuj({
   nazwa: 'render.ai', tytul: 'Render AI kadru', grupa: 'Obraz',
   wejscie: z.object({
     opis: z.string().default(''),

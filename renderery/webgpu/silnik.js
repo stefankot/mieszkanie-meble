@@ -55,6 +55,7 @@ import { utworzDrzewa } from './drzewa.js';
 import { PERF, utworzPomiar } from './wydajnosc.js';
 import { utworzHoverOutline } from './hover-outline.js?silhouette-v2';
 import { utworzSwiatlaEdytora } from './swiatla-edytora.js?swiatla-edytora-v1';
+import { utworzProfilFilmowy } from './film.js?film-v1';
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 import {modelSwiatlaDziennego} from './model-swiatla-dziennego.mjs';
 
@@ -1467,6 +1468,13 @@ const POZIOMY = {
     opis: `PHOTO_PATH niedostępny: ${photoPath.capability.reason}; podgląd PHOTO_RASTER`
   }
 };
+/* Profil filmowy (25 kl./s, rozmycie ruchu, głębia ostrości, ziarno) — dokłada się do gotowej kompozycji. */
+const profilFilmowy = utworzProfilFilmowy({camera, przyZmianie: przebuduj => {
+  if(przebuduj){ potok.outputNode = profilFilmowy.nalozNa(wyjscieDla(POZIOMY[poziomJakosci].potok), {predkosc: kPredkosc, glebia: kGlebia}); potok.needsUpdate = true; }
+  oznaczZmiane();
+}});
+window.__silnik.film = profilFilmowy;
+
 let poziomJakosci = 'srednia';
 let dopracowanieWlaczone = true;
 
@@ -1486,7 +1494,7 @@ function ustawPoziomJakosci(nazwa){
   if(photoInfo) photoInfo.textContent=stanPhotoRaster.active
     ? `PHOTO_RASTER: akumulacja 0/${stanPhotoRaster.target}` : '';
 
-  potok.outputNode = wyjscieDla(j.potok);
+  potok.outputNode = profilFilmowy.nalozNa(wyjscieDla(j.potok), {predkosc: kPredkosc, glebia: kGlebia});
   potok.needsUpdate = true;
 
   // 90% wymiaru to 81% pikseli. W tym projekcie TRAA w buforze 90% okazało
@@ -1649,6 +1657,8 @@ async function klatka(){
     .map(v => v.toFixed(4)).join();
   if(podpis !== podpisKamery){ podpisKamery = podpis; oznaczZmiane(); }
   const teraz = performance.now();
+  // Profil filmowy pilnuje stałego tempa (domyślnie 25 kl./s) — bez wyścigu o maksymalny FPS.
+  if(profilFilmowy.pomin(teraz)){ nawigacja.rysujZnacznik(); return; }
   const aktywny = !wlaczone('bezczynnosc') || !potokGotowy
     || (stanPhotoRaster.active && stanPhotoRaster.samples < stanPhotoRaster.target)
     || teraz - ostatniaZmiana < RYSUJ_PO_ZMIANIE_MS;
