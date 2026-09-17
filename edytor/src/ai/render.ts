@@ -16,6 +16,7 @@ export interface OpcjeRenderu {
   wiernosc: boolean
   krawedzie: boolean
   chronMebel: string | null
+  kanaly: boolean
 }
 export interface WynikAI { id: string; url: string; zrodlo: string; ekran: { fx: number; fy: number }; opis: string; model: string; orientacja: Orientacja; czas: number }
 
@@ -52,7 +53,7 @@ const ZASADY = [
 
 export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]> {
   const model = o.model === 'latest' ? await najnowszyModelObrazow() : o.model
-  const { kadr, blob, maska, ekran } = await przechwycKadr(s, o.orientacja, o.chronMebel)
+  const { kadr, blob, maska, kanaly, ekran } = await przechwycKadr(s, o.orientacja, o.chronMebel, o.kanaly)
   const zrodlo = kadr.toDataURL('image/jpeg', 0.9)
   const { toFile } = await import('openai')
   const obrazy = [await toFile(blob, 'kadr.png', { type: 'image/png' })]
@@ -60,6 +61,10 @@ export async function renderujAI(s: Silnik, o: OpcjeRenderu): Promise<WynikAI[]>
   if (o.krawedzie) {
     obrazy.push(await toFile(await mapaKrawedzi(kadr), 'krawedzie.png', { type: 'image/png' }))
     zasady.push('The second image is an edge map of the same view: every edge in the result must match it.')
+  }
+  if (kanaly) {
+    obrazy.push(await toFile(kanaly.normalne, 'normalne.png', { type: 'image/png' }), await toFile(kanaly.glebia, 'glebia.png', { type: 'image/png' }))
+    zasady.push('The next images are a surface-normal map and a depth map of the same view: keep every surface orientation and distance as shown.')
   }
   if (maska) zasady.push('The masked furniture must stay pixel-identical.')
   const [W, H] = ROZMIARY[o.orientacja]

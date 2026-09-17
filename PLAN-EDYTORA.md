@@ -181,8 +181,11 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
    - Sprawdzone na API: „Ustaw 7 półek w regale w salonie, rozkład równy” → agent wywołał `scene.describe`, potem `furniture.setShelfLayout` (7 półek, rozkład równy), odpowiedział po polsku; w historii jeden krok Cofnij. Czas 8,4 s.
    - **Pułapka do zapamiętania:** najnowszy model z listy to `gpt-live-1`, który na Responses zwraca 500 — filtr modeli pomija `live`, `realtime`, `codex`, `instruct`, obraz i dźwięk.
    - Rozmowy głosowej nie dało się sprawdzić automatycznie (brak mikrofonu w środowisku testowym) — do potwierdzenia ręcznego.
-10. Render AI (kanały, maski, nakładka); warianty A/B; eksport JSON projektu.
+10. ✅ Render AI — dokończony: kadr pełnego ekranu, mapa krawędzi, maska chroniąca mebel, **kanały geometrii** (mapa normalnych i głębi renderowane tą samą kamerą przez `scene.overrideMaterial`; głębia w zakresie 0,5–8 m, bo szerszy zakres dawał obraz prawie płaski), nakładka pełnoekranowa z kryciem, trybem mieszania i porównaniem A/B, wiele wariantów naraz (suwak Number of images) oraz eksport i import projektu JSON (panel File). Operacja `render.ai` przyjmuje te same przełączniki.
 Później: VR, ControlNet, kolizje, CSG, fizyka.
+
+## 11. Stan po przejściu całej listy (17.09)
+Punkty 1–10 wykonane i sprawdzone na żywej scenie; szczegóły przy każdym punkcie wyżej. Do potwierdzenia ręcznego zostaje rozmowa głosowa (brak mikrofonu w środowisku testowym). Serwer edytora: `npm run dev` (port 5173 bywa zajęty przez inny serwer — wtedy `edytor-5174` z `.claude/launch.json`).
 
 ## 10. Ryzyka
 - Fotorealizm w ruchu vs wydajność (ostatni pomiar 10.09: 16,5 FPS „wysoka”, M2).

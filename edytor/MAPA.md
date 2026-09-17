@@ -37,7 +37,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `ai/agent.ts` — polecenia tekstowe: pętla narzędzi na rejestrze operacji, `$rozmowa`, `$agentPracuje`.
 - `ai/glos.ts` — rozmowa głosowa Realtime (WebRTC, te same narzędzia), `$glos`.
 - `ai/tekstury.ts` — `generujTeksture(opis)`: bezszwowy kafel.
-- `ai/kadr.ts` — kadr z płótna silnika (przycięcie do 3:2/1:1/2:3), mapa krawędzi Sobel, maska chroniąca mebel.
+- `ai/kadr.ts` — kadr całego ekranu (kąt kamery + margines), mapa krawędzi Sobel, maska mebla, kanały normalnych i głębi.
 - `ai/render.ts` — `renderujAI` (images.edit, input_fidelity, krawędzie, maska), `$wynikiAI`, `$nakladkaAI`.
 
 ## Meble parametryczne
