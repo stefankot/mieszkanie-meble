@@ -1,0 +1,34 @@
+{
+  "name": "mieszkanie-meble",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:silnik": "node --test tests/"
+  },
+  "dependencies": {
+    "@lucide/vue": "1.47.0",
+    "@nanostores/vue": "1.1.0",
+    "@open-pencil/core": "0.15.0",
+    "@open-pencil/vue": "0.15.0",
+    "@vueuse/core": "14.4.0",
+    "canvaskit-wasm": "0.42.0",
+    "fuse.js": "7.5.0",
+    "nanostores": "1.5.3",
+    "reka-ui": "2.10.4",
+    "tinykeys": "4.0.0",
+    "vue": "3.5.43",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-vue": "6.0.9",
+    "sirv": "3.0.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.0",
+    "vue-tsc": "3.3.11"
+  }
+}
