@@ -6,11 +6,9 @@ import { obiekty } from '@/data/mieszkanie'
 import { $zaznaczenie } from '@/stan'
 import InspektorMebla from '@/ui/inspector/InspektorMebla.vue'
 
-import SekcjaMaterialu from './SekcjaMaterialu.vue'
-import SekcjaPalety from './SekcjaPalety.vue'
 
-/* Inspector: mebel parametryczny (także gdy zaznaczono jego moduł lub mechanizm) → układ Figma UI3;
-   pod spodem Material i Palette. */
+/* Inspector: mebel parametryczny (także gdy zaznaczono jego moduł lub mechanizm) → układ Figma UI3
+   z kolorami i materiałami zaznaczenia. */
 const zaznaczenie = useStore($zaznaczenie)
 const mebel = computed(() => {
   const id = zaznaczenie.value
@@ -22,7 +20,6 @@ const mebel = computed(() => {
 <template>
   <div>
     <InspektorMebla v-if="mebel" :key="mebel" :mebel="mebel" />
-    <SekcjaMaterialu />
-    <SekcjaPalety />
+    <p v-if="!mebel" class="px-[13px] py-4 text-[11px] text-[#a4a7ae]">Select furniture in the scene or in the layer list.</p>
   </div>
 </template>

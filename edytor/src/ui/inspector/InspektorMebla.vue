@@ -9,12 +9,15 @@ import { $silnik } from '@/silnik/most'
 import { wymiaryMebla } from '@/silnik/wymiary'
 import PrzyciskF from '@/ui/figma/PrzyciskF.vue'
 
+import SekcjaKolorow from './SekcjaKolorow.vue'
 import SekcjaKomponentu from './SekcjaKomponentu.vue'
+import SekcjaMaterialow from './SekcjaMaterialow.vue'
 import SekcjaPozycji from './SekcjaPozycji.vue'
 import SekcjaUkladuPolek from './SekcjaUkladuPolek.vue'
 
 /* Inspector mebla parametrycznego w układzie Figma UI3: nagłówek komponentu, Position, Shelf Layout
-   (odpowiednik Auto layout), komponenty powtarzane N razy z listą kopii. Wymiary ze sceny, gdy dostępne. */
+   (odpowiednik Auto layout), Selection colors i Selection materials (grupy elementów), potem komponenty
+   powtarzane N razy z listą kopii. Wymiary ze sceny, gdy dostępne. */
 const props = defineProps<{ mebel: string }>()
 const silnik = useStore($silnik)
 const uklady = useStore($uklady)
@@ -35,6 +38,8 @@ const w = computed(() => wymiaryMebla(silnik.value, props.mebel) ?? { szerokosc:
     </div>
     <SekcjaPozycji :key="mebel + '-poz'" :x="w.x" :y="w.y" :obrot="w.obrot" />
     <SekcjaUkladuPolek :mebel="mebel" :uklad="u" :szerokosc="w.szerokosc" :wysokosc="w.wysokosc" />
+    <SekcjaKolorow :mebel="mebel" />
+    <SekcjaMaterialow :mebel="mebel" />
     <SekcjaKomponentu v-for="k in u.komponenty" :key="k.id" :mebel="mebel" :uklad="u" :komponent="k" />
   </div>
 </template>

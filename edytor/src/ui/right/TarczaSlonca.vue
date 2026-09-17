@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 /* D5 Geo and Sky: tarcza ~140 px, godzina ~20 px pod nią; okrągła tarcza z ciemną kopułą, uchwyt słońca na obwodzie, godzina pod spodem. */
 const godzina = defineModel<number>({ required: true })
-const kat = computed(() => ((godzina.value - 6) / 24) * Math.PI * 2)
+const kat = computed(() => (((Number.isFinite(godzina.value) ? godzina.value : 12) - 6) / 24) * Math.PI * 2)
 const x = computed(() => 60 + Math.cos(kat.value) * 52)
 const y = computed(() => 60 + Math.sin(kat.value) * 52)
 const napis = computed(() => `${String(Math.floor(godzina.value)).padStart(2, '0')}:${String(Math.round((godzina.value % 1) * 60)).padStart(2, '0')}`)

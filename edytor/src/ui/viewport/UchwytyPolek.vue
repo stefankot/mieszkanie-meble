@@ -61,7 +61,7 @@ function policz() {
     const y = y0 + srodek / 10
     const a = naEkran(sciany.a[0], y, sciany.a[1])
     const c = naEkran(sciany.c[0], y, sciany.c[1])
-    if (a.z > 1 || c.z > 1) continue
+    if (a.z > 1 || c.z > 1 || ![a.x, a.y, c.x, c.y].every(Number.isFinite)) continue
     nowe.push({ x1: a.x, y1: a.y, x2: c.x, y2: c.y, xm: (a.x + c.x) / 2, ym: (a.y + c.y) / 2 })
   }
   linie.value = nowe

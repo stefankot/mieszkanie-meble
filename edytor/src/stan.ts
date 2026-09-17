@@ -14,3 +14,6 @@ export const $przyciaganie = atom(true)
 export const $kropkiWidoczne = atom(true)
 export const $panelWidokow = atom(true)
 export const $mapaWidoczna = atom(true)
+
+/* Pływające okno materiału (grupa elementów zaznaczonego mebla). */
+export const $oknoMaterialu = atom<{ mebel: string; klucz: string; zakladka: 'custom' | 'libraries' } | null>(null)

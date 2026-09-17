@@ -7,6 +7,7 @@ import { onBeforeUnmount } from 'vue'
 import { skrotyPowloki } from './skroty'
 import { $bibliotekaOtwarta, $tryb } from './stan'
 import OknoBiblioteki from './ui/assets/OknoBiblioteki.vue'
+import OknoMaterialu from './ui/material/OknoMaterialu.vue'
 import PaletaPolecen from './ui/command/PaletaPolecen.vue'
 import LewyPanel from './ui/left/LewyPanel.vue'
 import Szyna from './ui/rail/Szyna.vue'
@@ -32,6 +33,7 @@ onBeforeUnmount(odepnij)
       <PrawaKolumna v-show="tryb === 'edit'" />
     </main>
     <OknoBiblioteki v-if="biblioteka && tryb === 'edit'" />
+    <OknoMaterialu v-if="tryb === 'edit'" />
     <PaletaPolecen />
   </TooltipProvider>
 </template>
