@@ -33,10 +33,14 @@ for source in sources:
 write_json(ROOT/'renderery/manifest.json',{'schemaVersion':1,'currentVersion':versions[-1]['id'],'versions':list(reversed(versions))})
 
 # Coordinate data are copied from the supplied renderer; no new measurements.
-a=json.loads(re.search(rb'const APARTMENT\s*=\s*(\{.*?\});',first,re.S).group(1))
+# Plan bierzemy z aktualnego silnika (renderery/webgpu/plan.js), nie z pierwszego źródła renderera:
+# układ został ręcznie poprawiony (odbicie górnej części planu, wysokość 260 cm), a stare źródło
+# ma wersję sprzed poprawki i regeneracja cofała ją przy każdej zmianie w narzedzia/.
+a=json.loads(re.search(rb'APARTMENT_DATA\s*=\s*(\{.*?\});',(ROOT/'renderery/webgpu/plan.js').read_bytes(),re.S).group(1))
 ids=['KUCHNIA','WC','LAZIENKA','SALON','POKOJ-9','PRZEDPOKOJ','POKOJ-LOZKO']
 rooms=[]
 for room,rid in zip(a['rooms'],ids):
+    rid=room.get('id',rid)
     polygon=[[x*10,z*10]for x,z in room['polygon']];walls=[]
     for i,(p,q)in enumerate(zip(polygon,polygon[1:]+polygon[:1]),1):
         walls.append({'id':f'{rid}-W{i}','fromMm':p,'toMm':q,'lengthMm':round(math.dist(p,q),3)})
@@ -45,8 +49,17 @@ rooms[3]['walls'][3]['description']='Lewa długa ściana salonu: od strony łazi
 rooms[3]['walls'][1]['description']='Prawa długa ściana salonu: okna i drzwi balkonowe.'
 rooms[3]['walls'][0]['description']='Górna krótka ściana salonu na tym rysunku.'
 rooms[3]['walls'][2]['description']='Dolna krótka ściana salonu na tym rysunku.'
-plan={'schemaVersion':1,'units':'mm','coordinateSystem':'RH_Y_UP','svgAxes':'SVG x = scene X; SVG y = scene Z. Wysokość = scene Y. Dodatni obrót wokół Y odpowiada rotate(-rotationDeg) w SVG.','source':'Geometria APARTMENT z dostarczonego renderera. Nie jest nową inwentaryzacją pomiarową.','ceilingHeightMm':a['height']*10,'outerMm':[[x*10,z*10]for x,z in a['outer']],'rooms':rooms,'windows':[{'name':w['name'],'rectMm':[v*10 for v in w['rect']]}for w in a['windows']],'doors':[{'name':d['name'],'rectMm':[v*10 for v in d['rect']]}for d in a['doors']],'shaftRectMm':[v*10 for v in a['shaft']],'balconyRectMm':[v*10 for v in a['balcony']],'northVector':a['north']}
-write_json(ROOT/'plan/mieszkanie.json',plan)
+plan={'schemaVersion':1,'units':'mm','coordinateSystem':'RH_Y_UP','svgAxes':'SVG x = scene X; SVG y = scene Z. Wysokość = scene Y. Dodatni obrót wokół Y odpowiada rotate(-rotationDeg) w SVG.','source':'Geometria APARTMENT z dostarczonego renderera. Nie jest nową inwentaryzacją pomiarową.','ceilingHeightMm':a['height']*10,'outerMm':[[x*10,z*10]for x,z in a['outer']],'rooms':rooms,'windows':[{'name':w['name'],'rectMm':[v*10 for v in w['rect']],**({'sillMm':w['sill']*10,'headMm':w['head']*10} if 'sill' in w else {})}for w in a['windows']],'doors':[{'name':d['name'],'rectMm':[v*10 for v in d['rect']]}for d in a['doors']],'shaftRectMm':[v*10 for v in a['shaft']],'balconyRectMm':[v*10 for v in a['balcony']],'northVector':[round(v/math.hypot(*a['north']),3) for v in a['north']]}
+# Opisy pisane ręcznie (pole `source`, opisy ścian) zostają — generator zna tylko geometrię.
+poprzedni=ROOT/'plan/mieszkanie.json'
+if poprzedni.exists():
+    stary=json.loads(poprzedni.read_text(encoding='utf-8'))
+    plan['source']=stary.get('source',plan['source'])
+    opisy={w['id']:w['description'] for r in stary.get('rooms',[]) for w in r.get('walls',[]) if w.get('description')}
+    for r in plan['rooms']:
+        for w in r['walls']:
+            if w['id'] in opisy: w['description']=opisy[w['id']]
+write_json(poprzedni,plan)
 pol=lambda pts:' '.join(f'{x},{z}'for x,z in pts)
 svg=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="-600 -500 12200 8800" role="img" aria-labelledby="title desc">','<title id="title">Plan mieszkania — pomieszczenia i ściany</title>','<desc id="desc">Plan pochodzi z dostarczonego renderera. Jednostki współrzędnych: milimetry. Niebieskie otwory to okna, pomarańczowe to drzwi.</desc>','<rect x="-600" y="-500" width="12200" height="8800" fill="#f7f6f0"/>',f'<polygon points="{pol(plan["outerMm"])}" fill="#888a81"/>']
 colors=['#e4edde','#f0e8dd','#dde9ed','#ede8d7','#e5e0ec','#e7e6df','#e6eada']
@@ -65,5 +78,13 @@ for key,color in [('windows','#3e92b6'),('doors','#c68c47')]:
         x,z,w,h=hole['rectMm'];svg.append(f'<rect x="{x}" y="{z}" width="{w}" height="{h}" fill="{color}"><title>{html.escape(hole["name"])}</title></rect>')
 x,z,w,h=plan['shaftRectMm'];svg.append(f'<rect x="{x}" y="{z}" width="{w}" height="{h}" fill="#888a81"/><text x="{x+w/2}" y="{z+h/2}" text-anchor="middle" font-family="sans-serif" font-size="80">SZACHT</text>')
 svg.extend(['<g font-family="sans-serif" font-size="105" fill="#354235"><text x="-300" y="-220" font-size="165" font-weight="bold">Plan odniesienia do ustawiania mebli</text><text x="5400" y="5600">SALON-W4: długa ściana od strony</text><text x="5400" y="5780">łazienki i przedpokoju.</text><text x="5400" y="6180">Niebieski: okna · Pomarańczowy: drzwi</text><text x="5400" y="6460">SVG: X w prawo, Z w dół; Y = wysokość.</text><text x="5400" y="6740">Współrzędne w mm. Skala zgodna z rendererem.</text><text x="5400" y="7020">Nie zastępuje pomiaru mieszkania.</text></g>','<!-- FURNITURE_OVERLAY: wstaw tu grupę mebla, strzałkę frontu i wymiary przed potwierdzeniem. -->','</svg>'])
-(ROOT/'plan/mieszkanie.svg').write_text('\n'.join(svg)+'\n')
+# Tytuł i opis rysunku bywają pisane ręcznie — zachowujemy je przy regeneracji.
+svgTekst='\n'.join(svg)+'\n'
+svgPlik=ROOT/'plan/mieszkanie.svg'
+if svgPlik.exists():
+    stary=svgPlik.read_text(encoding='utf-8')
+    for znacznik in ('title','desc'):
+        poprzednio=re.search(rf'<{znacznik} id="[^"]*">(.*?)</{znacznik}>',stary,re.S)
+        if poprzednio: svgTekst=re.sub(rf'(<{znacznik} id="[^"]*">).*?(</{znacznik}>)',lambda m:m.group(1)+poprzednio.group(1)+m.group(2),svgTekst,count=1,flags=re.S)
+svgPlik.write_text(svgTekst)
 print(json.dumps({'renderers':len(versions),'source_and_engine_preserved':True,'rooms':len(rooms),'walls':sum(len(r['walls'])for r in rooms)},ensure_ascii=False))
