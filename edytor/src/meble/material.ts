@@ -10,8 +10,11 @@ export const UstawieniaMaterialu = z.object({
   baza: Baza,
   kolor: z.string().regex(/^#[0-9a-f]{6}$/i),
   tekstura: z.object({
-    zrodlo: z.enum(['scene', 'image']).describe('scene = skan materiału z silnika, image = wgrany lub wygenerowany obraz'),
+    zrodlo: z.enum(['scene', 'image', 'online']).describe('scene = skan z silnika, image = wgrany lub wygenerowany obraz, online = zestaw map z biblioteki'),
     url: z.string().optional(),
+    /* Pełny zestaw map PBR z biblioteki online (adresy plików). ARM łączy AO, chropowatość i metaliczność. */
+    mapy: z.object({ kolor: z.string().optional(), normalna: z.string().optional(), arm: z.string().optional(), chropowatosc: z.string().optional(), metalicznosc: z.string().optional(), ao: z.string().optional(), wysokosc: z.string().optional() }).optional(),
+    zrodloNazwa: z.string().optional(),
     ekspozycja: z.number().min(-1).max(1),
     kontrast: z.number().min(-1).max(1),
     nasycenie: z.number().min(-1).max(1),

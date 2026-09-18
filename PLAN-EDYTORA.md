@@ -194,6 +194,24 @@ Wzór: wcześniejsza paczka projektu `reference-logic/jezyk.js` (leksykon + obci
 - Poprawki w operacjach: grupa materiału i mechanizm dopasowywane po słowach (nie po pełnej nazwie), `light.set` przyjmuje mnożnik jasności („jaśniej”).
 - Sprawdzone na scenie: „zielony pistacjowy materac” → kolor #b5cd8f na tkaninie materaca (Cofnij przywraca), „zgaś wszystkie światła”, „otwórz/zamknij drzwiczki w regale w kuchni” (6 mechanizmów), „idź do łazienki”, „widok z góry”, „ustaw 6 półek w regale w salonie”. Zdanie spoza leksykonu poszło do modelu.
 
+## 10b. Biblioteka tekstur online + KTX2 (18.09)
+Prośba: podpiąć Poliigon pod zakładkę Online, tylko darmowe, z pełnymi parametrami; pytanie o BC7/ASTC/KTX2.
+
+**Ustalenia (sprawdzone w sieci 18.09):**
+- Poliigon ma API, ale **prywatne** — obsługuje ich wtyczki (Blender, 3ds Max, C4D, Maya); brak publicznej dokumentacji i kluczy dla obcych aplikacji.
+- Licencja Poliigon **zabrania udostępniania assetów komukolwiek spoza konta**, także zmodyfikowanych. Edytor jest publiczny (GitHub Pages), więc serwowanie ich tekstur przez niego jest wykluczone. Możliwy byłby wyłącznie tryb lokalny, na koncie użytkownika — do decyzji.
+- Poliigon wydaje JPG/PNG/TIFF/EXR. **Żadna biblioteka nie wydaje BC7/ASTC/KTX2** — to formaty GPU, powstają po naszej stronie.
+
+**Wdrożone: Poly Haven** (publiczne API, CORS `*`, wszystko CC0 — darmowe także komercyjnie):
+- `edytor/src/assets/polyhaven.ts` — katalog (862 tekstury), szukanie po nazwie/tagach/kategoriach, `mapyTekstury(id, 1k|2k|4k)` → adresy map z API (nie zgadywane), miniatury z CDN. Testy `polyhaven.test.ts`.
+- Pełny PBR, nie płaski obrazek: barwa, normalne (OpenGL), ARM (AO+chropowatość+metaliczność), osobne Rough/AO, wysokość. `silnik/budowaMaterialu.ts` składa z nich materiał (AO mnoży barwę, ARM steruje chropowatością i metalicznością, normalne przez `normalMap`, wysokość przez wypukłości). Skala mapowania z wymiarów rzeczywistych z API (np. 3 m → 300 cm na powtórzenie).
+- `renderery/webgpu/tekstury-online.js` — wczytywanie z pamięcią podręczną i obsługą `.ktx2` (KTX2Loader silnika). **Pułapka:** tekstura bez pikseli wysłana do GPU unieważnia cały potok WebGPU (czarna scena) — mapy są więc wczytywane przed zbudowaniem materiału, a w razie czego wraca biały piksel.
+- Okno Assets: zakładka Online z siatką miniatur, kategoriami, szukaniem i wyborem 1K/2K/4K; operacja `material.applyOnlineTexture`.
+
+**KTX2 u nas:** `narzedzia/tekstury-ktx2.mjs` (wymaga `basisu`) pobiera mapy i koduje do KTX2; edytor woli lokalne KTX2 od JPG (`tekstury/<id>/mapy.json`).
+Pomiary dla `old_wood_floor` 1k: JPG 2,3 MB → **UASTC 4,0 MB** (jakość, transkodowanie do BC7/ASTC) albo **ETC1S 0,4 MB** (18% wagi). Pamięć GPU: 4,0 MB w RGBA8 → 1,0 MB po kompresji. Sprawdzone w scenie: `isCompressedTexture: true`, format **ASTC 4×4** na Apple Silicon (na desktopie z BC7 sterownik wybierze BC7), 11 poziomów mipmap.
+`tekstury/` jest w `.gitignore` — pliki binarne commitujemy świadomie; bez nich strona używa JPG z CDN Poly Haven.
+
 ## 11. Stan po przejściu całej listy (17.09)
 Punkty 1–10 wykonane i sprawdzone na żywej scenie; szczegóły przy każdym punkcie wyżej. Do potwierdzenia ręcznego zostaje rozmowa głosowa (brak mikrofonu w środowisku testowym). Serwer edytora: `npm run dev` (port 5173 bywa zajęty przez inny serwer — wtedy `edytor-5174` z `.claude/launch.json`).
 

@@ -50,6 +50,9 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `meble/uklad.ts` — stan parametryczny mebli (`$uklady`): przepływ, półki, kolumny, rozkład, płyty, marginesy, komponenty powtarzane N razy.
 - `silnik/wymiary.ts` — wymiary i położenie mebla ze sceny (mm).
 
+## Biblioteki online
+- `assets/polyhaven.ts` — katalog Poly Haven (CC0), szukanie, mapy PBR dla 1k/2k/4k, pierwszeństwo lokalnych KTX2.
+
 ## Dane i operacje
 - `data/mieszkanie.ts` — dane makiety z repo: widoki, warstwy, obiekty, materiały, palety, kategorie Assets.
 - `ops/rejestr.ts` — rejestr operacji (zod): `zdefiniuj`, `wykonaj` (wynik + `$dziennikOperacji`), `zDanymiDomyslnymi`, `narzedziaAI()`.

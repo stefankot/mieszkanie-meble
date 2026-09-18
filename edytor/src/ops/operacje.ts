@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { generujTeksture } from '@/ai/tekstury'
+import { $katalogOnline, mapyTekstury } from '@/assets/polyhaven'
 import { renderujAI } from '@/ai/render'
 import { palety, widoki } from '@/data/mieszkanie'
 import { presetyMaterialow, kopiaUstawien } from '@/meble/material'
@@ -226,6 +227,36 @@ zdefiniuj({
       cele.forEach((g) => {
         const u = kopiaUstawien(d.materialy[`${id}/${g.klucz}`] ?? g.ustawienia)
         u.kolor = kolor.toLowerCase()
+        d.materialy[`${id}/${g.klucz}`] = u
+      })
+    )
+    return cele.length
+  }
+})
+zdefiniuj({
+  nazwa: 'material.applyOnlineTexture', tytul: 'Nadaj teksturę z biblioteki online (Poly Haven, CC0)', grupa: 'Materiały',
+  wejscie: z.object({ mebel: z.string().optional(), grupa: z.string().optional(), tekstura: z.string(), rozdzielczosc: z.enum(['1k', '2k', '4k']).default('2k') }),
+  wykonaj: async ({ mebel, grupa, tekstura, rozdzielczosc }) => {
+    const id = wymagajMebla(mebel)
+    const cele = grupyMebla(id, grupa)
+    const mapy = await mapyTekstury(tekstura, rozdzielczosc)
+    if (!mapy.kolor) throw new Error(`Tekstura ${tekstura} nie ma mapy barwy w ${rozdzielczosc}.`)
+    // Mapy muszą być w pamięci GPU zanim zbudujemy materiał — pusta tekstura psuje potok renderowania.
+    const tekstury = (silnik() as any)?.tekstury
+    await Promise.all(Object.entries(mapy).filter(([, url]) => url).map(([rodzaj, url]) => tekstury?.wczytaj(url as string, { kolor: rodzaj === 'kolor' })))
+    const wpis = $katalogOnline.get().find((t) => t.id === tekstura)
+    const nazwa = wpis?.nazwa ?? tekstura
+    // Wymiary z API są w mm — skala mapowania to centymetry na jedno powtórzenie, więc tekstura ma realny rozmiar.
+    const skala = wpis?.wymiaryM ? Math.min(400, Math.max(1, Math.round(wpis.wymiaryM[0] * 100))) : null
+    zmienProjekt(`Tekstura · ${nazwa}`, (d) =>
+      cele.forEach((g) => {
+        const u = kopiaUstawien(d.materialy[`${id}/${g.klucz}`] ?? g.ustawienia)
+        u.nazwa = nazwa
+        u.baza = 'texture'
+        u.kolor = '#ffffff'
+        u.tekstura = { ...u.tekstura, zrodlo: 'online', mapy, zrodloNazwa: `Poly Haven · ${nazwa} (CC0)` }
+        if (skala) u.mapowanie = { ...u.mapowanie, skala }
+        u.relief = { ...u.relief, wypuklosc: mapy.wysokosc ? Math.max(0.25, u.relief.wypuklosc) : u.relief.wypuklosc }
         d.materialy[`${id}/${g.klucz}`] = u
       })
     )

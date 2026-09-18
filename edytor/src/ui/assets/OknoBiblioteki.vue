@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { Box, ChevronDown, ChevronRight, Clock, Heart, LayoutGrid, Maximize2, Pin, Search, X } from '@lucide/vue'
 import { useDraggable } from '@vueuse/core'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 
+import { $katalogOnline, $stanKatalogu, kategorie as kategorieOnline, MINIATURA, pobierzKatalog, szukaj } from '@/assets/polyhaven'
 import { kategorieBiblioteki, materialy, obiekty, palety } from '@/data/mieszkanie'
 import { wykonaj } from '@/ops/rejestr'
 import '@/ops/operacje'
+import { useStore } from '@nanostores/vue'
+
 import { $bibliotekaOtwarta, $zaznaczenie } from '@/stan'
 import Pudelko from '@/ui/primitives/Pudelko.vue'
 
@@ -19,6 +22,24 @@ const dynamiczne = ref(false)
 const wybrana = ref('regal-salon')
 const meble = computed(() => obiekty.filter((o) => o.typ === 'mebel'))
 const blad = ref('')
+/* Zakładka Online: Poly Haven — licencja CC0, czyli wszystko darmowe; pobieramy pełny zestaw map PBR. */
+const katalog = useStore($katalogOnline)
+const stanKatalogu = useStore($stanKatalogu)
+const szukanie = ref('')
+const kategoria = ref<string | null>(null)
+const rozdzielczosc = ref<'1k' | '2k' | '4k'>('2k')
+watch(zrodlo, (z) => z === 'online' && pobierzKatalog().catch((e) => (blad.value = e.message)), { immediate: true })
+const wynikiOnline = computed(() => szukaj(szukanie.value, kategoria.value, katalog.value).slice(0, 180))
+const kategorieZKatalogu = computed(() => kategorieOnline(katalog.value))
+function uzyjOnline(id: string) {
+  blad.value = ''
+  try {
+    const wynik = wykonaj('material.applyOnlineTexture', { tekstura: id, rozdzielczosc: rozdzielczosc.value, mebel: $zaznaczenie.get() ?? undefined })
+    if (wynik instanceof Promise) wynik.catch((e) => (blad.value = e instanceof Error ? e.message : String(e)))
+  } catch (e) {
+    blad.value = e instanceof Error ? e.message : String(e)
+  }
+}
 /* Podwójny klik wstawia mebel przed kamerą (kopia w projekcie), nadaje materiał albo paletę zaznaczeniu. */
 function uzyj(id: string) {
   blad.value = ''
@@ -51,21 +72,31 @@ const wierszListy = 'flex h-(--wiersz-listy) items-center gap-2 rounded-[3px] px
     <div class="flex h-7 shrink-0 items-center justify-end gap-3 pr-3.5">
       <label class="flex items-center gap-1.5 text-[10.5px] text-label"><Pudelko v-model="dynamiczne" /> Dynamic only</label>
       <button type="button" class="flex h-5 items-center gap-2 rounded-d5 bg-field pl-2 pr-1.5 text-[10.5px] text-text">Medium Icons <ChevronDown :size="10" class="text-muted" /></button>
-      <button type="button" class="flex h-5 items-center rounded-d5 bg-accent px-2 text-[10.5px] font-medium text-white" @click="uzyj(wybrana)">{{ typ === 'model' ? 'Insert' : 'Apply' }}</button>
+      <select v-if="zrodlo === 'online'" v-model="rozdzielczosc" aria-label="Rozdzielczość" class="h-5 rounded-d5 bg-field px-1 text-[10.5px] text-text outline-none">
+        <option value="1k">1K</option>
+        <option value="2k">2K</option>
+        <option value="4k">4K</option>
+      </select>
+      <button type="button" class="flex h-5 items-center rounded-d5 bg-accent px-2 text-[10.5px] font-medium text-white" @click="zrodlo === 'online' ? uzyjOnline(wybrana) : uzyj(wybrana)">{{ zrodlo === 'online' ? 'Apply' : typ === 'model' ? 'Insert' : 'Apply' }}</button>
     </div>
+    <p v-if="zrodlo === 'online'" class="px-4 pb-1 text-[10.5px] text-muted">Poly Haven · CC0 (darmowe, także komercyjnie) · pełny zestaw map PBR: barwa, normalne, ARM, wysokość</p>
     <p v-if="blad" class="px-4 pb-1 text-[10.5px] text-[#ff8a80]">{{ blad }}</p>
     <div class="grid min-h-0 flex-1 grid-cols-[137px_1fr]">
       <nav class="flex min-h-0 flex-col overflow-y-auto pb-3 pl-2 pr-1">
         <div class="flex h-6 items-center gap-3 px-1">
           <button v-for="t in ['model', 'material', 'palette'] as const" :key="t" type="button" class="text-[10.5px] capitalize" :class="typ === t ? 'text-white' : 'text-muted'" @click="typ = t">{{ t }}</button>
         </div>
-        <label class="mt-2.5 flex h-(--wys-listy) shrink-0 items-center gap-1.5 rounded-d5 bg-field px-2 text-muted"><Search :size="11" /><input class="min-w-0 flex-1 bg-transparent text-[10.5px] text-text outline-none placeholder:text-faint" placeholder="Search Assets" /></label>
+        <label class="mt-2.5 flex h-(--wys-listy) shrink-0 items-center gap-1.5 rounded-d5 bg-field px-2 text-muted"><Search :size="11" /><input v-model="szukanie" class="min-w-0 flex-1 bg-transparent text-[10.5px] text-text outline-none placeholder:text-faint" :placeholder="zrodlo === 'online' ? 'Szukaj w Poly Haven (CC0)' : 'Search Assets'" /></label>
         <ul class="mt-3">
           <li :class="[wierszListy, 'text-text']"><LayoutGrid :size="11" class="text-label" /> All <span class="ml-auto text-label">16</span></li>
           <li :class="[wierszListy, 'text-text']"><Clock :size="11" class="text-label" /> Recent <span class="ml-auto text-label">4</span></li>
           <li :class="[wierszListy, 'text-text']"><Heart :size="11" class="text-label" /> Favourite <span class="ml-auto text-label">2</span></li>
         </ul>
-        <ul class="mt-5">
+        <ul v-if="zrodlo === 'online'" class="mt-3">
+          <li :class="[wierszListy, kategoria === null ? 'bg-accent text-white' : 'text-text']"><button type="button" class="flex w-full items-center" @click="kategoria = null">Wszystkie <span class="ml-auto" :class="kategoria === null ? 'text-white' : 'text-label'">{{ katalog.length }}</span></button></li>
+          <li v-for="[k, ile] in kategorieZKatalogu" :key="k" :class="[wierszListy, kategoria === k ? 'bg-accent text-white' : 'text-text']"><button type="button" class="flex w-full items-center capitalize" @click="kategoria = k">{{ k }} <span class="ml-auto" :class="kategoria === k ? 'text-white' : 'text-label'">{{ ile }}</span></button></li>
+        </ul>
+        <ul v-else class="mt-5">
           <template v-for="k in kategorieBiblioteki" :key="k.nazwa">
             <li :class="[wierszListy, 'gap-1 pl-1 text-text']"><ChevronRight :size="10" :class="k.dzieci ? 'rotate-90 text-label' : 'opacity-0'" /> {{ k.nazwa }} <span class="ml-auto text-label">{{ k.liczba }}</span></li>
             <li v-for="(d, i) in k.dzieci" :key="d.nazwa" :class="[wierszListy, 'pl-6', i === 0 ? 'bg-accent text-white' : 'text-text']">{{ d.nazwa }} <span class="ml-auto" :class="i === 0 ? 'text-white' : 'text-label'">{{ d.liczba }}</span></li>
@@ -73,7 +104,25 @@ const wierszListy = 'flex h-(--wiersz-listy) items-center gap-2 rounded-[3px] px
         </ul>
       </nav>
       <div class="grid min-h-0 auto-rows-[150px] grid-cols-3 content-start gap-1.5 overflow-y-auto pb-3 pl-4 pr-3">
-        <template v-if="typ === 'model'">
+        <template v-if="zrodlo === 'online'">
+          <p v-if="stanKatalogu === 'pobieranie'" class="col-span-3 py-6 text-center text-[10.5px] text-muted">Pobieram katalog Poly Haven…</p>
+          <p v-else-if="stanKatalogu === 'blad'" class="col-span-3 py-6 text-center text-[10.5px] text-[#ff8a80]">Nie udało się pobrać katalogu.</p>
+          <button
+            v-for="t in wynikiOnline"
+            :key="t.id"
+            type="button"
+            class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left"
+            :class="karta(t.id)"
+            :title="`${t.nazwa} · ${t.kategorie.slice(0, 3).join(', ')}${t.wymiaryM ? ` · ${t.wymiaryM[0]}×${t.wymiaryM[1]} m` : ''} · CC0`"
+            @click="wybrana = t.id"
+            @dblclick="uzyjOnline(t.id)"
+          >
+            <img :src="MINIATURA(t.id)" :alt="t.nazwa" loading="lazy" class="min-h-0 flex-1 object-cover" />
+            <span class="truncate px-2.5 pb-2 pt-1.5 text-[10.5px] text-text">{{ t.nazwa }}</span>
+          </button>
+          <p v-if="stanKatalogu === 'gotowy' && !wynikiOnline.length" class="col-span-3 py-6 text-center text-[10.5px] text-muted">Brak wyników.</p>
+        </template>
+        <template v-else-if="typ === 'model'">
           <button v-for="m in meble" :key="m.id" type="button" class="flex flex-col overflow-hidden rounded-[3px] bg-[#16181c] text-left" :class="karta(m.id)" @click="wybrana = m.id" @dblclick="uzyj(m.id)">
             <span class="flex flex-1 items-center justify-center text-[#5b5f67]"><Box :size="46" :stroke-width="0.8" /></span>
             <span class="truncate px-2.5 pb-2.5 text-[10.5px] text-text">{{ m.nazwa }}</span>

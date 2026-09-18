@@ -7,3 +7,5 @@ edytor-app/
 .env
 .env.*
 !.env.example
+# Skompresowane tekstury KTX2 (narzedzia/tekstury-ktx2.mjs) — commituj świadomie, to pliki binarne
+tekstury/

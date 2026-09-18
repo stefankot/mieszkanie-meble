@@ -7,7 +7,7 @@ import type { Silnik } from './most'
    Współrzędne wzoru/tekstury: trójplanarnie w świecie (cm) albo UV siatki. Wypukłości: gradient wysokości
    w przestrzeni ekranu (Mikkelsen), jak BumpMapNode, ale także dla wysokości proceduralnej. */
 export const kluczStruktury = (u: UstawieniaMaterialu) =>
-  JSON.stringify([u.baza, u.wzor.rodzaj, u.tekstura.zrodlo, u.tekstura.url, u.relief.sledzenieWysokosci, u.relief.generatywne, u.niedoskonalosci.wlaczone, u.mapowanie.trojplanarne])
+  JSON.stringify([u.baza, u.wzor.rodzaj, u.tekstura.zrodlo, u.tekstura.url, u.tekstura.mapy, u.relief.sledzenieWysokosci, u.relief.generatywne, u.niedoskonalosci.wlaczone, u.mapowanie.trojplanarne])
 
 const tekstury = new Map<string, any>()
 
@@ -99,6 +99,8 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
   let kolor: any
   let wysokosc: any = L.float(0)
   let bazowaNormalna: any = L.normalView
+  let chropowatoscMapy: any = null
+  let metalicznoscMapy: any = null
 
   if (u.baza === 'solid') kolor = U.kolor
   else if (u.baza === 'pattern') {
@@ -127,6 +129,31 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
       }
     }
     kolor = L.mix(U.kolor, U.kolor2, trojplanarnie(maska))
+  } else if (u.tekstura.zrodlo === 'online' && u.tekstura.mapy?.kolor) {
+    /* Zestaw map z biblioteki online: barwa, normalne, ARM (AO + chropowatość + metaliczność) i wysokość.
+       Wszystkie mapy próbkujemy tym samym odwzorowaniem, żeby się nie rozjeżdżały. */
+    const mapy = u.tekstura.mapy
+    const tekstury = (s as any).tekstury
+    const wczytaj = (url: string, kolorSrgb = false) => tekstury?.wczytajOdRazu(url, { kolor: kolorSrgb, poWczytaniu: () => s.oznaczZmiane?.() })
+    const probka = (url: string, kolorSrgb = false) => {
+      const t = wczytaj(url, kolorSrgb)
+      if (!t) return null
+      if (u.mapowanie.trojplanarne) return L.triplanarTexture(L.texture(t), null, null, U.skala, pozycja, L.normalWorld)
+      return L.texture(t, obroc(L.uv().mul(U.skala.mul(60))))
+    }
+    const barwa = probka(mapy.kolor, true)
+    let c = barwa.rgb.mul(L.pow(L.float(2), U.eksp.mul(2)))
+    c = c.sub(0.5).mul(U.kontrast.add(1)).add(0.5)
+    c = L.saturation(c, U.nasycenie.add(1))
+    c = c.mul(L.vec3(U.temperatura.mul(0.25).add(1), U.odcien.mul(-0.2).add(1), U.temperatura.mul(-0.25).add(1)))
+    const arm = mapy.arm ? probka(mapy.arm) : null
+    const ao = arm ? arm.r : mapy.ao ? probka(mapy.ao)!.r : null
+    if (ao) c = c.mul(ao.mul(0.85).add(0.15))          // AO nie gasi materiału do zera
+    kolor = c.mul(U.kolor).clamp(0, 1)
+    chropowatoscMapy = arm ? arm.g : mapy.chropowatosc ? probka(mapy.chropowatosc)!.r : null
+    metalicznoscMapy = arm ? arm.b : mapy.metalicznosc ? probka(mapy.metalicznosc)!.r : null
+    if (mapy.normalna) bazowaNormalna = L.normalMap(probka(mapy.normalna)!, L.vec2(1, 1))
+    if (mapy.wysokosc) wysokosc = probka(mapy.wysokosc)!.r.mul(U.wypuklosc)
   } else {
     const mapa = u.tekstura.zrodlo === 'image' && u.tekstura.url ? obraz(s, u.tekstura.url) : zrodlo?.map
     let surowy: any
@@ -156,7 +183,8 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
     wysokosc = wysokosc.add(L.mx_fractal_noise_float(pozycja.div(U.skalaSzumu).add(U.ziarno.mul(17.3)), 4, 2, 0.5).mul(U.silaSzumu))
   }
 
-  let chropowatosc: any = L.materialRoughness
+  let chropowatosc: any = chropowatoscMapy ? chropowatoscMapy.mul(L.materialRoughness.add(0.5)) : L.materialRoughness
+  if (metalicznoscMapy) m.metalnessNode = metalicznoscMapy
   if (u.niedoskonalosci.wlaczone) {
     const q = pozycja.add(U.ziarno.mul(31.7))
     // Kurz osiada na powierzchniach zwróconych do góry; smugi to płaty satyny; rysy — rozciągnięte komórki Worleya.

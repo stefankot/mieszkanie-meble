@@ -16,7 +16,7 @@ function silnikBezTransformacji(): Plugin {
     name: 'silnik-bez-transformacji',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (/^\/(renderery|plan|meble)\//.test(req.url ?? '')) return surowe(req, res, next)
+        if (/^\/(renderery|plan|meble|tekstury)\//.test(req.url ?? '')) return surowe(req, res, next)
         next()
       })
     }

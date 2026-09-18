@@ -56,6 +56,7 @@ import { PERF, utworzPomiar } from './wydajnosc.js';
 import { utworzHoverOutline } from './hover-outline.js?silhouette-v2';
 import { utworzSwiatlaEdytora } from './swiatla-edytora.js?swiatla-edytora-v1';
 import { utworzProfilFilmowy } from './film.js?film-v1';
+import { utworzTeksturyOnline } from './tekstury-online.js?tekstury-v1';
 import {PRESSETY_SWIATLA, DOMYSLNY_PRESET_SWIATLA, dataPresetuSwiatla} from './presety-swiatla.mjs';
 import {modelSwiatlaDziennego} from './model-swiatla-dziennego.mjs';
 
@@ -991,6 +992,8 @@ sterowanie = utworzSterowanie({
 window.__silnik.sterowanie = sterowanie;
 window.__silnik.biblioteka = biblioteka;
 window.__silnik.plan = PLAN;
+/* Tekstury z bibliotek online i plików użytkownika (KTX2 → format GPU wybiera sterownik). */
+window.__silnik.tekstury = utworzTeksturyOnline({THREE, renderer});
 /* Własne światła edytora (poza pulami silnika). */
 const swiatlaEdytora = utworzSwiatlaEdytora({THREE, scena: scene, przyZmianie: () => oznaczZmiane()});
 window.__silnik.swiatlaEdytora = swiatlaEdytora;
