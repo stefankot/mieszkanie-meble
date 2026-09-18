@@ -1,6 +1,6 @@
 import { kluczUstawien, type UstawieniaMaterialu } from '@/meble/material'
 
-import { zbudujMaterial } from './budowaMaterialu'
+import { wczytajMapy, zbudujMaterial } from './budowaMaterialu'
 import type { Silnik } from './most'
 import { doObrazu, renderujDoObrazu } from './tonowanie'
 
@@ -35,6 +35,7 @@ export function kulka(s: Silnik | null, u: UstawieniaMaterialu, zrodlo?: any): P
   if (!pamiec.has(klucz)) {
     const zadanie = kolejka.then(async () => {
       const { scena, kamera, kula } = przygotuj(s)
+      await wczytajMapy(s, u)          // kulka z biblioteki online potrzebuje map, nie białego zastępnika
       const m = zbudujMaterial(s, u, zrodlo)
       kula.material = m
       try {

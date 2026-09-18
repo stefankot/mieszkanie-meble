@@ -2,7 +2,7 @@ import { atom } from 'nanostores'
 
 import { kopiaUstawien, nowyMaterial, type UstawieniaMaterialu } from '@/meble/material'
 
-import { aktualizujUniformy, kluczStruktury, zbudujMaterial } from './budowaMaterialu'
+import { aktualizujUniformy, kluczStruktury, mapyGotowe, wczytajMapy, zbudujMaterial } from './budowaMaterialu'
 import type { Silnik } from './most'
 
 /* Grupy materiałów w zaznaczonym meblu (jak Figma „Selection colors”): siatki o wspólnym materiale edytuje się razem.
@@ -65,6 +65,11 @@ export function ustawGrupe(s: Silnik | null, mebel: string, klucz: string, u: Us
   const g = grupyMaterialow(s, mebel).find((x) => x.klucz === klucz)
   if (!s || !g) return
   const kopia = kopiaUstawien(u)
+  // Materiał z mapami online budujemy dopiero, gdy mapy są w pamięci GPU (po wczytaniu wracamy tu sami).
+  if (!mapyGotowe(s, kopia)) {
+    void wczytajMapy(s, kopia).then(() => ustawGrupe(s, mebel, klucz, u))
+    return
+  }
   if (g.material.userData?.grupaEdytora && g.material.userData.struktura === kluczStruktury(kopia)) {
     aktualizujUniformy(s, g.material, kopia)
     g.material.userData.ustawieniaEdytora = kopia

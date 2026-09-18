@@ -66,6 +66,20 @@ function obraz(s: Silnik, url: string) {
   return tekstury.get(url)
 }
 
+/* Mapy z biblioteki online muszą być w pamięci GPU, zanim zbudujemy materiał — tekstura bez pikseli
+   unieważnia cały potok WebGPU. Adresy, których nie udało się wczytać, pomijamy, żeby nie czekać w kółko. */
+const nieudaneMapy = new Set<string>()
+const mapyOnline = (u: UstawieniaMaterialu): [string, string][] =>
+  u.tekstura.zrodlo === 'online'
+    ? (Object.entries(u.tekstura.mapy ?? {}).filter(([, url]) => typeof url === 'string' && !nieudaneMapy.has(url)) as [string, string][])
+    : []
+
+export const mapyGotowe = (s: Silnik, u: UstawieniaMaterialu) =>
+  mapyOnline(u).every(([rodzaj, url]) => (s as any).tekstury?.czyGotowa(url, rodzaj === 'kolor'))
+
+export const wczytajMapy = (s: Silnik, u: UstawieniaMaterialu) =>
+  Promise.all(mapyOnline(u).map(([rodzaj, url]) => (s as any).tekstury?.wczytaj(url, { kolor: rodzaj === 'kolor' }).catch(() => nieudaneMapy.add(url))))
+
 /* `zrodlo` — materiał, który grupa miała w silniku (skan, normal map, kolor zadeklarowany w modelu). */
 export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) {
   const T = s.THREE
@@ -84,6 +98,8 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
   const cs = L.cos(U.obrot)
   const sn = L.sin(U.obrot)
   const obroc = (v: any) => L.vec2(v.x.mul(cs).sub(v.y.mul(sn)), v.x.mul(sn).add(v.y.mul(cs)))
+  // Obrót odwrotny — wektory styczne (nachylenie, normalna z mapy) wracają z obróconego UV do płaszczyzny rzutu.
+  const obrocWstecz = (v: any) => L.vec2(v.x.mul(cs).add(v.y.mul(sn)), v.y.mul(cs).sub(v.x.mul(sn)))
   const pozycja = L.positionWorld
   const wagi = (() => {
     const w = L.normalWorld.abs().pow(L.vec3(4))
@@ -97,7 +113,7 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
   }
 
   let kolor: any
-  let wysokosc: any = L.float(0)
+  let wysokosc: any = null          // null = brak pola wysokości, więc bez perturbacji ekranowej
   let bazowaNormalna: any = L.normalView
   let chropowatoscMapy: any = null
   let metalicznoscMapy: any = null
@@ -129,31 +145,66 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
       }
     }
     kolor = L.mix(U.kolor, U.kolor2, trojplanarnie(maska))
-  } else if (u.tekstura.zrodlo === 'online' && u.tekstura.mapy?.kolor) {
+  } else if (u.tekstura.zrodlo === 'online' && u.tekstura.mapy?.kolor && (s as any).tekstury?.czyGotowa(u.tekstura.mapy.kolor, true)) {
     /* Zestaw map z biblioteki online: barwa, normalne, ARM (AO + chropowatość + metaliczność) i wysokość.
        Wszystkie mapy próbkujemy tym samym odwzorowaniem, żeby się nie rozjeżdżały. */
     const mapy = u.tekstura.mapy
-    const tekstury = (s as any).tekstury
-    const wczytaj = (url: string, kolorSrgb = false) => tekstury?.wczytajOdRazu(url, { kolor: kolorSrgb, poWczytaniu: () => s.oznaczZmiane?.() })
-    const probka = (url: string, kolorSrgb = false) => {
-      const t = wczytaj(url, kolorSrgb)
-      if (!t) return null
-      if (u.mapowanie.trojplanarne) return L.triplanarTexture(L.texture(t), null, null, U.skala, pozycja, L.normalWorld)
-      return L.texture(t, obroc(L.uv().mul(U.skala.mul(60))))
-    }
-    const barwa = probka(mapy.kolor, true)
-    let c = barwa.rgb.mul(L.pow(L.float(2), U.eksp.mul(2)))
+    const magazyn = (s as any).tekstury
+    const wczytaj = (url?: string, kolorSrgb = false) => (url && magazyn.czyGotowa(url, kolorSrgb) ? magazyn.wczytajOdRazu(url, { kolor: kolorSrgb }) : null)
+    const tKolor = wczytaj(mapy.kolor, true)
+    const tNormalna = wczytaj(mapy.normalna)
+    const tWysokosc = wczytaj(mapy.wysokosc)
+    const p = pozycja.mul(U.skala)
+    // Trzy rzuty świata mieszane wagami normalnej albo jedno UV siatki — wspólne dla wszystkich map.
+    const rzuty: { uv: any; waga: any }[] = u.mapowanie.trojplanarne
+      ? [{ uv: obroc(p.zy), waga: wagi.x }, { uv: obroc(p.xz), waga: wagi.y }, { uv: obroc(p.xy), waga: wagi.z }]
+      : [{ uv: obroc(L.uv().mul(U.skala.mul(60))), waga: null }]
+    const probka = (t: any) => (t ? rzuty.map((r) => (r.waga ? L.texture(t, r.uv).mul(r.waga) : L.texture(t, r.uv))).reduce((a: any, b: any) => a.add(b)) : null)
+    let c = probka(tKolor).rgb.mul(L.pow(L.float(2), U.eksp.mul(2)))
     c = c.sub(0.5).mul(U.kontrast.add(1)).add(0.5)
     c = L.saturation(c, U.nasycenie.add(1))
     c = c.mul(L.vec3(U.temperatura.mul(0.25).add(1), U.odcien.mul(-0.2).add(1), U.temperatura.mul(-0.25).add(1)))
-    const arm = mapy.arm ? probka(mapy.arm) : null
-    const ao = arm ? arm.r : mapy.ao ? probka(mapy.ao)!.r : null
+    /* Mapy danych bywają wydane inaczej, niż czyta je silnik: gloss zamiast chropowatości (odwrócona)
+       albo wartość spakowana w innym kanale — manifest z `narzedzia/blendkit.mjs` to opisuje. */
+    const kanalMapy = (n: any, rodzaj: string) => (n ? (mapy.kanaly?.[rodzaj] ? n[mapy.kanaly[rodzaj]] : n.r) : null)
+    const wartoscMapy = (url: string | undefined, rodzaj: string) => {
+      const n = kanalMapy(probka(wczytaj(url)), rodzaj)
+      return n && mapy.odwrocone?.includes(rodzaj) ? L.float(1).sub(n) : n
+    }
+    const arm = probka(wczytaj(mapy.arm))
+    const ao = arm ? arm.r : wartoscMapy(mapy.ao, 'ao')
     if (ao) c = c.mul(ao.mul(0.85).add(0.15))          // AO nie gasi materiału do zera
     kolor = c.mul(U.kolor).clamp(0, 1)
-    chropowatoscMapy = arm ? arm.g : mapy.chropowatosc ? probka(mapy.chropowatosc)!.r : null
-    metalicznoscMapy = arm ? arm.b : mapy.metalicznosc ? probka(mapy.metalicznosc)!.r : null
-    if (mapy.normalna) bazowaNormalna = L.normalMap(probka(mapy.normalna)!, L.vec2(1, 1))
-    if (mapy.wysokosc) wysokosc = probka(mapy.wysokosc)!.r.mul(U.wypuklosc)
+    chropowatoscMapy = arm ? arm.g : wartoscMapy(mapy.chropowatosc, 'chropowatosc')
+    metalicznoscMapy = arm ? arm.b : wartoscMapy(mapy.metalicznosc, 'metalicznosc')
+    /* Relief liczymy w przestrzeni tekstury, nie ekranu: nachylenie [cm/cm] = Δwysokość · amplituda / droga,
+       gdzie krok jednego teksela to e/skala centymetrów. Gradient ekranowy (dFdx) przy powtórzeniu rzędu metrów
+       dawał ułamki stopnia, czyli materiał zupełnie płaski. Normalną z mapy mieszamy metodą „whiteout” (Golus) —
+       normalMap() zakłada styczne z UV siatki i dla rzutów trójplanarnych rozrzuca normalne losowo. */
+    if (tNormalna || tWysokosc) {
+      const e = 1 / Math.max(64, tWysokosc?.image?.width ?? 1024)
+      const nachylenie = (uv: any) => {
+        const h = (dx: number, dy: number) => L.texture(tWysokosc, uv.add(L.vec2(dx, dy))).r
+        const h0 = h(0, 0)
+        return L.vec2(h(e, 0).sub(h0), h(0, e).sub(h0)).mul(U.wypuklosc.mul(2 / e).mul(U.skala))
+      }
+      const styczna = (uv: any) => {
+        const n = tNormalna ? L.texture(tNormalna, uv).xyz.mul(2).sub(1) : L.vec3(0, 0, 1)
+        const xy = tWysokosc ? n.xy.mul(U.wypuklosc.mul(4)).sub(nachylenie(uv)) : n.xy.mul(U.wypuklosc.mul(4))
+        return L.vec3(obrocWstecz(xy), n.z.max(0.05))
+      }
+      if (!u.mapowanie.trojplanarne) bazowaNormalna = L.normalMap(L.vec4(styczna(rzuty[0].uv).normalize().mul(0.5).add(0.5), 1), L.vec2(1, 1))
+      else {
+        const n = L.normalWorld
+        const [sx, sy, sz] = rzuty.map((r) => styczna(r.uv))
+        const wSwiecie = (t: any, rzut: any, os: any) => L.vec3(t.xy.add(rzut), t.z.abs().mul(os))
+        bazowaNormalna = wSwiecie(sx, n.zy, n.x).zyx.mul(wagi.x)
+          .add(wSwiecie(sy, n.xz, n.y).xzy.mul(wagi.y))
+          .add(wSwiecie(sz, n.xy, n.z).xyz.mul(wagi.z))
+          .normalize()
+          .transformNormalByViewMatrix(L.cameraViewMatrix)
+      }
+    }
   } else {
     const mapa = u.tekstura.zrodlo === 'image' && u.tekstura.url ? obraz(s, u.tekstura.url) : zrodlo?.map
     let surowy: any
@@ -180,7 +231,7 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
   }
 
   if (u.relief.generatywne) {
-    wysokosc = wysokosc.add(L.mx_fractal_noise_float(pozycja.div(U.skalaSzumu).add(U.ziarno.mul(17.3)), 4, 2, 0.5).mul(U.silaSzumu))
+    wysokosc = (wysokosc ?? L.float(0)).add(L.mx_fractal_noise_float(pozycja.div(U.skalaSzumu).add(U.ziarno.mul(17.3)), 4, 2, 0.5).mul(U.silaSzumu))
   }
 
   let chropowatosc: any = chropowatoscMapy ? chropowatoscMapy.mul(L.materialRoughness.add(0.5)) : L.materialRoughness
@@ -194,16 +245,18 @@ export function zbudujMaterial(s: Silnik, u: UstawieniaMaterialu, zrodlo?: any) 
     const dlon = L.smoothstep(55, 85, pozycja.y).mul(L.smoothstep(125, 95, pozycja.y)).mul(L.float(1).sub(L.normalWorld.y.abs())).mul(U.wytarcie)
     kolor = L.mix(kolor, L.vec3(0.38, 0.37, 0.35), kurz.mul(0.35)).mul(L.float(1).add(dlon.mul(0.08))).add(rysa.mul(0.05)).clamp(0, 1)
     chropowatosc = chropowatosc.add(smugi.mul(0.25)).add(kurz.mul(0.3)).add(rysa.mul(0.2)).sub(dlon.mul(0.2)).clamp(0.04, 1)
-    wysokosc = wysokosc.sub(rysa.mul(0.3))
+    wysokosc = (wysokosc ?? L.float(0)).sub(rysa.mul(0.3))
   }
 
-  const dH = L.vec2(wysokosc.dFdx(), wysokosc.dFdy())
-  const sx = L.positionView.dFdx().normalize()
-  const sy = L.positionView.dFdy().normalize()
-  const R1 = sy.cross(bazowaNormalna)
-  const R2 = bazowaNormalna.cross(sx)
-  const det = sx.dot(R1).mul(L.faceDirection)
-  m.normalNode = det.abs().mul(bazowaNormalna).sub(det.sign().mul(dH.x.mul(R1).add(dH.y.mul(R2)))).normalize()
+  if (wysokosc) {
+    const dH = L.vec2(wysokosc.dFdx(), wysokosc.dFdy())
+    const sx = L.positionView.dFdx().normalize()
+    const sy = L.positionView.dFdy().normalize()
+    const R1 = sy.cross(bazowaNormalna)
+    const R2 = bazowaNormalna.cross(sx)
+    const det = sx.dot(R1).mul(L.faceDirection)
+    m.normalNode = det.abs().mul(bazowaNormalna).sub(det.sign().mul(dH.x.mul(R1).add(dH.y.mul(R2)))).normalize()
+  } else m.normalNode = bazowaNormalna
   m.colorNode = kolor
   m.roughnessNode = chropowatosc
   aktualizujUniformy(s, m, u)
