@@ -4,11 +4,15 @@ import { lista, wykonaj, zNazwyAI } from '@/ops/rejestr'
 import '@/ops/operacje'
 import { narzedziaAI } from '@/ops/rejestr'
 
+import { zinterpretuj } from './jezyk'
 import { najnowszyModelTekstowy, openai } from './klient'
+import { zbierzKontekst } from './kontekst'
+import { $kluczOpenAI } from './klucz'
 
-/* Agent tekstowy: rozumie polecenia po polsku i wykonuje je WYŁĄCZNIE operacjami z rejestru
-   (te same, które klika UI), więc każda zmiana przechodzi przez dokument i Cofnij/Ponów. */
-export interface WiadomoscAgenta { rola: 'uzytkownik' | 'agent' | 'narzedzie' | 'blad'; tekst: string; czas: number; nazwa?: string }
+/* Agent: najpierw interpreter offline (leksykon + słownik ze sceny) — działa bez klucza, natychmiast
+   i bez kosztów. Model językowy jest zapasem dla zdań, których leksykon nie rozpoznał.
+   Obie drogi wykonują WYŁĄCZNIE operacje z rejestru, więc każda zmiana ma Cofnij/Ponów. */
+export interface WiadomoscAgenta { rola: 'uzytkownik' | 'agent' | 'narzedzie' | 'blad'; tekst: string; czas: number; nazwa?: string; opcje?: { etykieta: string; tekst: string }[] }
 export const $rozmowa = atom<WiadomoscAgenta[]>([])
 export const $agentPracuje = atom(false)
 
@@ -26,6 +30,11 @@ const teraz = () => Date.now()
 export async function zapytajAgenta(tekst: string) {
   if (!tekst.trim() || $agentPracuje.get()) return
   dopisz({ rola: 'uzytkownik', tekst, czas: teraz() })
+  if (lokalnie(tekst)) return
+  if (!$kluczOpenAI.get()) {
+    dopisz({ rola: 'blad', tekst: 'Nie rozumiem tego polecenia, a bez klucza OpenAI nie mam zapasowego modelu. Spróbuj prościej, np. „zielony materac w łóżku”, „6 półek w regale w salonie”, „zgaś światła”.', czas: teraz() })
+    return
+  }
   $agentPracuje.set(true)
   try {
     const klient = await openai()
@@ -57,6 +66,40 @@ export async function zapytajAgenta(tekst: string) {
   } finally {
     $agentPracuje.set(false)
   }
+}
+
+/* Interpreter offline. Zwraca true, gdy polecenie zostało obsłużone (wykonane albo zadane pytanie). */
+function lokalnie(tekst: string) {
+  let wynik
+  try {
+    wynik = zinterpretuj(tekst, zbierzKontekst())
+  } catch (e) {
+    console.warn('[jezyk]', e)
+    return false
+  }
+  if (wynik.pytanie) {
+    dopisz({ rola: 'agent', tekst: wynik.pytanie.tekst, opcje: wynik.pytanie.opcje, czas: teraz() })
+    return true
+  }
+  if (!wynik.operacje.length) return false
+  const zrobione: string[] = []
+  const bledy: string[] = []
+  for (const o of wynik.operacje) {
+    try {
+      const r = wykonaj(o.nazwa, o.dane)
+      if (r instanceof Promise) r.catch((e) => dopisz({ rola: 'blad', nazwa: o.nazwa, tekst: `${o.nazwa}: ${e instanceof Error ? e.message : String(e)}`, czas: teraz() }))
+      dopisz({ rola: 'narzedzie', nazwa: o.nazwa, tekst: podsumuj(o.nazwa, JSON.stringify(o.dane)), czas: teraz() })
+      zrobione.push(o.nazwa)
+    } catch (e) {
+      bledy.push(e instanceof Error ? e.message : String(e))
+    }
+  }
+  if (!zrobione.length && bledy.length) {
+    dopisz({ rola: 'blad', tekst: bledy[0], czas: teraz() })
+    return true
+  }
+  dopisz({ rola: 'agent', tekst: `Zrobione: ${wynik.wyjasnienie || zrobione.join(', ')}.${bledy.length ? ` Nie udało się: ${bledy[0]}` : ''}`, czas: teraz() })
+  return true
 }
 
 export const podsumuj = (nazwa: string, argumenty?: string) => {

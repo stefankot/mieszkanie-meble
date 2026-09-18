@@ -34,7 +34,9 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 ## AI
 - `ai/klucz.ts` — `$kluczOpenAI`: przeglądarka albo `.env.local` przez serwer dev (`/__lokalne/openai`).
 - `ai/klient.ts` — klient OpenAI w przeglądarce, `najnowszyModelObrazow()` (najnowszy gpt-image-*).
-- `ai/agent.ts` — polecenia tekstowe: pętla narzędzi na rejestrze operacji, `$rozmowa`, `$agentPracuje`.
+- `ai/jezyk.ts` — interpreter poleceń offline: leksykon, rdzenie, Fuse, sloty → operacje (testy `jezyk.test.ts`).
+- `ai/kontekst.ts` — słownik celów ze sceny (meble, części, światła, pokoje, presety, palety).
+- `ai/agent.ts` — najpierw interpreter offline, model językowy jako zapas; `$rozmowa`, `$agentPracuje`.
 - `ai/glos.ts` — rozmowa głosowa Realtime (WebRTC, te same narzędzia), `$glos`.
 - `ai/tekstury.ts` — `generujTeksture(opis)`: bezszwowy kafel.
 - `ai/kadr.ts` — kadr całego ekranu (kąt kamery + margines), mapa krawędzi Sobel, maska mebla, kanały normalnych i głębi.

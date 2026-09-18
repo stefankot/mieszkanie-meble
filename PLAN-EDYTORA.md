@@ -184,6 +184,16 @@ Kolejność wg użytkownika („po zakończeniu layoutu z Figmy”):
 10. ✅ Render AI — dokończony: kadr pełnego ekranu, mapa krawędzi, maska chroniąca mebel, **kanały geometrii** (mapa normalnych i głębi renderowane tą samą kamerą przez `scene.overrideMaterial`; głębia w zakresie 0,5–8 m, bo szerszy zakres dawał obraz prawie płaski), nakładka pełnoekranowa z kryciem, trybem mieszania i porównaniem A/B, wiele wariantów naraz (suwak Number of images) oraz eksport i import projektu JSON (panel File). Operacja `render.ai` przyjmuje te same przełączniki.
 Później: VR, ControlNet, kolizje, CSG, fizyka.
 
+## 10a. Interpreter poleceń offline (18.09)
+Powód: agent na modelu odmawiał prostych rzeczy („nie ma sofy”, „nie rozpoznał materiału materaca”, „narzędzia nie pozwalają”).
+Wzór: wcześniejsza paczka projektu `reference-logic/jezyk.js` (leksykon + obcinanie końcówek + Fuse), znaleziona w kopii Codex
+`Documents/Codex/2026-09-16/prompt-wdro-eniowy-ui-i-edytor/work/reference-logic/`.
+- `edytor/src/ai/jezyk.ts` — leksykon (czasowniki, liczniki, rozkłady, barwy, jednostki, liczebniki), rdzeniowanie polskie, Fuse na literówki, wypełnianie slotów → operacje z rejestru. 7 testów vitest.
+- `edytor/src/ai/kontekst.ts` — słownik celów z ŻYWEJ sceny: meble, grupy materiałów (nazwa materiału + nazwy siatek, więc „materac”, „bordo”, „fronty” trafiają), światła, pokoje, presety, palety.
+- `ai/agent.ts` — najpierw interpreter offline (bez klucza, bez kosztu, 3–60 ms), model językowy dopiero jako zapas dla zdań spoza leksykonu; brak celu → pytanie z przyciskami wyboru mebla.
+- Poprawki w operacjach: grupa materiału i mechanizm dopasowywane po słowach (nie po pełnej nazwie), `light.set` przyjmuje mnożnik jasności („jaśniej”).
+- Sprawdzone na scenie: „zielony pistacjowy materac” → kolor #b5cd8f na tkaninie materaca (Cofnij przywraca), „zgaś wszystkie światła”, „otwórz/zamknij drzwiczki w regale w kuchni” (6 mechanizmów), „idź do łazienki”, „widok z góry”, „ustaw 6 półek w regale w salonie”. Zdanie spoza leksykonu poszło do modelu.
+
 ## 11. Stan po przejściu całej listy (17.09)
 Punkty 1–10 wykonane i sprawdzone na żywej scenie; szczegóły przy każdym punkcie wyżej. Do potwierdzenia ręcznego zostaje rozmowa głosowa (brak mikrofonu w środowisku testowym). Serwer edytora: `npm run dev` (port 5173 bywa zajęty przez inny serwer — wtedy `edytor-5174` z `.claude/launch.json`).
 

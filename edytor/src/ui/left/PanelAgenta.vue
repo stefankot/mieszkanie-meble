@@ -30,10 +30,10 @@ function wyslij() {
 }
 const STYL = { uzytkownik: 'self-end bg-[#0d99ff] text-white', agent: 'bg-[#2c2e34] text-white', narzedzie: 'bg-transparent text-[#a4a7ae] ring-1 ring-[#34363c]', blad: 'bg-[#3a2326] text-[#ffb4a9]' } as const
 const sugestie = [
-  { nazwa: 'Arrange furniture', ikona: Box, przyklady: ['Balance the living room layout', 'Place a sofa along the longest wall'] },
-  { nazwa: 'Colors and materials', ikona: SwatchBook, przyklady: ['Apply the Nordic palette to kitchen fronts', 'Warmer wood on the shelves'] },
-  { nazwa: 'Set the lighting', ikona: Sun, przyklady: ['Winter morning, 8:00', 'Evening with ceiling lamps on'] },
-  { nazwa: 'Render with AI', ikona: Sparkles, przyklady: ['Photoreal still of this view', 'Evening mood with soft light'] }
+  { nazwa: 'Meble i układ', ikona: Box, przyklady: ['ustaw 6 półek w regale w salonie', 'kolumny na 4 w regale w kuchni', 'otwórz drzwiczki', 'ukryj łóżko'] },
+  { nazwa: 'Kolory i materiały', ikona: SwatchBook, przyklady: ['zielony pistacjowy materac', 'burgund mat na regale w salonie', 'paleta nordic na kuchni', '#2e4fa0 na frontach'] },
+  { nazwa: 'Światło', ikona: Sun, przyklady: ['zgaś wszystkie światła', 'włącz led w regale w salonie', 'jaśniej lampa w salonie', 'cieplej'] },
+  { nazwa: 'Widok i projekt', ikona: Sparkles, przyklady: ['idź do kuchni', 'widok z góry', 'zapisz wersję', 'renderuj to ujęcie'] }
 ]
 </script>
 
@@ -53,6 +53,9 @@ const sugestie = [
         <div v-for="(w, i) in rozmowa" :key="i" class="mb-2 flex max-w-[92%] flex-col rounded-[10px] px-3 py-2 text-[12.5px] leading-snug" :class="STYL[w.rola]">
           <span v-if="w.rola === 'narzedzie'" class="flex items-center gap-1.5 text-[11px]"><Wrench :size="11" /> {{ w.tekst }}</span>
           <span v-else class="whitespace-pre-wrap">{{ w.tekst }}</span>
+          <span v-if="w.opcje" class="mt-2 flex flex-wrap gap-1.5">
+            <button v-for="o in w.opcje" :key="o.etykieta" type="button" class="rounded-[6px] bg-[#34406a] px-2 py-1 text-[11.5px] text-[#8cc8ff] hover:bg-[#3d4b7a]" @click="zapytajAgenta(o.tekst)">{{ o.etykieta }}</button>
+          </span>
         </div>
         <p v-if="pracuje" class="mb-2 flex items-center gap-2 text-[12px] text-[#a4a7ae]"><LoaderCircle :size="13" class="animate-spin" /> Agent pracuje…</p>
       </template>

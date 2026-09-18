@@ -9,6 +9,7 @@ import { cofnij, dokumentProjektu, eksportujProjekt, ponow, zapiszWersje, zmienP
 import { grupyMaterialow, koloryZaznaczenia, ustawieniaPoZmianieKoloru } from '@/silnik/materialyMebla'
 import { $silnik, kliknij, ustawKontrolke } from '@/silnik/most'
 import { przyciagnijDoSciany } from '@/silnik/przyciaganie'
+import { slowaCelu } from '@/ai/jezyk'
 import { parametrySwiatla, swiatlaMebli, swiatlaPokoi, znajdzSwiatlo } from '@/silnik/swiatla'
 import { $aktywnyWidok, $mapaWidoczna, $przyciaganie, $tryb, $trybPrawejKolumny, $zaznaczenie } from '@/stan'
 
@@ -29,10 +30,20 @@ const wymagajMebla = (mebel?: string) => {
   if (!id) throw new Error('Nie wskazano mebla i nic nie jest zaznaczone.')
   return id
 }
+/* Grupa wskazana kluczem, nazwą materiału albo nazwą części („materac”, „bordo”) — tak mówi użytkownik. */
 const grupyMebla = (mebel: string, grupa?: string) => {
   const wszystkie = grupyMaterialow(silnik(), mebel)
   if (!wszystkie.length) throw new Error(`Mebel ${mebel} nie ma grup materiałów w scenie.`)
-  return grupa ? wszystkie.filter((g) => g.klucz === grupa || g.nazwa === grupa) : wszystkie
+  if (!grupa) return wszystkie
+  const szukane = slowaCelu(grupa)
+  const pasuje = (g: (typeof wszystkie)[number]) => {
+    if (g.klucz === grupa || g.nazwa === grupa) return true
+    const slowa = [...slowaCelu(g.nazwa), ...g.siatki.slice(0, 12).flatMap((o: any) => slowaCelu(String(o.name ?? '').replace(/^[\w-]+:/, '').replace(/[_-]+/g, ' ')))]
+    return szukane.some((x) => slowa.some((y) => x === y || (x.length >= 4 && y.startsWith(x)) || (y.length >= 4 && x.startsWith(y))))
+  }
+  const trafione = wszystkie.filter(pasuje)
+  if (!trafione.length) throw new Error(`W meblu ${mebel} nie ma części „${grupa}”. Części: ${[...new Set(wszystkie.map((g) => g.nazwa))].slice(0, 6).join(', ')}.`)
+  return trafione
 }
 
 /* ---------- scena i kamera ---------- */
@@ -117,7 +128,15 @@ zdefiniuj({
   wykonaj: ({ mebel, mechanizm, otwarty }) => {
     const s = silnik()
     const id = wymagajMebla(mebel)
-    const ruchy = (s?.interakcje.ruchy() ?? []).filter((r) => r.mebel === id && (!mechanizm || r.ruch.id === mechanizm || r.ruch.etykieta === mechanizm))
+    // „drzwiczki” ma trafić w „Drzwiczki R1 C1” — porównujemy po słowach, nie po pełnej nazwie.
+    const szukane = mechanizm ? slowaCelu(mechanizm) : []
+    const pasuje = (r: any) => {
+      if (!mechanizm) return true
+      if (r.ruch.id === mechanizm || r.ruch.etykieta === mechanizm) return true
+      const slowa = [...slowaCelu(String(r.ruch.etykieta ?? '')), ...slowaCelu(String(r.ruch.id ?? '').replace(/[:_-]+/g, ' '))]
+      return szukane.some((x) => slowa.some((y) => y === x || (x.length >= 4 && y.startsWith(x)) || (y.length >= 4 && x.startsWith(y))))
+    }
+    const ruchy = (s?.interakcje.ruchy() ?? []).filter((r) => r.mebel === id && pasuje(r))
     if (!ruchy.length) throw new Error('Nie znaleziono takiego mechanizmu.')
     for (const r of ruchy) s?.interakcje.ustaw(r.ruch, otwarty ? 1 : 0)
     return ruchy.length
@@ -251,11 +270,12 @@ zdefiniuj({
 /* ---------- światło i obraz ---------- */
 zdefiniuj({
   nazwa: 'light.set', tytul: 'Ustaw światło (lumeny, skupienie, barwa)', grupa: 'Światło',
-  wejscie: z.object({ swiatlo: z.string(), wlaczone: z.boolean().optional(), lumeny: z.number().min(0).max(6000).optional(), skupienie: z.number().min(0).max(100).optional(), kelwiny: z.number().min(1800).max(6500).optional() }),
-  wykonaj: ({ swiatlo, ...zmiana }) => {
+  wejscie: z.object({ swiatlo: z.string(), wlaczone: z.boolean().optional(), lumeny: z.number().min(0).max(6000).optional(), skupienie: z.number().min(0).max(100).optional(), kelwiny: z.number().min(1800).max(6500).optional(), mnoznikJasnosci: z.number().min(0.1).max(5).optional() }),
+  wykonaj: ({ swiatlo, mnoznikJasnosci, ...zmiana }) => {
     const l = znajdzSwiatlo(silnik(), swiatlo)
     if (!l) throw new Error(`Nie ma światła ${swiatlo}.`)
-    const p = { ...parametrySwiatla(l), ...zmiana }
+    const biezace = parametrySwiatla(l)
+    const p = { ...biezace, ...zmiana, ...(mnoznikJasnosci ? { lumeny: Math.round(biezace.lumeny * mnoznikJasnosci), wlaczone: true } : {}) }
     zmienProjekt(`Light · ${l.etykieta}`, (d) => (d.swiatla[swiatlo] = p))
   }
 })
