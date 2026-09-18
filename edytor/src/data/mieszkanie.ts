@@ -52,12 +52,11 @@ export const obiekty: Wezel[] = [
 export const mechanizmy = ['Drzwiczki R1 C1', 'Drzwiczki R1 C2', 'Drzwiczki R1 C3', 'Drzwiczki R6 C1', 'Drzwiczki R6 C2', 'Drzwiczki R6 C3']
 
 export interface Material { id: string; nazwa: string; kolor: string; miniatura?: string }
-const polyhaven = (id: string) => `https://cdn.polyhaven.com/asset_img/thumbs/${id}.png?width=160&height=160`
 export const materialy: Material[] = [
   { id: 'maple-0375', nazwa: 'Klon 0375', kolor: '#c9a27a' },
-  { id: 'oak_veneer_01', nazwa: 'Fornir dębowy 01', kolor: '#b48a5f', miniatura: polyhaven('oak_veneer_01') },
-  { id: 'rectangular_parquet', nazwa: 'Parkiet prostokątny', kolor: '#9c7250', miniatura: polyhaven('rectangular_parquet') },
-  { id: 'painted_plaster_wall', nazwa: 'Tynk malowany', kolor: '#dcd8d0', miniatura: polyhaven('painted_plaster_wall') },
+  { id: 'oak_veneer_01', nazwa: 'Fornir dębowy 01', kolor: '#b48a5f' },
+  { id: 'rectangular_parquet', nazwa: 'Parkiet prostokątny', kolor: '#9c7250' },
+  { id: 'painted_plaster_wall', nazwa: 'Tynk malowany', kolor: '#dcd8d0' },
   { id: 'burgundy', nazwa: 'Burgund mat', kolor: '#6f2230' },
   { id: 'cobalt-matte', nazwa: 'Kobalt mat', kolor: '#2e4fa0' },
   { id: 'cream', nazwa: 'Krem', kolor: '#ece2cf' },

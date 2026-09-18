@@ -194,23 +194,54 @@ Wzór: wcześniejsza paczka projektu `reference-logic/jezyk.js` (leksykon + obci
 - Poprawki w operacjach: grupa materiału i mechanizm dopasowywane po słowach (nie po pełnej nazwie), `light.set` przyjmuje mnożnik jasności („jaśniej”).
 - Sprawdzone na scenie: „zielony pistacjowy materac” → kolor #b5cd8f na tkaninie materaca (Cofnij przywraca), „zgaś wszystkie światła”, „otwórz/zamknij drzwiczki w regale w kuchni” (6 mechanizmów), „idź do łazienki”, „widok z góry”, „ustaw 6 półek w regale w salonie”. Zdanie spoza leksykonu poszło do modelu.
 
-## 10b. Biblioteka tekstur online + KTX2 (18.09)
-Prośba: podpiąć Poliigon pod zakładkę Online, tylko darmowe, z pełnymi parametrami; pytanie o BC7/ASTC/KTX2.
+## 10b. Biblioteka tekstur online: Blendkit (18.09)
 
-**Ustalenia (sprawdzone w sieci 18.09):**
-- Poliigon ma API, ale **prywatne** — obsługuje ich wtyczki (Blender, 3ds Max, C4D, Maya); brak publicznej dokumentacji i kluczy dla obcych aplikacji.
-- Licencja Poliigon **zabrania udostępniania assetów komukolwiek spoza konta**, także zmodyfikowanych. Edytor jest publiczny (GitHub Pages), więc serwowanie ich tekstur przez niego jest wykluczone. Możliwy byłby wyłącznie tryb lokalny, na koncie użytkownika — do decyzji.
-- Poliigon wydaje JPG/PNG/TIFF/EXR. **Żadna biblioteka nie wydaje BC7/ASTC/KTX2** — to formaty GPU, powstają po naszej stronie.
+Poly Haven usunięty na życzenie użytkownika; źródłem jest **Blendkit** (blendkit.com — przemianowany BlenderKit,
+to samo API i te same identyfikatory assetów). Rozpoznanie przed wdrożeniem:
+- Materiały wydawane są **wyłącznie jako `.blend`**, także warianty „resolution_0_5K/1K/2K/4K”. Nie ma tam plików map,
+  nie ma glTF dla materiałów → mapy trzeba wyciągnąć Blenderem.
+- API **nie wysyła nagłówków CORS** → przeglądarka nie odpyta go wprost; szukanie idzie przez serwer dev.
+- Darmowe assety pobierają się **bez klucza API** (sprawdzone). Licencje: `cc_zero` (wolno publikować)
+  albo `royalty_free` = licencja Blendkit (tylko do własnych projektów, bez redystrybucji).
+- Żadna biblioteka nie wydaje BC7/ASTC/KTX2 — to formaty GPU, powstają u nas.
 
-**Wdrożone: Poly Haven** (publiczne API, CORS `*`, wszystko CC0 — darmowe także komercyjnie):
-- `edytor/src/assets/polyhaven.ts` — katalog (862 tekstury), szukanie po nazwie/tagach/kategoriach, `mapyTekstury(id, 1k|2k|4k)` → adresy map z API (nie zgadywane), miniatury z CDN. Testy `polyhaven.test.ts`.
-- Pełny PBR, nie płaski obrazek: barwa, normalne (OpenGL), ARM (AO+chropowatość+metaliczność), osobne Rough/AO, wysokość. `silnik/budowaMaterialu.ts` składa z nich materiał (AO mnoży barwę, ARM steruje chropowatością i metalicznością, normalne przez `normalMap`, wysokość przez wypukłości). Skala mapowania z wymiarów rzeczywistych z API (np. 3 m → 300 cm na powtórzenie).
+**Wdrożenie**
+- `narzedzia/blendkit.mjs` — `szukaj` (lista kandydatów do wyboru) i `pobierz <assetBaseId> --res 1k|2k|4k`:
+  pobranie `.blend` → Blender bez okna (`-b`) → mapy → `basisu` → `tekstury/<slug>/<mapa>_<res>.ktx2` + `mapy.json`
+  + wpis w `tekstury/katalog.json`. Pomiar: 1K ≈ 5 s, 2K ≈ 21 s (pobranie + wyciąg + kompresja czterech map).
+- `narzedzia/blendkit-wyciag.py` — skrypt Blendera. Idzie wstecz po grafie od gniazd Principled BSDF
+  (Base Color, Roughness, Metallic, Normal) i od wyjścia Displacement, a kandydatów **punktuje**
+  (przestrzeń barw, słowa w nazwie pliku, węzeł Normal Map/Bump, odległość w grafie) — materiały Blendkit bywają
+  mieszane (PBR + proceduralne) i „pierwszy znaleziony obraz” dawał np. mapę wysokości w roli barwy.
+  Zapis bez rekompresji (unpack), EXR/TIFF → PNG 16-bit. Zapisuje też, że mapa jest odwrócona (gloss → chropowatość)
+  albo siedzi w jednym kanale.
+- `vite.config.ts` → wtyczka `blendkitLokalnie`: `/__lokalne/blendkit/szukaj` (pośrednik do API) i `/__lokalne/blendkit/pobierz`
+  (uruchamia wyciąg na żądanie z edytora).
+- `edytor/src/assets/blendkit.ts` — katalog lokalny (działa też w zbudowanej wersji), szukanie w całym Blendkicie
+  (tylko dev), `mapyTekstury(id, res)` zamawia wyciąg, gdy materiału nie ma jeszcze na dysku.
+- Okno Assets → Online: siatka z licencją i autorem, znacznik „do pobrania”, nakładka „Blender wyciąga mapy…”,
+  filtr **CC0** (`license:cc_zero` — 329 darmowych materiałów) i wybór 1K/2K/4K.
+- `silnik/budowaMaterialu.ts` czyta manifest: mapy odwrócone (`1 − wartość`) i wybór kanału.
+- Operacja `material.applyOnlineTexture` bierze opis assetu **przed** pobraniem (po wyciągu wpis dostaje identyfikator
+  lokalny), skalę mapowania z rzeczywistego rozmiaru kafla, a `zrodloNazwa` zapisuje nazwę, licencję i autora.
+
+**Ograniczenia, o których trzeba pamiętać**
+- Bez Blendera (`BLENDER=/Applications/Blender.app/Contents/MacOS/Blender`) i bez `basisu` pobieranie nie zadziała.
+- Na GitHub Pages nie ma serwera ani Blendera: działają tylko tekstury wyciągnięte wcześniej i **zacommitowane**.
+  `tekstury/` jest w `.gitignore` — do decyzji, czy wrzucamy materiały CC0 (royalty_free nie wolno).
+- Materiały proceduralne (bez obrazów) są odfiltrowane — nie ma z czego zrobić map.
+
+**Sprawdzone na żywo (18.09):** szukanie „oak wood” → 803 trafienia w oknie Assets; dwuklik na „Polished Oak Wood”
+uruchomił Blendera w tle i nałożył materiał; CC0 „Wood Floor” (2K, 4 mapy, skala 170 cm z rozmiaru kafla)
+widoczny na regale z pełnym reliefem.
+
+- **Relief map online (naprawione 18.09, zgłoszenie „tekstury zupełnie płaskie mimo mapy wysokości”).** Dwa błędy, oba zmierzone na żywej scenie:
+  1. `normalMap()` dostawał węzeł `triplanarTexture` — a zakłada styczne z UV siatki. Efekt: normalne rozrzucone losowo (średni kąt do kamery 75° zamiast 53°, zmiana normalnej 0,70), co oko czyta jako gładką, płaską powierzchnię. Teraz trzy rzuty świata mieszamy metodą **„whiteout”** (Golus) i wynik przenosimy do widoku przez `transformNormalByViewMatrix`.
+  2. Wypukłość liczyliśmy gradientem **ekranowym** (`dFdx`, Mikkelsen). Przy powtórzeniu 300 cm `dFdx(wysokość)` = 0,0023 na piksel → nachylenie **0,13°**, czyli nic. Teraz nachylenie liczymy **w przestrzeni tekstury**: `Δwysokość · amplituda / (krok teksela · skala)`, więc relief nie zależy od rozdzielczości ani odległości. Suwak *Bump* skaluje jednocześnie normalne (×4) i amplitudę wysokości (0,25 → 0,5 cm).
+  Gradient ekranowy został tylko dla wysokości proceduralnej i niedoskonałości (rysy), i włącza się wyłącznie, gdy takie pole istnieje.
+- **Materiał z mapami online budujemy dopiero po ich wczytaniu** (`mapyGotowe`/`wczytajMapy` w `budowaMaterialu.ts`, brama w `ustawGrupe` i w kulkach). Bez tego po przeładowaniu strony materiał powstawał na białym zastępniku i WebGPU odrzucał potok („Color target has no corresponding fragment stage output”), a scena leciała w czerń.
 - `renderery/webgpu/tekstury-online.js` — wczytywanie z pamięcią podręczną i obsługą `.ktx2` (KTX2Loader silnika). **Pułapka:** tekstura bez pikseli wysłana do GPU unieważnia cały potok WebGPU (czarna scena) — mapy są więc wczytywane przed zbudowaniem materiału, a w razie czego wraca biały piksel.
 - Okno Assets: zakładka Online z siatką miniatur, kategoriami, szukaniem i wyborem 1K/2K/4K; operacja `material.applyOnlineTexture`.
-
-**KTX2 u nas:** `narzedzia/tekstury-ktx2.mjs` (wymaga `basisu`) pobiera mapy i koduje do KTX2; edytor woli lokalne KTX2 od JPG (`tekstury/<id>/mapy.json`).
-Pomiary dla `old_wood_floor` 1k: JPG 2,3 MB → **UASTC 4,0 MB** (jakość, transkodowanie do BC7/ASTC) albo **ETC1S 0,4 MB** (18% wagi). Pamięć GPU: 4,0 MB w RGBA8 → 1,0 MB po kompresji. Sprawdzone w scenie: `isCompressedTexture: true`, format **ASTC 4×4** na Apple Silicon (na desktopie z BC7 sterownik wybierze BC7), 11 poziomów mipmap.
-`tekstury/` jest w `.gitignore` — pliki binarne commitujemy świadomie; bez nich strona używa JPG z CDN Poly Haven.
 
 ## 11. Stan po przejściu całej listy (17.09)
 Punkty 1–10 wykonane i sprawdzone na żywej scenie; szczegóły przy każdym punkcie wyżej. Do potwierdzenia ręcznego zostaje rozmowa głosowa (brak mikrofonu w środowisku testowym). Serwer edytora: `npm run dev` (port 5173 bywa zajęty przez inny serwer — wtedy `edytor-5174` z `.claude/launch.json`).

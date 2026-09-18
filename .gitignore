@@ -7,5 +7,10 @@ edytor-app/
 .env
 .env.*
 !.env.example
-# Skompresowane tekstury KTX2 (narzedzia/tekstury-ktx2.mjs) — commituj świadomie, to pliki binarne
-tekstury/
+# Mapy wyciągnięte z Blendkitu + KTX2 (narzedzia/blendkit.mjs). Domyślnie poza gitem: to pliki binarne,
+# a licencja Blendkit (royalty_free) zabrania redystrybucji. Publikujemy wyłącznie materiały CC0 —
+# każdy dopisujemy tu wyjątkiem, żeby opublikowana strona miała swoją bibliotekę.
+tekstury/*
+!tekstury/katalog.json
+!tekstury/wood-floor/
+!tekstury/wood-floor-broken/

@@ -51,7 +51,7 @@ Nazwy w UI po angielsku (1:1 D5), identyfikatory w kodzie po polsku.
 - `silnik/wymiary.ts` — wymiary i położenie mebla ze sceny (mm).
 
 ## Biblioteki online
-- `assets/polyhaven.ts` — katalog Poly Haven (CC0), szukanie, mapy PBR dla 1k/2k/4k, pierwszeństwo lokalnych KTX2.
+- `assets/blendkit.ts` — biblioteka Blendkit: katalog wyciągniętych lokalnie tekstur (`tekstury/katalog.json`), szukanie w całym Blendkicie przez serwer dev, mapy PBR (barwa, normalne, chropowatość, metaliczność, AO, wysokość) dla 1k/2k/4k jako KTX2.
 
 ## Dane i operacje
 - `data/mieszkanie.ts` — dane makiety z repo: widoki, warstwy, obiekty, materiały, palety, kategorie Assets.

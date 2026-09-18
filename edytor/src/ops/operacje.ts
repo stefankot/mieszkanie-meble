@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { generujTeksture } from '@/ai/tekstury'
-import { $katalogOnline, mapyTekstury } from '@/assets/polyhaven'
+import { $katalogOnline, mapyTekstury } from '@/assets/blendkit'
 import { renderujAI } from '@/ai/render'
 import { palety, widoki } from '@/data/mieszkanie'
 import { presetyMaterialow, kopiaUstawien } from '@/meble/material'
@@ -234,27 +234,29 @@ zdefiniuj({
   }
 })
 zdefiniuj({
-  nazwa: 'material.applyOnlineTexture', tytul: 'Nadaj teksturę z biblioteki online (Poly Haven, CC0)', grupa: 'Materiały',
+  nazwa: 'material.applyOnlineTexture', tytul: 'Nadaj teksturę z biblioteki online (Blendkit)', grupa: 'Materiały',
   wejscie: z.object({ mebel: z.string().optional(), grupa: z.string().optional(), tekstura: z.string(), rozdzielczosc: z.enum(['1k', '2k', '4k']).default('2k') }),
   wykonaj: async ({ mebel, grupa, tekstura, rozdzielczosc }) => {
     const id = wymagajMebla(mebel)
     const cele = grupyMebla(id, grupa)
+    // Opis assetu bierzemy przed pobraniem: po wyciągnięciu map wpis w katalogu dostaje identyfikator lokalny.
+    const wpis = $katalogOnline.get().find((t) => t.id === tekstura || t.assetBaseId === tekstura)
     const mapy = await mapyTekstury(tekstura, rozdzielczosc)
     if (!mapy.kolor) throw new Error(`Tekstura ${tekstura} nie ma mapy barwy w ${rozdzielczosc}.`)
     // Mapy muszą być w pamięci GPU zanim zbudujemy materiał — pusta tekstura psuje potok renderowania.
     const tekstury = (silnik() as any)?.tekstury
-    await Promise.all(Object.entries(mapy).filter(([, url]) => url).map(([rodzaj, url]) => tekstury?.wczytaj(url as string, { kolor: rodzaj === 'kolor' })))
-    const wpis = $katalogOnline.get().find((t) => t.id === tekstura)
+    await Promise.all(Object.entries(mapy).filter(([, url]) => typeof url === 'string').map(([rodzaj, url]) => tekstury?.wczytaj(url as string, { kolor: rodzaj === 'kolor' })))
     const nazwa = wpis?.nazwa ?? tekstura
-    // Wymiary z API są w mm — skala mapowania to centymetry na jedno powtórzenie, więc tekstura ma realny rozmiar.
+    // Blendkit podaje rzeczywisty rozmiar kafla w metrach — skala mapowania to centymetry na jedno powtórzenie.
     const skala = wpis?.wymiaryM ? Math.min(400, Math.max(1, Math.round(wpis.wymiaryM[0] * 100))) : null
+    const licencja = wpis?.licencja === 'cc_zero' ? 'CC0' : wpis?.licencja === 'royalty_free' ? 'licencja Blendkit' : (wpis?.licencja ?? '')
     zmienProjekt(`Tekstura · ${nazwa}`, (d) =>
       cele.forEach((g) => {
         const u = kopiaUstawien(d.materialy[`${id}/${g.klucz}`] ?? g.ustawienia)
         u.nazwa = nazwa
         u.baza = 'texture'
         u.kolor = '#ffffff'
-        u.tekstura = { ...u.tekstura, zrodlo: 'online', mapy, zrodloNazwa: `Poly Haven · ${nazwa} (CC0)` }
+        u.tekstura = { ...u.tekstura, zrodlo: 'online', mapy, zrodloNazwa: `Blendkit · ${nazwa}${licencja ? ` (${licencja})` : ''}${wpis?.autor ? ` · ${wpis.autor}` : ''}` }
         if (skala) u.mapowanie = { ...u.mapowanie, skala }
         u.relief = { ...u.relief, wypuklosc: mapy.wysokosc ? Math.max(0.25, u.relief.wypuklosc) : u.relief.wypuklosc }
         d.materialy[`${id}/${g.klucz}`] = u

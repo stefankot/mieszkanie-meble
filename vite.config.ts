@@ -41,10 +41,48 @@ function kluczLokalny(): Plugin {
   }
 }
 
+/* Blendkit: API nie wysyła nagłówków CORS, a materiały wydawane są jako `.blend`, więc przeglądarka
+   nie zrobi tego sama. Serwer dev pośredniczy w szukaniu i na żądanie uruchamia Blendera bez okna,
+   który wyciąga mapy (barwa, normalne, chropowatość, metaliczność, AO, wysokość) i koduje je do KTX2.
+   Wynik ląduje w `tekstury/<id>/` i od tej pory działa też w zbudowanej wersji strony. */
+function blendkitLokalnie(): Plugin {
+  return {
+    name: 'blendkit-lokalnie',
+    apply: 'serve',
+    configureServer(server) {
+      const narzedzie = () => import(new URL('./narzedzia/blendkit.mjs', import.meta.url).href)
+      const odpowiedz = (res: any, kod: number, dane: unknown) => {
+        res.statusCode = kod
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Cache-Control', 'no-store')
+        res.end(JSON.stringify(dane))
+      }
+      server.middlewares.use('/__lokalne/blendkit', async (req, res) => {
+        const url = new URL(req.url ?? '/', 'http://localhost')
+        try {
+          const bk = await narzedzie()
+          if (url.pathname.startsWith('/szukaj')) {
+            return odpowiedz(res, 200, await bk.szukaj(url.searchParams.get('q') ?? '', { ile: Math.min(48, +(url.searchParams.get('ile') ?? 24)) }))
+          }
+          if (url.pathname.startsWith('/pobierz')) {
+            const id = url.searchParams.get('id')
+            if (!id) return odpowiedz(res, 400, { blad: 'brak id' })
+            const rozdzielczosc = (url.searchParams.get('res') ?? '2k') as '1k' | '2k' | '4k'
+            return odpowiedz(res, 200, await bk.pobierzTeksture(id, { rozdzielczosc, log: (t: string) => server.config.logger.info(`[blendkit] ${t}`) }))
+          }
+          odpowiedz(res, 404, { blad: 'nieznana ścieżka' })
+        } catch (e) {
+          odpowiedz(res, 500, { blad: e instanceof Error ? e.message : String(e) })
+        }
+      })
+    }
+  }
+}
+
 export default defineConfig({
   root: 'edytor',
   base: './',
-  plugins: [vue(), tailwindcss(), silnikBezTransformacji(), kluczLokalny()],
+  plugins: [vue(), tailwindcss(), silnikBezTransformacji(), kluczLokalny(), blendkitLokalnie()],
   resolve: { alias: { '@': fileURLToPath(new URL('./edytor/src', import.meta.url)) } },
   server: { port: 5173, strictPort: true },
   build: { outDir: '../dist-edytor', emptyOutDir: true }

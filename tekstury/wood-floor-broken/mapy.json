@@ -1,0 +1,30 @@
+{
+  "id": "wood-floor-broken",
+  "assetBaseId": "0374d4e6-da5f-40d5-8fba-1e0936e9a452",
+  "zrodlo": "blendkit",
+  "nazwa": "Wood floor broken",
+  "autor": "Free poly",
+  "licencja": "cc_zero",
+  "kategoria": "wood",
+  "tagi": [
+    "wood",
+    "floor",
+    "broken",
+    "4k",
+    "texture"
+  ],
+  "miniatura": "https://public.blenderkit.com/thumbnails/assets/def989b4d853415f97462133fbfbcc57/files/thumbnail_3e8a1d43-1c1f-4e1c-bb0a-2e20b7abceed.png.512x512_q85_crop-%2C.png",
+  "rozmiarM": 1.5,
+  "rozdzielczosc": "1k",
+  "kodek": "uastc",
+  "mapy": {
+    "normalna": "tekstury/wood-floor-broken/normalna_1k.ktx2",
+    "kolor": "tekstury/wood-floor-broken/kolor_1k.ktx2",
+    "chropowatosc": "tekstury/wood-floor-broken/chropowatosc_1k.ktx2",
+    "wysokosc": "tekstury/wood-floor-broken/wysokosc_1k.ktx2"
+  },
+  "odwrocone": [
+    "chropowatosc"
+  ],
+  "kanaly": {}
+}

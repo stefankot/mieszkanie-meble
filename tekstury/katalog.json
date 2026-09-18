@@ -1,0 +1,77 @@
+[
+  {
+    "id": "polished-oak-wood",
+    "assetBaseId": "82eb786c-436c-4938-abc2-5c7316573d75",
+    "nazwa": "Polished Oak Wood",
+    "autor": "yossif kh",
+    "licencja": "royalty_free",
+    "kategoria": "wood",
+    "tagi": [
+      "Wood",
+      "wood",
+      "oak"
+    ],
+    "miniatura": "https://public.blenderkit.com/thumbnails/assets/947a6d904f56433b9a0515def0de5031/files/thumbnail_211e2c2a-82f2-4a3a-92f1-71fbf180c4b3.png.512x512_q85_crop-%2C.png",
+    "rozmiarM": null,
+    "rozdzielczosc": "2k"
+  },
+  {
+    "id": "wood-floor",
+    "assetBaseId": "cce20c19-8822-46f8-9617-74b180f79ad1",
+    "nazwa": "Wood Floor",
+    "autor": "Poly Haven ",
+    "licencja": "cc_zero",
+    "kategoria": "wood",
+    "tagi": [
+      "wooden",
+      "wooden_flooring",
+      "grain",
+      "interior_design",
+      "interior",
+      "flooring",
+      "clean",
+      "man_made",
+      "wood_grain",
+      "wood"
+    ],
+    "miniatura": "https://public.blenderkit.com/thumbnails/assets/49619ed406794805b70ce60a11279ab5/files/thumbnail_31e758ff-02ac-4259-852b-25c774e818b5.png.512x512_q85_crop-%2C.png",
+    "rozmiarM": 1.7,
+    "rozdzielczosc": "2k"
+  },
+  {
+    "id": "wood-floor-broken",
+    "assetBaseId": "0374d4e6-da5f-40d5-8fba-1e0936e9a452",
+    "nazwa": "Wood floor broken",
+    "autor": "Free poly",
+    "licencja": "cc_zero",
+    "kategoria": "wood",
+    "tagi": [
+      "wood",
+      "floor",
+      "broken",
+      "4k",
+      "texture"
+    ],
+    "miniatura": "https://public.blenderkit.com/thumbnails/assets/def989b4d853415f97462133fbfbcc57/files/thumbnail_3e8a1d43-1c1f-4e1c-bb0a-2e20b7abceed.png.512x512_q85_crop-%2C.png",
+    "rozmiarM": 1.5,
+    "rozdzielczosc": "1k"
+  },
+  {
+    "id": "wood-floor-walnut",
+    "assetBaseId": "a739a62b-a0ed-4dc4-9c6f-c51912e9b167",
+    "nazwa": "Wood Floor Walnut",
+    "autor": "James Middleton",
+    "licencja": "royalty_free",
+    "kategoria": "floor",
+    "tagi": [
+      "wood",
+      "floor",
+      "walnut",
+      "patina",
+      "wooden"
+    ],
+    "miniatura": "https://public.blenderkit.com/thumbnails/assets/dd21e3d11f484012902036b81dc353d7/files/thumbnail_1aa5fa73-494a-46a7-8375-119a9be654fa.png.512x512_q85_crop-%2C.png",
+    "rozmiarM": 1.5,
+    "rozdzielczosc": "1k"
+  }
+]

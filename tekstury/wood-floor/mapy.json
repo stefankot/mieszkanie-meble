@@ -1,0 +1,33 @@
+{
+  "id": "wood-floor",
+  "assetBaseId": "cce20c19-8822-46f8-9617-74b180f79ad1",
+  "zrodlo": "blendkit",
+  "nazwa": "Wood Floor",
+  "autor": "Poly Haven ",
+  "licencja": "cc_zero",
+  "kategoria": "wood",
+  "tagi": [
+    "wooden",
+    "wooden_flooring",
+    "grain",
+    "interior_design",
+    "interior",
+    "flooring",
+    "clean",
+    "man_made",
+    "wood_grain",
+    "wood"
+  ],
+  "miniatura": "https://public.blenderkit.com/thumbnails/assets/49619ed406794805b70ce60a11279ab5/files/thumbnail_31e758ff-02ac-4259-852b-25c774e818b5.png.512x512_q85_crop-%2C.png",
+  "rozmiarM": 1.7,
+  "rozdzielczosc": "2k",
+  "kodek": "uastc",
+  "mapy": {
+    "normalna": "tekstury/wood-floor/normalna_2k.ktx2",
+    "kolor": "tekstury/wood-floor/kolor_2k.ktx2",
+    "chropowatosc": "tekstury/wood-floor/chropowatosc_2k.ktx2",
+    "wysokosc": "tekstury/wood-floor/wysokosc_2k.ktx2"
+  },
+  "odwrocone": [],
+  "kanaly": {}
+}
