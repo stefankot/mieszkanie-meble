@@ -89,7 +89,9 @@ export async function szukajOnline(fraza: string, { tylkoCC0 = false } = {}): Pr
 }
 
 const lokalne = new Map<string, Promise<MapyTekstury | null>>()
-const adres = (sciezka: string) => `${BAZA}/${sciezka}`
+/* Adresy map muszą być bezwzględne: wczytuje je silnik z ramki (`/renderery/webgpu/`), więc ścieżka
+   względna edytora („../tekstury/…") rozwiązałaby się tam na `/renderery/tekstury/…` i dawała 404. */
+const adres = (sciezka: string) => new URL(`${BAZA}/${sciezka}`, globalThis.location?.href ?? 'http://localhost/').href
 
 function manifestLokalny(id: string, rozdzielczosc: string) {
   const klucz = `${id}/${rozdzielczosc}`

@@ -39,7 +39,8 @@ describe('katalog Blendkit', () => {
       })
     )
     const mapy = await mapyTekstury('deska', '2k')
-    expect(mapy.kolor).toContain('tekstury/deska/kolor_2k.ktx2')
+    // Adresy muszą być bezwzględne — mapy wczytuje silnik z ramki, nie strona edytora.
+    expect(mapy.kolor).toMatch(/^https?:\/\/.*\/tekstury\/deska\/kolor_2k\.ktx2$/)
     expect(mapy.wysokosc).toContain('wysokosc_2k.ktx2')     // mapa wysokości musi dojść do materiału
     expect(mapy.odwrocone).toEqual(['chropowatosc'])
     expect(mapy.kanaly).toEqual({ chropowatosc: 'g' })
