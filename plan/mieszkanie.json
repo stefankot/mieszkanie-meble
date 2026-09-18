@@ -3,8 +3,8 @@
   "units": "mm",
   "coordinateSystem": "RH_Y_UP",
   "svgAxes": "SVG x = scene X; SVG y = scene Z. Wysokość = scene Y. Dodatni obrót wokół Y odpowiada rotate(-rotationDeg) w SVG.",
-  "source": "rzut_zp3.svg dostarczony 2026-09-11; górna i środkowa część poprawiona względem lustrzanego renderera, pokój z łóżkiem bez zmian.",
-  "ceilingHeightMm": 2600,
+  "source": "Geometria APARTMENT z dostarczonego renderera. Nie jest nową inwentaryzacją pomiarową.",
+  "ceilingHeightMm": 2500,
   "outerMm": [
     [
       0,
@@ -38,68 +38,68 @@
       "dimensions": "370 × 224 cm · 8,29 m²",
       "polygonMm": [
         [
-          6120,
-          150
+          240.0,
+          150.0
         ],
         [
-          9820,
-          150
+          3940.0,
+          150.0
         ],
         [
-          9820,
-          2390
+          3940.0,
+          2390.0
         ],
         [
-          6120,
-          2390
+          240.0,
+          2390.0
         ]
       ],
       "walls": [
         {
           "id": "KUCHNIA-W1",
           "fromMm": [
-            6120,
-            150
+            240.0,
+            150.0
           ],
           "toMm": [
-            9820,
-            150
+            3940.0,
+            150.0
           ],
           "lengthMm": 3700.0
         },
         {
           "id": "KUCHNIA-W2",
           "fromMm": [
-            9820,
-            150
+            3940.0,
+            150.0
           ],
           "toMm": [
-            9820,
-            2390
+            3940.0,
+            2390.0
           ],
           "lengthMm": 2240.0
         },
         {
           "id": "KUCHNIA-W3",
           "fromMm": [
-            9820,
-            2390
+            3940.0,
+            2390.0
           ],
           "toMm": [
-            6120,
-            2390
+            240.0,
+            2390.0
           ],
           "lengthMm": 3700.0
         },
         {
           "id": "KUCHNIA-W4",
           "fromMm": [
-            6120,
-            2390
+            240.0,
+            2390.0
           ],
           "toMm": [
-            6120,
-            150
+            240.0,
+            150.0
           ],
           "lengthMm": 2240.0
         }
@@ -111,68 +111,68 @@
       "dimensions": "78 × 145 cm · 1,13 m²",
       "polygonMm": [
         [
-          5220,
-          150
+          4060.0,
+          150.0
         ],
         [
-          6000,
-          150
+          4840.0,
+          150.0
         ],
         [
-          6000,
-          1600
+          4840.0,
+          1600.0
         ],
         [
-          5220,
-          1600
+          4060.0,
+          1600.0
         ]
       ],
       "walls": [
         {
           "id": "WC-W1",
           "fromMm": [
-            5220,
-            150
+            4060.0,
+            150.0
           ],
           "toMm": [
-            6000,
-            150
+            4840.0,
+            150.0
           ],
           "lengthMm": 780.0
         },
         {
           "id": "WC-W2",
           "fromMm": [
-            6000,
-            150
+            4840.0,
+            150.0
           ],
           "toMm": [
-            6000,
-            1600
+            4840.0,
+            1600.0
           ],
           "lengthMm": 1450.0
         },
         {
           "id": "WC-W3",
           "fromMm": [
-            6000,
-            1600
+            4840.0,
+            1600.0
           ],
           "toMm": [
-            5220,
-            1600
+            4060.0,
+            1600.0
           ],
           "lengthMm": 780.0
         },
         {
           "id": "WC-W4",
           "fromMm": [
-            5220,
-            1600
+            4060.0,
+            1600.0
           ],
           "toMm": [
-            5220,
-            150
+            4060.0,
+            150.0
           ],
           "lengthMm": 1450.0
         }
@@ -184,68 +184,68 @@
       "dimensions": "145 × 224 cm · 3,25 m²",
       "polygonMm": [
         [
-          3690,
-          150
+          4920.0,
+          150.0
         ],
         [
-          5140,
-          150
+          6370.0,
+          150.0
         ],
         [
-          5140,
-          2390
+          6370.0,
+          2390.0
         ],
         [
-          3690,
-          2390
+          4920.0,
+          2390.0
         ]
       ],
       "walls": [
         {
           "id": "LAZIENKA-W1",
           "fromMm": [
-            3690,
-            150
+            4920.0,
+            150.0
           ],
           "toMm": [
-            5140,
-            150
+            6370.0,
+            150.0
           ],
           "lengthMm": 1450.0
         },
         {
           "id": "LAZIENKA-W2",
           "fromMm": [
-            5140,
-            150
+            6370.0,
+            150.0
           ],
           "toMm": [
-            5140,
-            2390
+            6370.0,
+            2390.0
           ],
           "lengthMm": 2240.0
         },
         {
           "id": "LAZIENKA-W3",
           "fromMm": [
-            5140,
-            2390
+            6370.0,
+            2390.0
           ],
           "toMm": [
-            3690,
-            2390
+            4920.0,
+            2390.0
           ],
           "lengthMm": 1450.0
         },
         {
           "id": "LAZIENKA-W4",
           "fromMm": [
-            3690,
-            2390
+            4920.0,
+            2390.0
           ],
           "toMm": [
-            3690,
-            150
+            4920.0,
+            150.0
           ],
           "lengthMm": 2240.0
         }
@@ -257,73 +257,74 @@
       "dimensions": "333 × 484 cm · 16,12 m²",
       "polygonMm": [
         [
-          240,
-          150
+          6490.0,
+          150.0
         ],
         [
-          3570,
-          150
+          9820.0,
+          150.0
         ],
         [
-          3570,
-          4990
+          9820.0,
+          4990.0
         ],
         [
-          240,
-          4990
+          6490.0,
+          4990.0
         ]
       ],
       "walls": [
         {
           "id": "SALON-W1",
           "fromMm": [
-            240,
-            150
+            6490.0,
+            150.0
           ],
           "toMm": [
-            3570,
-            150
+            9820.0,
+            150.0
           ],
           "lengthMm": 3330.0,
-          "description": "Górna krótka ściana salonu; plecy regału."
+          "description": "Górna krótka ściana salonu na tym rysunku."
         },
         {
           "id": "SALON-W2",
           "fromMm": [
-            3570,
-            150
+            9820.0,
+            150.0
           ],
           "toMm": [
-            3570,
-            4990
+            9820.0,
+            4990.0
           ],
           "lengthMm": 4840.0,
-          "description": "Prawa długa ściana salonu od strony łazienki i przedpokoju; prawy bok regału jest do niej dosunięty."
+          "description": "Prawa długa ściana salonu: okna i drzwi balkonowe."
         },
         {
           "id": "SALON-W3",
           "fromMm": [
-            3570,
-            4990
+            9820.0,
+            4990.0
           ],
           "toMm": [
-            240,
-            4990
+            6490.0,
+            4990.0
           ],
-          "lengthMm": 3330.0
+          "lengthMm": 3330.0,
+          "description": "Dolna krótka ściana salonu na tym rysunku."
         },
         {
           "id": "SALON-W4",
           "fromMm": [
-            240,
-            4990
+            6490.0,
+            4990.0
           ],
           "toMm": [
-            240,
-            150
+            6490.0,
+            150.0
           ],
           "lengthMm": 4840.0,
-          "description": "Lewa długa ściana salonu z oknami i drzwiami balkonowymi."
+          "description": "Lewa długa ściana salonu: od strony łazienki i przedpokoju. Zawiera drzwi do salonu; sprawdź otwory w planie."
         }
       ]
     },
@@ -333,68 +334,68 @@
       "dimensions": "370 × 245 cm · 9,07 m²",
       "polygonMm": [
         [
-          6120,
-          2540
+          240.0,
+          2540.0
         ],
         [
-          9820,
-          2540
+          3940.0,
+          2540.0
         ],
         [
-          9820,
-          4990
+          3940.0,
+          4990.0
         ],
         [
-          6120,
-          4990
+          240.0,
+          4990.0
         ]
       ],
       "walls": [
         {
           "id": "POKOJ-9-W1",
           "fromMm": [
-            6120,
-            2540
+            240.0,
+            2540.0
           ],
           "toMm": [
-            9820,
-            2540
+            3940.0,
+            2540.0
           ],
           "lengthMm": 3700.0
         },
         {
           "id": "POKOJ-9-W2",
           "fromMm": [
-            9820,
-            2540
+            3940.0,
+            2540.0
           ],
           "toMm": [
-            9820,
-            4990
+            3940.0,
+            4990.0
           ],
           "lengthMm": 2450.0
         },
         {
           "id": "POKOJ-9-W3",
           "fromMm": [
-            9820,
-            4990
+            3940.0,
+            4990.0
           ],
           "toMm": [
-            6120,
-            4990
+            240.0,
+            4990.0
           ],
           "lengthMm": 3700.0
         },
         {
           "id": "POKOJ-9-W4",
           "fromMm": [
-            6120,
-            4990
+            240.0,
+            4990.0
           ],
           "toMm": [
-            6120,
-            2540
+            240.0,
+            2540.0
           ],
           "lengthMm": 2450.0
         }
@@ -406,102 +407,102 @@
       "dimensions": "231 × 245 cm + nisza 78 × 94 cm · 6,39 m²",
       "polygonMm": [
         [
-          5220,
-          1600
+          4060.0,
+          1600.0
         ],
         [
-          6000,
-          1600
+          4840.0,
+          1600.0
         ],
         [
-          6000,
-          4990
+          4840.0,
+          2540.0
         ],
         [
-          3690,
-          4990
+          6370.0,
+          2540.0
         ],
         [
-          3690,
-          2540
+          6370.0,
+          4990.0
         ],
         [
-          5220,
-          2540
+          4060.0,
+          4990.0
         ]
       ],
       "walls": [
         {
           "id": "PRZEDPOKOJ-W1",
           "fromMm": [
-            5220,
-            1600
+            4060.0,
+            1600.0
           ],
           "toMm": [
-            6000,
-            1600
+            4840.0,
+            1600.0
           ],
           "lengthMm": 780.0
         },
         {
           "id": "PRZEDPOKOJ-W2",
           "fromMm": [
-            6000,
-            1600
+            4840.0,
+            1600.0
           ],
           "toMm": [
-            6000,
-            4990
+            4840.0,
+            2540.0
           ],
-          "lengthMm": 3390.0
+          "lengthMm": 940.0
         },
         {
           "id": "PRZEDPOKOJ-W3",
           "fromMm": [
-            6000,
-            4990
+            4840.0,
+            2540.0
           ],
           "toMm": [
-            3690,
-            4990
+            6370.0,
+            2540.0
           ],
-          "lengthMm": 2310.0
+          "lengthMm": 1530.0
         },
         {
           "id": "PRZEDPOKOJ-W4",
           "fromMm": [
-            3690,
-            4990
+            6370.0,
+            2540.0
           ],
           "toMm": [
-            3690,
-            2540
+            6370.0,
+            4990.0
           ],
           "lengthMm": 2450.0
         },
         {
           "id": "PRZEDPOKOJ-W5",
           "fromMm": [
-            3690,
-            2540
+            6370.0,
+            4990.0
           ],
           "toMm": [
-            5220,
-            2540
+            4060.0,
+            4990.0
           ],
-          "lengthMm": 1530.0
+          "lengthMm": 2310.0
         },
         {
           "id": "PRZEDPOKOJ-W6",
           "fromMm": [
-            5220,
-            2540
+            4060.0,
+            4990.0
           ],
           "toMm": [
-            5220,
-            1600
+            4060.0,
+            1600.0
           ],
-          "lengthMm": 940.0
+          "lengthMm": 3390.0
         }
       ]
     },
@@ -511,68 +512,68 @@
       "dimensions": "465 × 227 cm · 10,56 m²",
       "polygonMm": [
         [
-          240,
-          5140
+          240.0,
+          5140.0
         ],
         [
-          4890,
-          5140
+          4890.0,
+          5140.0
         ],
         [
-          4890,
-          7410
+          4890.0,
+          7410.0
         ],
         [
-          240,
-          7410
+          240.0,
+          7410.0
         ]
       ],
       "walls": [
         {
           "id": "POKOJ-LOZKO-W1",
           "fromMm": [
-            240,
-            5140
+            240.0,
+            5140.0
           ],
           "toMm": [
-            4890,
-            5140
+            4890.0,
+            5140.0
           ],
           "lengthMm": 4650.0
         },
         {
           "id": "POKOJ-LOZKO-W2",
           "fromMm": [
-            4890,
-            5140
+            4890.0,
+            5140.0
           ],
           "toMm": [
-            4890,
-            7410
+            4890.0,
+            7410.0
           ],
           "lengthMm": 2270.0
         },
         {
           "id": "POKOJ-LOZKO-W3",
           "fromMm": [
-            4890,
-            7410
+            4890.0,
+            7410.0
           ],
           "toMm": [
-            240,
-            7410
+            240.0,
+            7410.0
           ],
           "lengthMm": 4650.0
         },
         {
           "id": "POKOJ-LOZKO-W4",
           "fromMm": [
-            240,
-            7410
+            240.0,
+            7410.0
           ],
           "toMm": [
-            240,
-            5140
+            240.0,
+            5140.0
           ],
           "lengthMm": 2270.0
         }
@@ -583,141 +584,137 @@
     {
       "name": "Okno — kuchnia",
       "rectMm": [
-        9820,
-        1000,
-        240,
-        1360
+        0.0,
+        1000.0,
+        240.0,
+        1360.0
       ]
     },
     {
       "name": "Okno — pokój 9,07 m²",
       "rectMm": [
-        9820,
-        2570,
-        240,
-        1650
+        0.0,
+        2570.0,
+        240.0,
+        1650.0
       ]
     },
     {
       "name": "Okno — pokój 10,56 m²",
       "rectMm": [
-        0,
-        5510,
-        240,
-        1380
+        0.0,
+        5510.0,
+        240.0,
+        1380.0
       ]
     },
     {
       "name": "Okno — salon, część północna",
       "rectMm": [
-        0,
-        1000,
-        240,
-        1400
-      ],
-      "sillMm": 700,
-      "headMm": 2400
+        9820.0,
+        1000.0,
+        240.0,
+        1400.0
+      ]
     },
     {
       "name": "Okno — salon, część południowa",
       "rectMm": [
-        0,
-        3220,
-        240,
-        980
-      ],
-      "sillMm": 700,
-      "headMm": 2400
+        9820.0,
+        3220.0,
+        240.0,
+        980.0
+      ]
     }
   ],
   "doors": [
     {
       "name": "Drzwi balkonowe",
       "rectMm": [
-        0,
-        2400,
-        240,
-        820
+        9820.0,
+        2400.0,
+        240.0,
+        820.0
       ]
     },
     {
       "name": "Drzwi — pokój 10,56 m²",
       "rectMm": [
-        4030,
-        4990,
-        780,
-        150
+        4030.0,
+        4990.0,
+        780.0,
+        150.0
       ]
     },
     {
       "name": "Drzwi wejściowe do mieszkania",
       "rectMm": [
-        5100,
-        4990,
-        820,
-        150
+        5100.0,
+        4990.0,
+        820.0,
+        150.0
       ]
     },
     {
       "name": "Drzwi — kuchnia",
       "rectMm": [
-        6000,
-        1580,
-        120,
-        800
+        3940.0,
+        1580.0,
+        120.0,
+        800.0
       ]
     },
     {
       "name": "Drzwi — pokój 9,07 m²",
       "rectMm": [
-        6000,
-        3430,
-        120,
-        790
+        3940.0,
+        3430.0,
+        120.0,
+        790.0
       ]
     },
     {
       "name": "Drzwi — łazienka",
       "rectMm": [
-        5140,
-        1600,
-        80,
-        790
+        4840.0,
+        1600.0,
+        80.0,
+        790.0
       ]
     },
     {
       "name": "Otwór drzwiowy — WC",
       "rectMm": [
-        5220,
-        1500,
-        780,
-        200
+        4060.0,
+        1500.0,
+        780.0,
+        200.0
       ]
     },
     {
       "name": "Drzwi — salon",
       "rectMm": [
-        3570,
-        3410,
-        120,
-        790
+        6370.0,
+        3410.0,
+        120.0,
+        790.0
       ]
     }
   ],
   "shaftRectMm": [
-    6120,
+    3390,
     970,
     550,
     600
   ],
   "balconyRectMm": [
-    -1000,
-    150,
-    1000,
-    4840
+    10060,
+    1430,
+    800,
+    2000
   ],
   "northVector": [
-    0.342,
-    -0.94
+    -44,
+    44
   ]
 }
