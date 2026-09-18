@@ -235,6 +235,22 @@ to samo API i te same identyfikatory assetów). Rozpoznanie przed wdrożeniem:
 uruchomił Blendera w tle i nałożył materiał; CC0 „Wood Floor” (2K, 4 mapy, skala 170 cm z rozmiaru kafla)
 widoczny na regale z pełnym reliefem.
 
+**Opublikowane na main (18.09)** — https://stefankot.github.io/mieszkanie-meble/edytor-app/ .
+W repozytorium leżą dwa materiały CC0: `wood-floor` (2K, 17 MB) i `wood-floor-broken` (1K, 3,5 MB);
+`.gitignore` trzyma `tekstury/*` poza gitem i wypuszcza je wyjątkami — dopisz kolejny wyjątek dla nowego CC0.
+Opublikowana wersja pokazuje w zakładce Online wyłącznie CC0 (filtr w `blendkit.ts`), lokalnie widać wszystko.
+
+Dwie rzeczy wyszły dopiero przy publikacji:
+- **Adresy map muszą być bezwzględne.** Mapy wczytuje silnik z ramki (`/renderery/webgpu/`), więc ścieżka
+  względna edytora („../tekstury/…") rozwiązywała się tam na `/renderery/tekstury/…` → 404 i czarny materiał.
+  Teraz `new URL(..., location.href)`.
+- **Generator planu cofał ręczne poprawki.** Workflow rendererów rusza przy każdej zmianie w `narzedzia/**`,
+  a `buduj.py` odtwarzał `plan/mieszkanie.json` z pierwszego pliku w `renderery/zrodla` — czyli sprzed poprawki
+  układu (sufit wracał na 2500 mm, test planu na czerwono). Teraz plan powstaje z `renderery/webgpu/plan.js`,
+  a regeneracja zachowuje ręczne opisy, tytuł SVG i `sillMm`/`headMm` okien.
+- Krok publikacji edytora ponawia push (pięć prób z rebase) — workflow rendererów pisze na tę samą gałąź
+  i przy zbiegu w czasie `git push` leciał odrzucony.
+
 - **Relief map online (naprawione 18.09, zgłoszenie „tekstury zupełnie płaskie mimo mapy wysokości”).** Dwa błędy, oba zmierzone na żywej scenie:
   1. `normalMap()` dostawał węzeł `triplanarTexture` — a zakłada styczne z UV siatki. Efekt: normalne rozrzucone losowo (średni kąt do kamery 75° zamiast 53°, zmiana normalnej 0,70), co oko czyta jako gładką, płaską powierzchnię. Teraz trzy rzuty świata mieszamy metodą **„whiteout”** (Golus) i wynik przenosimy do widoku przez `transformNormalByViewMatrix`.
   2. Wypukłość liczyliśmy gradientem **ekranowym** (`dFdx`, Mikkelsen). Przy powtórzeniu 300 cm `dFdx(wysokość)` = 0,0023 na piksel → nachylenie **0,13°**, czyli nic. Teraz nachylenie liczymy **w przestrzeni tekstury**: `Δwysokość · amplituda / (krok teksela · skala)`, więc relief nie zależy od rozdzielczości ani odległości. Suwak *Bump* skaluje jednocześnie normalne (×4) i amplitudę wysokości (0,25 → 0,5 cm).
