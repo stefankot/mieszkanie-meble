@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./archiwum/**)",
+      "Read(./edytor-app/**)",
+      "Read(./dist-edytor/**)",
+      "Read(./package-lock.json)"
+    ],
+    "ask": [
+      "Read(./renderery/2026-09-08-v1.html)",
+      "Read(./renderery/zrodla/**)"
+    ],
+    "allow": [
+      "Bash(npm run test:silnik)",
+      "Bash(npm run test:edytor)",
+      "Bash(npm run build)",
+      "Bash(node narzedzia/mapa.mjs)",
+      "Bash(node narzedzia/mapa.mjs --sprawdz)",
+      "Bash(node narzedzia/rozmiar.mjs)",
+      "Bash(node narzedzia/rozmiar.mjs --lista)"
+    ]
+  }
+}

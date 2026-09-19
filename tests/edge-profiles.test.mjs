@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';
 import {zbudujModel} from '../renderery/webgpu/biblioteka.js';
-import {frontParametryczny} from '../renderery/webgpu/experymenty/front-parametryczny.js';
+import {frontParametryczny} from '../renderery/webgpu/front-parametryczny.js';
 const root=process.env.THREE_TEST_ROOT;
 const THREE=await import(root?pathToFileURL(root+'/build/three.webgpu.js').href:'three/webgpu');
 const {RoundedBoxGeometry}=await import(root?pathToFileURL(root+'/examples/jsm/geometries/RoundedBoxGeometry.js').href:'three/addons/geometries/RoundedBoxGeometry.js');

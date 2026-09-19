@@ -266,3 +266,28 @@ Punkty 1–10 wykonane i sprawdzone na żywej scenie; szczegóły przy każdym p
 - Fotorealizm w ruchu vs wydajność (ostatni pomiar 10.09: 16,5 FPS „wysoka”, M2).
 - @open-pencil/vue 0.x — API może się zmieniać; wymaga peer `@open-pencil/core` + `canvaskit-wasm` (tylko instalacja).
 - API OpenAI/Gemini nie gwarantują wierności geometrii w renderze AI.
+
+## 12. Koszt czytania kodu — etap 1 (19.09)
+
+Cel: żeby edycja tego repozytorium przez model językowy kosztowała jak najmniej tokenów. Koszt
+bierze się z dwóch rzeczy: (a) czytania plików, których nie trzeba było czytać, (b) długości pliku,
+który trzeba otworzyć, żeby zmienić jedną funkcję.
+
+Zrobione:
+- `CLAUDE.md` w korzeniu — układ repo, granica powłoka↔silnik (`window.__silnik`), polecenia,
+  konwencje, czego nie czytać. Czytany na starcie każdej sesji.
+- `narzedzia/mapa.mjs` — generator `MAPA.md` (rozmiar, eksporty, jedno zdanie opisu na plik).
+  Mapa silnika kosztuje **1 400 tokenów** zamiast 123 000 za przeczytanie całego katalogu.
+  `node narzedzia/mapa.mjs --sprawdz` pilnuje aktualności.
+- `narzedzia/rozmiar.mjs` — strażnik limitu 300 linii na moduł.
+- `archiwum/` — notatki P3–P17 i dzienniki zmian wyprowadzone z `renderery/webgpu/`
+  (~45 000 tokenów wyjęte ze ścieżki `grep`). **Uwaga:** `experymenty/P10-ktx2/` musiało zostać,
+  bo `materialy.js` wczytuje stamtąd mapy w czasie działania; `front-parametryczny.js` awansował
+  na zwykły moduł silnika (ma test).
+- `.claude/settings.json` — twarda odmowa czytania `archiwum/`, `edytor-app/`, `dist-edytor/`,
+  `package-lock.json`; pytanie przy starym rendererze WebGL.
+
+Nie zrobione (etap 2, wstrzymany decyzją użytkownika): podział `silnik.js` (1 837 l.) i
+`nawigacja.js` (1 115 l.) na moduły ≤300 linii. Projekt podziału `silnik.js`: renderer, mieszkanie,
+zieleń, słońce, pule świateł, krycie, środowisko, meble, potok TSL, dopracowanie, jakość, pomiar A/B,
+suwaki, pętla — każdy moduł dostaje kontekst argumentem i zwraca API, jak reszta silnika.
