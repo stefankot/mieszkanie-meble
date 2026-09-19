@@ -1,0 +1,105 @@
+{
+  "wersja": 1,
+  "tekstury": [
+    {
+      "id": "Metal034",
+      "nazwa": "Metal034",
+      "zrodlo": "https://ambientcg.com/view?id=Metal034",
+      "licencja": "CC0",
+      "pliki": {
+        "kolor": "Metal034_kolor.jpg",
+        "metalicznosc": "Metal034_metalicznosc.jpg",
+        "normalne": "Metal034_normalne.jpg",
+        "chropowatosc": "Metal034_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood050",
+      "nazwa": "Wood050",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=Wood050",
+      "pliki": {
+        "kolor": "Wood050_kolor.jpg",
+        "normalne": "Wood050_normalne.jpg",
+        "chropowatosc": "Wood050_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood051",
+      "nazwa": "Wood051",
+      "zrodlo": "https://ambientcg.com/view?id=Wood051",
+      "licencja": "CC0",
+      "pliki": {
+        "kolor": "Wood051_kolor.jpg",
+        "normalne": "Wood051_normalne.jpg",
+        "chropowatosc": "Wood051_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood062",
+      "nazwa": "Wood062",
+      "zrodlo": "https://ambientcg.com/view?id=Wood062",
+      "licencja": "CC0",
+      "pliki": {
+        "kolor": "Wood062_kolor.jpg",
+        "normalne": "Wood062_normalne.jpg",
+        "chropowatosc": "Wood062_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood092",
+      "nazwa": "Wood092",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=Wood092",
+      "pliki": {
+        "kolor": "Wood092_kolor.jpg",
+        "normalne": "Wood092_normalne.jpg",
+        "chropowatosc": "Wood092_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood094",
+      "nazwa": "Wood094",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=Wood094",
+      "pliki": {
+        "kolor": "Wood094_kolor.jpg",
+        "normalne": "Wood094_normalne.jpg",
+        "chropowatosc": "Wood094_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "Wood095",
+      "nazwa": "Wood095",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=Wood095",
+      "pliki": {
+        "kolor": "Wood095_kolor.jpg",
+        "normalne": "Wood095_normalne.jpg",
+        "chropowatosc": "Wood095_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "WoodFloor040",
+      "nazwa": "WoodFloor040",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=WoodFloor040",
+      "pliki": {
+        "kolor": "WoodFloor040_kolor.jpg",
+        "normalne": "WoodFloor040_normalne.jpg",
+        "chropowatosc": "WoodFloor040_chropowatosc.jpg"
+      }
+    },
+    {
+      "id": "WoodFloor043",
+      "nazwa": "WoodFloor043",
+      "licencja": "CC0",
+      "zrodlo": "https://ambientcg.com/view?id=WoodFloor043",
+      "pliki": {
+        "kolor": "WoodFloor043_kolor.jpg",
+        "normalne": "WoodFloor043_normalne.jpg",
+        "chropowatosc": "WoodFloor043_chropowatosc.jpg"
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wardrobe configurator</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/themes/light.css">
+<link rel="stylesheet" href="szafa.css">
+<script type="importmap">
+{"imports":{
+  "three":"https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js",
+  "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/",
+  "three/examples/jsm/":"https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/",
+  "three-mesh-bvh":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/index.js",
+  "three-mesh-bvh/":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.9.15/src/"
+}}
+</script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.20.1/cdn/shoelace-autoloader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
+</head>
+<body>
+<main class="uklad">
+  <section class="scena" id="scena">
+    <div class="plotno" id="plotno"></div>
+    <div class="siatka" id="siatka"></div>
+    <div class="wymiary" id="wymiary" hidden></div>
+    <p class="komunikat" id="blad" hidden></p>
+    <div class="sciezki-stan" id="sciezki-stan" hidden></div>
+    <nav class="szyna" aria-label="Stage actions">
+      <button class="ikona" data-akcja="widok-3d" title="Look around"><i data-lucide="rotate-3d"></i></button>
+      <button class="ikona" data-akcja="dopasuj" title="Straight-on view"><i data-lucide="maximize"></i></button>
+      <button class="ikona" data-akcja="sciezki" title="Path tracing — slow, photographic preview"><i data-lucide="sparkles"></i></button>
+      <button class="ikona" data-akcja="wymiary" title="Show dimensions"><i data-lucide="ruler"></i></button>
+      <button class="ikona" data-akcja="ikea" title="Snap every size to the nearest IKEA LASTARE dimension"><i data-lucide="magnet"></i></button>
+      <button class="ikona" data-akcja="reset" title="Reset"><i data-lucide="rotate-ccw"></i></button>
+      <button class="ikona" data-akcja="import" title="Import a saved JSON"><i data-lucide="upload"></i></button>
+      <button class="ikona" data-akcja="eksport" title="Export JSON"><i data-lucide="download"></i></button>
+    </nav>
+    <div class="olowki" id="olowki"></div>
+    <div class="znaczniki" id="znaczniki" hidden></div>
+    <p class="podpowiedz" id="podpowiedz" hidden>Click a cell to add doors or drawers</p>
+  </section>
+
+  <aside class="panel" id="panel">
+    <header class="panel-naglowek">
+      <p class="panel-etykieta" id="panel-asset">…</p>
+      <h1 class="panel-tytul" id="panel-nazwa">Loading model…</h1>
+      <p class="panel-opis" id="panel-stan">Fetching the parametric model from GitHub Pages.</p>
+    </header>
+    <div class="wiersze" id="wiersze"></div>
+  </aside>
+  <input type="file" id="plik-json" accept="application/json,.json" hidden>
+</main>
+<script type="module" src="szafa.js"></script>
+</body>
+</html>

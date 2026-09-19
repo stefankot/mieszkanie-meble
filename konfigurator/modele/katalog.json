@@ -1,0 +1,118 @@
+{
+  "wersja": 2,
+  "modele": [
+    {
+      "id": "fafdbaf8-70f0-4965-a76d-5f096a22b7d5",
+      "nazwa": "Indoor Plant  - Cuban Cigar",
+      "autor": "Pandora Land",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/fafdbaf8-70f0-4965-a76d-5f096a22b7d5/",
+      "wymiaryMm": [
+        865,
+        807,
+        1617
+      ],
+      "trojkatyZrodla": 67628,
+      "podglad": "fafdbaf8-70f0-4965-a76d-5f096a22b7d5.jpg",
+      "plik": "fafdbaf8-70f0-4965-a76d-5f096a22b7d5.glb",
+      "rola": "podloga",
+      "budzetTrojkatow": 40000,
+      "zrodloPliku": "gltf"
+    },
+    {
+      "id": "04465836-20e1-495a-878e-07da34c1080a",
+      "nazwa": "Decorative clay sculptures",
+      "autor": "Flareworks Studio",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/04465836-20e1-495a-878e-07da34c1080a/",
+      "wymiaryMm": [
+        741,
+        220,
+        339
+      ],
+      "trojkatyZrodla": 93728,
+      "podglad": "04465836-20e1-495a-878e-07da34c1080a.jpg",
+      "plik": "04465836-20e1-495a-878e-07da34c1080a.glb",
+      "rola": "polka",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K"
+    },
+    {
+      "id": "585219d4-27fe-4d13-ac40-f8dfbfab8c62",
+      "nazwa": "Individual Book Collection 1",
+      "autor": "Maiz Abloh",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/585219d4-27fe-4d13-ac40-f8dfbfab8c62/",
+      "wymiaryMm": [
+        263,
+        267,
+        308
+      ],
+      "trojkatyZrodla": 273,
+      "podglad": "585219d4-27fe-4d13-ac40-f8dfbfab8c62.jpg",
+      "plik": "585219d4-27fe-4d13-ac40-f8dfbfab8c62.glb",
+      "rola": "polka",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K"
+    },
+    {
+      "id": "14947da9-f2b2-4ff5-8ad8-ca910370b908",
+      "nazwa": "Indoor potted plant",
+      "autor": "Mesk911 ",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/14947da9-f2b2-4ff5-8ad8-ca910370b908/",
+      "wymiaryMm": [
+        330,
+        347,
+        427
+      ],
+      "trojkatyZrodla": 179894,
+      "podglad": "14947da9-f2b2-4ff5-8ad8-ca910370b908.jpg",
+      "plik": "14947da9-f2b2-4ff5-8ad8-ca910370b908.glb",
+      "rola": "polka",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K"
+    },
+    {
+      "id": "3d83f702-3bd2-40bb-8752-d1bf4c90a641",
+      "nazwa": "Opaque glass table lamp",
+      "autor": "Joris LM",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/3d83f702-3bd2-40bb-8752-d1bf4c90a641/",
+      "wymiaryMm": [
+        528,
+        359,
+        415
+      ],
+      "trojkatyZrodla": 10884,
+      "podglad": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.jpg",
+      "plik": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.glb",
+      "rola": "lampa",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "gltf",
+      "swiatlo": {
+        "kelwiny": 2700,
+        "lumeny": 400,
+        "wysokoscMm": 300
+      }
+    },
+    {
+      "id": "75a9fa8a-b105-4965-9e1d-e5f5d5253842",
+      "nazwa": "Set of decorative sculptures",
+      "autor": "Flareworks Studio",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/75a9fa8a-b105-4965-9e1d-e5f5d5253842/",
+      "wymiaryMm": [
+        509,
+        245,
+        389
+      ],
+      "trojkatyZrodla": 85824,
+      "podglad": "75a9fa8a-b105-4965-9e1d-e5f5d5253842.jpg",
+      "plik": "75a9fa8a-b105-4965-9e1d-e5f5d5253842.glb",
+      "rola": "polka",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K"
+    }
+  ]
+}

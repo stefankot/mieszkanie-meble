@@ -1,0 +1,366 @@
+/* Układ i gęstość paneli jak w edytorze mieszkania (edytor-app), ale w wersji jasnej.
+   Nazwy zmiennych zostają, żeby nie przepisywać 250 reguł — zmienia się sama paleta. */
+:root{
+  --tlo-sceny:#eff0f1; --biel:#fff; --linia:#ebedf0; --obwodka:#e2e4e8;
+  --szary:#6b7077; --atrament:#1c1e23; --tor:#f1f2f4;
+  --akcent:#0d99ff; --cena:#e4002b; --panel:300px;
+  --pole:#f7f8f9; --wypelnienie:#e4e6ea; --najazd:#f1f2f4; --slaby:#9aa0a6;
+  --cien:0 10px 30px rgba(28,30,35,.14);
+}
+*{box-sizing:border-box}
+/* `.wiersz{display:flex}` i `.sekcja{...}` to style autora, więc wygrywały z regułą
+   `[hidden]{display:none}` przeglądarki — ukrywane wiersze zostawały widoczne. */
+[hidden]{display:none !important}
+html,body{height:100%}
+body{
+  margin:0; background:var(--biel); color:var(--atrament);
+  font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.uklad{display:flex; height:100vh; overflow:hidden}
+
+/* ---------- scena ---------- */
+.scena{position:relative; flex:1 1 auto; background:var(--tlo-sceny); overflow:hidden}
+.plotno{position:absolute; inset:0}
+.plotno canvas{display:block; width:100%; height:100%}
+.komunikat{
+  position:absolute; inset:auto 12% 50% 12%; margin:0; padding:22px 26px;
+  background:var(--biel); border:1px solid var(--obwodka); border-radius:14px;
+  font-size:14px; line-height:1.5; color:var(--atrament); text-align:center; transform:translateY(50%);
+}
+.szyna{
+  position:absolute; top:50%; right:28px; transform:translateY(-50%);
+  display:flex; flex-direction:column; gap:12px; z-index:3;
+}
+.ikona{
+  width:44px; height:44px; display:grid; place-items:center;
+  background:var(--biel); border:1px solid var(--obwodka); border-radius:50%;
+  color:var(--atrament); cursor:pointer; padding:0; transition:border-color .15s,color .15s;
+}
+.ikona:hover{border-color:var(--wypelnienie)}
+.ikona.aktywny{border-color:var(--akcent); color:var(--akcent)}
+.ikona svg{width:19px; height:19px}
+.olowki{position:absolute; inset:0; pointer-events:none; z-index:3}
+.olowek{
+  position:absolute; width:36px; height:36px; margin:-18px 0 0 -18px;
+  display:grid; place-items:center; pointer-events:auto;
+  background:var(--biel); border:1px solid var(--obwodka); border-radius:50%;
+  color:var(--atrament); cursor:ew-resize; padding:0; touch-action:none;
+}
+.olowek svg{width:15px; height:15px}
+.olowek.ciagniety{border-color:var(--akcent); color:var(--akcent)}
+.olowek.pion{cursor:ns-resize}
+.przelacznik{
+  position:absolute; left:28px; bottom:28px; display:flex; z-index:3;
+  background:var(--biel); border:1px solid var(--obwodka); border-radius:999px; padding:4px;
+}
+.przelacznik button{
+  border:0; background:none; border-radius:999px; padding:8px 20px;
+  font:inherit; font-size:13px; color:var(--szary); cursor:pointer;
+}
+.przelacznik button.aktywny{background:var(--atrament); color:var(--biel)}
+
+.sciezki-stan{
+  position:absolute; left:28px; bottom:28px; z-index:4; background:var(--atrament); color:var(--biel);
+  border-radius:999px; padding:9px 16px; font-size:12px; letter-spacing:.02em;
+}
+.ikona.pracuje{opacity:.5; pointer-events:none}
+/* Znaczniki mebli: pastylka nad każdą bryłą. Mebel obrócony bokiem prawie nie ma sylwetki
+   do kliknięcia, więc to on jest pewnym celem — widać go pod każdym kątem. */
+.znaczniki{position:absolute; inset:0; z-index:4; pointer-events:none}
+.znacznik{
+  position:absolute; transform:translate(-50%,-140%); pointer-events:auto;
+  display:flex; align-items:center; gap:7px; white-space:nowrap;
+  background:var(--biel); color:var(--atrament); border:1px solid var(--obwodka); border-radius:999px;
+  padding:6px 12px; font:inherit; font-size:11.5px; cursor:pointer;
+  box-shadow:0 4px 14px rgba(28,30,35,.14); transition:background .15s, color .15s, transform .15s;
+}
+.znacznik .kropka{width:9px; height:9px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(28,30,35,.14)}
+.znacznik.aktywny{background:var(--atrament); color:var(--biel); border-color:var(--atrament); cursor:default}
+.znacznik:not(.aktywny):hover,.znacznik.blisko{
+  background:var(--akcent); color:var(--biel); border-color:var(--akcent); transform:translate(-50%,-150%);
+}
+
+/* Styl Custom: podziały wpisywane ręcznie, składnia jak w CSS grid. */
+.kontrolka.pionowa{display:block}
+.pole-siatki{
+  width:100%; background:var(--biel); border:1px solid var(--obwodka); border-radius:12px;
+  padding:10px 13px; font:inherit; font-size:13px; color:var(--atrament); outline-offset:2px;
+}
+.pole-siatki:focus{outline:2px solid var(--akcent); border-color:transparent}
+.nota-siatki{margin:8px 2px 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
+.nota-siatki.uwaga{color:#e9a23b}
+.podpowiedz{
+  position:absolute; left:50%; bottom:88px; transform:translateX(-50%); margin:0; z-index:3;
+  background:var(--biel); border:1px solid var(--obwodka); border-radius:999px;
+  padding:9px 18px; font-size:12px; color:var(--szary);
+}
+
+/* komórki i karta */
+.siatka{position:absolute; inset:0; z-index:2; pointer-events:none}
+/* Komórki nie łapią wskaźnika — przeciąganie po meblu ma obracać scenę.
+   Klik jest rozpoznawany geometrycznie, a chwytne są tylko uchwyty w rogach. */
+.komorka{position:absolute; border:1px solid transparent; border-radius:3px; pointer-events:none}
+.komorka.podswietlona,.komorka.wybrana{border-color:var(--akcent); background:rgba(13,153,255,.12)}
+.komorka{display:flex; align-items:flex-start; justify-content:center; touch-action:none}
+.komorka.zaznaczona{border-color:var(--akcent); background:rgba(13,153,255,.26)}
+.zaznaczenie{
+  position:absolute; pointer-events:none; border:2px solid var(--akcent);
+  background:rgba(13,153,255,.16); border-radius:2px; box-shadow:0 0 0 1px rgba(13,153,255,.55);
+}
+.zaznaczenie-podpis{
+  position:absolute; transform:translate(-50%,-100%); pointer-events:none; white-space:nowrap;
+  background:var(--atrament); color:var(--biel); border-radius:999px; padding:4px 11px; font-size:11px;
+}
+.rog{
+  position:absolute; width:26px; height:26px; margin:-13px 0 0 -13px; padding:0; pointer-events:auto;
+  display:grid; place-items:center; border-radius:50%; cursor:nwse-resize; touch-action:none;
+  background:var(--akcent); border:2px solid var(--biel); color:var(--biel);
+  box-shadow:0 2px 8px rgba(28,30,35,.3);
+}
+.rog.ne,.rog.sw{cursor:nesw-resize}
+.rog svg{width:13px; height:13px}
+.rog:hover{transform:scale(1.14)}
+.komorka.wneka{border-color:rgba(28,30,35,.35); border-style:dashed; background:rgba(28,30,35,.04)}
+.komorka.wneka.podswietlona{border-color:var(--akcent); border-style:solid; background:rgba(13,153,255,.14)}
+.komorka .miara{
+  margin-top:4px; background:rgba(255,255,255,.94); border:1px solid var(--obwodka); border-radius:999px;
+  padding:1px 7px; font-size:10px; color:var(--atrament); white-space:nowrap; pointer-events:none;
+}
+.wymiar-et{
+  position:absolute; transform:translate(-50%,-50%); background:var(--biel); border:1px solid var(--obwodka);
+  border-radius:999px; padding:3px 9px; font-size:11px; color:var(--atrament); white-space:nowrap; pointer-events:none;
+}
+.wymiar-et.suma{font-size:12px; border-color:var(--atrament)}
+.wymiar-et.niezgodny{border-color:#e9a23b; background:rgba(233,162,59,.12)}
+.wymiar-et .zle{color:#e9a23b; margin-left:5px}
+.uklady{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+.uklad-mini{
+  padding:3px; background:var(--biel); border:1px solid var(--obwodka); border-radius:8px; cursor:pointer;
+  display:grid; place-items:center;
+}
+.uklad-mini.aktywny{border-color:var(--akcent); box-shadow:0 0 0 1px var(--akcent)}
+.uklad-mini{position:relative}
+.uklad-mini.custom::after{
+  content:""; position:absolute; top:3px; right:3px; width:5px; height:5px;
+  border-radius:50%; background:var(--akcent);
+}
+.uklad-mini svg{width:100%; height:auto; display:block}
+.karta{
+  position:absolute; z-index:5; width:284px; background:var(--biel);
+  border:1px solid var(--obwodka); border-radius:20px; padding:20px;
+  box-shadow:0 22px 52px rgba(28,30,35,.16);
+  max-height:calc(100% - 24px); overflow-y:auto; scrollbar-width:thin;
+}
+.karta::before{
+  content:""; position:absolute; top:50%; left:-9px; width:16px; height:16px; margin-top:-8px;
+  background:var(--biel); border-left:1px solid var(--obwodka); border-bottom:1px solid var(--obwodka);
+  transform:rotate(45deg); border-radius:0 0 0 4px;
+}
+.karta.od-prawej::before{left:auto; right:-9px; transform:rotate(225deg)}
+.karta .nota{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
+.karta .nota.uwaga{color:#e9a23b; background:rgba(233,162,59,.12); border-radius:10px; padding:9px 11px}
+.karta .nota.zgodne{color:#4fb477}
+.karta .grupa button{font-size:12px}
+.karta .grupa button.grozny{color:var(--cena)}
+.karta .grupa button.grozny.aktywny,.karta .grupa button.grozny:hover{background:var(--biel); color:var(--cena)}
+.karta .probniki{grid-template-columns:repeat(7,30px); gap:7px}
+.karta .cta{margin-top:14px; padding:11px; font-size:13px}
+.karta h3{margin:0 0 2px; font-size:15px}
+.karta p{margin:0 0 14px; font-size:12px; color:var(--szary)}
+.karta .pole{margin-bottom:14px}
+.karta .pole:last-child{margin-bottom:0}
+.karta .mini{font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--szary); margin-bottom:6px}
+.karta-zamknij{position:absolute; top:12px; right:12px; border:0; background:none; cursor:pointer; color:var(--szary); padding:2px}
+
+/* ---------- panel ---------- */
+.lista-mebli{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  display:inline-flex; align-items:center; gap:7px; padding:7px 12px; cursor:pointer;
+  background:var(--tor); border:1px solid transparent; border-radius:999px;
+  font:inherit; font-size:12px; color:var(--szary);
+}
+.chip.aktywny{background:var(--akcent); border-color:var(--akcent); color:#fff}
+.chip .kropka{width:11px; height:11px; border-radius:50%; border:1px solid rgba(28,30,35,.18)}
+.chip.dodaj{padding:7px 10px}
+.chip svg{width:14px; height:14px}
+.panel{
+  flex:0 0 var(--panel); width:var(--panel); background:var(--biel);
+  overflow-y:auto; overflow-x:hidden; border-left:1px solid var(--linia);
+}
+.panel-naglowek{display:flex; align-items:baseline; gap:8px; height:44px; padding:0 13px; border-bottom:1px solid var(--obwodka)}
+.panel-etykieta{display:none}
+.panel-tytul{margin:0; font-size:12px; font-weight:600; color:var(--atrament)}
+.panel-opis{margin:0; font-size:10.5px; color:var(--szary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+/* Sekcje jak w Inspektorze edytora: nagłówek 40 px, tytuł 12 px pogrubiony, linia na dole.
+   Rzeczy ustawiane raz (konstrukcja, scena) startują zwinięte — kolumna ma 300 px, nie 470. */
+.sekcja{border-bottom:1px solid var(--obwodka); padding:0 13px 12px}
+.sekcja-naglowek{
+  display:flex; align-items:center; gap:6px; height:40px; width:100%; padding:0;
+  background:none; border:0; font:inherit; font-size:12px; font-weight:600; color:var(--atrament);
+  text-align:left; cursor:default;
+}
+.sekcja-naglowek.zwijana{cursor:pointer}
+.sekcja-naglowek svg{width:12px; height:12px; color:var(--szary); transition:transform .15s}
+.sekcja.zwinieta{padding-bottom:0}
+.sekcja.zwinieta .sekcja-naglowek svg{transform:rotate(-90deg)}
+.sekcja.zwinieta .wiersz{display:none}
+
+.wiersz{display:flex; align-items:center; gap:10px; padding:3px 0}
+.wiersz > .etykieta{flex:0 0 78px; width:78px; color:var(--szary); font-size:11px}
+.wiersz > .kontrolka{flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:8px}
+.wiersz.kolumna{display:block; padding:4px 0}
+.wiersz.kolumna > .etykieta{width:auto; flex:none; margin-bottom:6px}
+/* W wierszu pionowym kontrolka jest blokiem na pełną szerokość — bez tego siatka próbników
+   z `auto-fill` nie zna swojej szerokości i układa się w jedną kolumnę. */
+.wiersz.kolumna > .kontrolka{display:block}
+.probniki{width:100%}
+
+/* Przy 300 px kolumny siedem stylów nie mieści się w jednym pasku — zawijam zamiast chować
+   za przewijaniem, bo ukryty przycisk to przycisk, którego nie ma. */
+.grupa{display:flex; flex-wrap:wrap; gap:3px; background:var(--tor); border-radius:10px; padding:3px}
+.grupa::-webkit-scrollbar{display:none}
+.grupa button{
+  flex:1 0 auto; border:0; background:none; border-radius:8px; padding:5px 8px;
+  font:inherit; font-size:11.5px; color:var(--szary); cursor:pointer; white-space:nowrap;
+}
+.grupa button.aktywny{background:var(--wypelnienie); color:#fff; box-shadow:none}
+
+.tor{flex:1 1 auto; position:relative}
+.suwak{width:100%; --track-color-active:var(--atrament); --thumb-size:18px}
+.progi{position:absolute; left:0; right:0; top:calc(50% + 11px); height:6px; pointer-events:none}
+.progi i{position:absolute; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:var(--akcent); opacity:.55}
+.banka{
+  flex:0 0 auto; min-width:64px; text-align:center; background:var(--biel);
+  border:1px solid var(--obwodka); border-radius:999px; padding:6px 10px; font-size:12px;
+}
+
+.probniki{display:grid; grid-template-columns:repeat(auto-fill,24px); gap:7px}
+.probnik{
+  width:24px; height:24px; border-radius:50%; border:1px solid rgba(28,30,35,.14);
+  padding:0; cursor:pointer; outline-offset:2px;
+}
+.probnik.aktywny{outline:2px solid var(--akcent)}
+.probnik.bez-rosliny{background:repeating-linear-gradient(45deg,#f1f2f4 0 6px,#e0e2e6 6px 12px)}
+.probniki.drewno,.probniki.nozki{grid-template-columns:repeat(auto-fill,24px)}
+.probnik.proceduralne{background:repeating-linear-gradient(90deg,#cbad83,#cbad83 3px,#b8946a 3px,#b8946a 5px)}
+.probnik.dodaj-drewno{display:grid; place-items:center; background:var(--tor); color:var(--szary)}
+.probnik.dodaj-drewno svg{width:14px; height:14px}
+.karta.biblioteka{width:420px}
+.karta.biblioteka .szukaj{
+  width:100%; margin:4px 0 12px; padding:9px 13px; font:inherit; font-size:13px;
+  border:1px solid var(--obwodka); border-radius:999px; outline-color:var(--akcent);
+}
+.karta.biblioteka .wyniki{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px;
+  max-height:320px; overflow-y:auto; font-size:12px; color:var(--szary);
+}
+.karta.biblioteka .material{
+  display:grid; gap:4px; padding:0; border:1px solid var(--obwodka); border-radius:10px;
+  background:var(--biel); cursor:pointer; overflow:hidden; font:inherit; font-size:10px; color:var(--szary);
+}
+.karta.biblioteka .material img{width:100%; aspect-ratio:1; object-fit:cover; display:block}
+.karta.biblioteka .material span{padding:0 4px 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.karta.biblioteka .material:hover{border-color:var(--akcent)}
+.karta.biblioteka .material.juz{outline:2px solid var(--akcent); outline-offset:-2px}
+.karta.biblioteka .material.pobieranie{opacity:.45}
+
+.cena-blok{padding-bottom:6px}
+.cena-stara{font-size:13px; color:var(--szary); text-decoration:line-through}
+.cena-oszczednosc{font-size:13px; color:var(--cena); margin-left:8px}
+.cena-glowna{font-size:34px; font-weight:600; color:var(--cena); line-height:1.1; margin:4px 0 2px}
+.cena-nota{font-size:11px; color:var(--szary)}
+.podsumowanie{font-size:10.5px; color:var(--szary); line-height:1.6; padding:10px 13px; border-bottom:1px solid var(--obwodka)}
+.podsumowanie b{color:var(--atrament); font-weight:600}
+.podsumowanie .ostrzezenie{color:var(--cena)}
+
+/* Przyciski końcowe w gęstości panelu — wcześniej były wielkości przycisków ze sklepu. */
+.cta{
+  width:100%; border:0; border-radius:6px; padding:9px; margin:0;
+  background:var(--akcent); color:#fff; font:inherit; font-size:12px; font-weight:500; cursor:pointer;
+}
+.cta.wtorna{background:var(--tor); color:var(--atrament); border:1px solid var(--obwodka); margin-top:6px}
+.przyciski-panelu{padding:10px 13px 14px}
+
+.wymiary{
+  position:absolute; z-index:3; transform:translate(-50%,0); background:var(--biel);
+  border:1px solid var(--obwodka); border-radius:999px; padding:6px 14px; font-size:12px; color:var(--szary);
+}
+.dodatek-info{position:absolute; left:28px; top:24px; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--slaby); z-index:3}
+
+/* selftest */
+.selftest{position:fixed; inset:0; background:var(--biel); z-index:99; padding:28px; overflow:auto; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px}
+.selftest li{margin-bottom:6px; list-style:none}
+.selftest .pass{color:#4fb477}
+.selftest .fail{color:var(--cena)}
+
+/* Panel ma teraz 300 px zamiast 470, więc układ obok siebie mieści się na węższym oknie. */
+@media (max-width:760px){
+  .uklad{flex-direction:column}
+  .panel{flex:1 1 auto; width:100%; border-left:0; border-top:1px solid var(--linia)}
+  .scena{flex:0 0 52vh}
+}
+
+/* ---------- lista modułów ---------- */
+/* Wzorzec panelu „Object" z D5: wiersz 24 px, wcięcie pokazuje przyleganie, ikona odróżnia
+   moduł samodzielny od zakotwiczonego. Zachowanie z Figmy — klik, Shift-klik, dwuklik. */
+.lista-modulow .lista-glowka{display:flex; align-items:center; gap:6px; margin-bottom:4px}
+.lista-modulow .licznik{color:var(--slaby); font-size:10px}
+.lista-modulow .ikonka{
+  margin-left:auto; display:flex; width:20px; height:20px; align-items:center; justify-content:center;
+  border:0; background:none; border-radius:4px; color:var(--szary); cursor:pointer; padding:0;
+}
+.lista-modulow .ikonka:last-child{margin-left:0}
+.lista-modulow .ikonka:hover{background:var(--najazd); color:var(--atrament)}
+.lista-modulow .ikonka svg{width:13px; height:13px}
+.drzewo{list-style:none; margin:0; padding:0}
+.modul{
+  display:flex; align-items:center; gap:6px; width:100%; height:24px; padding-right:6px;
+  border:0; background:none; border-radius:3px; font:inherit; font-size:11.5px;
+  color:var(--atrament); text-align:left; cursor:pointer;
+}
+.modul:hover{background:var(--najazd)}
+.modul.zaznaczony{background:var(--akcent); color:#fff}
+.modul.wejsciowy{background:rgba(13,153,255,.14); box-shadow:inset 0 0 0 1px var(--akcent)}
+.modul svg{width:12px; height:12px; flex:0 0 12px; color:#a78bfa}
+.modul.zaznaczony svg{color:#fff}
+.modul .kropka{width:8px; height:8px; flex:0 0 8px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(28,30,35,.18)}
+.modul .nazwa{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.modul .strona{flex:0 0 auto; font-size:10px; color:var(--slaby)}
+.modul.zaznaczony .strona{color:rgba(255,255,255,.7)}
+.okruchy{display:flex; align-items:center; gap:3px; margin-top:6px; color:var(--szary); font-size:10px}
+.okruchy button{border:0; background:none; color:inherit; font:inherit; cursor:pointer; padding:0}
+.okruchy button:last-child{color:var(--atrament)}
+.okruchy svg{width:9px; height:9px}
+.sekcja.zablokowana{opacity:.4; pointer-events:none}
+.podpowiedz-modulu{
+  margin:0; padding:8px 13px 10px; font-size:10.5px; line-height:1.5; color:var(--szary);
+  border-bottom:1px solid var(--obwodka);
+}
+.lista-wyboru{
+  width:100%; height:24px; padding:0 6px; border:1px solid var(--obwodka); border-radius:5px;
+  background:var(--tor); color:var(--atrament); font:inherit; font-size:11.5px; cursor:pointer;
+}
+.komponent{display:flex; flex-direction:column; gap:6px}
+.komponent-nazwa{display:flex; align-items:center; gap:6px; margin:0; font-size:11.5px; color:var(--atrament)}
+.komponent-nazwa svg{width:12px; height:12px; color:#8b5cf6}
+.komponent-nazwa .licznik{margin-left:auto; color:var(--slaby); font-size:10px}
+.odstepstwa{display:flex; flex-wrap:wrap; gap:4px}
+.odstepstwa button{
+  display:flex; align-items:center; gap:4px; border:1px solid var(--obwodka); border-radius:999px;
+  background:var(--tor); color:var(--szary); font:inherit; font-size:10px; padding:2px 6px; cursor:pointer;
+}
+.odstepstwa button:hover{color:var(--akcent); border-color:var(--akcent)}
+.odstepstwa svg{width:9px; height:9px}
+.cta[disabled]{opacity:.45; cursor:default}
+/* Pole o różnych wartościach w zaznaczeniu — jak „Mixed" w Figmie. */
+.wiersz.mieszany > .etykieta::after{content:' · mixed'; color:var(--akcent)}
+.wiersz.mieszany .banka{color:var(--akcent)}
+.pasek-zaznaczenia{
+  margin:0; padding:7px 13px; font-size:10.5px; color:var(--akcent);
+  background:rgba(13,153,255,.08); border-bottom:1px solid var(--obwodka);
+}
+.modul.korzen{font-weight:600}
+.modul.korzen svg{color:var(--szary)}
+.modul.korzen.zaznaczony svg{color:#fff}
