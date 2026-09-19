@@ -1,0 +1,1318 @@
+{
+  "schemaVersion": 2,
+  "assetId": "regal-przy-lozku",
+  "version": "v0021-parametric",
+  "name": "Regał przy łóżku — skrzydło główne parametryczne",
+  "summary": "Skrzydło główne przebudowane do schema v2 + parametric (1764×2600×570, 3×4). Krótkie skrzydło pozostaje jawne z v0020 jako kontekst. Zachowano semantykę LED w lights i jawne lustro/listwy LED.",
+  "units": "mm",
+  "placement": {
+    "confirmed": true,
+    "roomId": "POKOJ-LOZKO",
+    "wallId": "POKOJ-LOZKO-W3",
+    "positionMm": [
+      3408,
+      0,
+      7125
+    ],
+    "rotationDeg": 180,
+    "confirmationSvg": "meble/regal-przy-lozku/plany/v0010.svg",
+    "description": "Ustawienie i obrys odziedziczone z potwierdzonego v0018; zmienia się wyłącznie wewnętrzny podział koralowego kubika."
+  },
+  "geometry": {
+    "parts": [
+      {
+        "id": "SHORT-WING-BOTTOM",
+        "type": "box",
+        "sizeMm": [
+          600,
+          18,
+          1200
+        ],
+        "positionMm": [
+          -1182,
+          799,
+          315
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Dolna płyta konstrukcyjna krótszego skrzydła",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-TOP",
+        "type": "box",
+        "sizeMm": [
+          600,
+          18,
+          1200
+        ],
+        "positionMm": [
+          -1182,
+          2591,
+          315
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Górna płyta konstrukcyjna krótszego skrzydła",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-BACK",
+        "type": "box",
+        "sizeMm": [
+          18,
+          1774,
+          1200
+        ],
+        "positionMm": [
+          -1473,
+          1695,
+          315
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Pełne plecy drewnianej szafy krótszego skrzydła",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-END-CORNER",
+        "type": "box",
+        "sizeMm": [
+          600,
+          1774,
+          18
+        ],
+        "positionMm": [
+          -1182,
+          1695,
+          -276
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Bok krótszego skrzydła od strony narożnika",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-END-OUTER",
+        "type": "box",
+        "sizeMm": [
+          600,
+          1774,
+          18
+        ],
+        "positionMm": [
+          -1182,
+          1695,
+          906
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Bok zewnętrzny krótszego skrzydła",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-SHELF-UPPER",
+        "type": "box",
+        "sizeMm": [
+          540,
+          18,
+          1200
+        ],
+        "positionMm": [
+          -1194,
+          1991,
+          315
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Pełnoszeroka półka na obecnej wysokości, cofnięta 42 mm od płaszczyzny frontu, aby nie była widoczna po zamknięciu drzwi",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-FIXED-FRONT",
+        "type": "box",
+        "sizeMm": [
+          18,
+          1770,
+          578
+        ],
+        "positionMm": [
+          -891,
+          1695,
+          24
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Stała drewniana płyta frontowa zlicowana z bryłą; minimalna szczelina",
+        "bevelMm": 0.2
+      },
+      {
+        "id": "SHORT-WING-DOOR-FULL-LEFT",
+        "type": "box",
+        "sizeMm": [
+          18,
+          1770,
+          578
+        ],
+        "positionMm": [
+          -891,
+          1695,
+          606
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "maple-0375",
+        "label": "Jedne drewniane drzwi na pełną wysokość, zlicowane z bryłą, zawias po LEWEJ stronie",
+        "bevelMm": 0.2
+      },
+      {
+        "id": "SHORT-WING-CORAL-CUBBY-BOTTOM",
+        "type": "box",
+        "sizeMm": [
+          600,
+          18,
+          200
+        ],
+        "positionMm": [
+          -1182,
+          809,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Jasnokoralowa dolna płyta bocznej półki 600×200",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-CORAL-CUBBY-TOP",
+        "type": "box",
+        "sizeMm": [
+          600,
+          18,
+          200
+        ],
+        "positionMm": [
+          -1182,
+          1391,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Jasnokoralowa górna płyta bocznej półki; górą idealnie wyrównana z biurkami",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-CORAL-CUBBY-SIDE-BACK",
+        "type": "box",
+        "sizeMm": [
+          18,
+          582,
+          200
+        ],
+        "positionMm": [
+          -1473,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Jasnokoralowa tylna ścianka głębokości bocznej półki",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-CORAL-CUBBY-SIDE-FRONT",
+        "type": "box",
+        "sizeMm": [
+          18,
+          582,
+          200
+        ],
+        "positionMm": [
+          -891,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Jasnokoralowa przednia ścianka głębokości bocznej półki",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-CORAL-CUBBY-INNER-BACK",
+        "type": "box",
+        "sizeMm": [
+          600,
+          582,
+          6
+        ],
+        "positionMm": [
+          -1182,
+          1100,
+          918
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Jasnokoralowe plecy półki na drewnianym boku szafy; strona od drzwi pokoju pozostaje otwarta",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-LEG-TAPER-1",
+        "type": "cylinder",
+        "radiusTopMm": 18,
+        "radiusBottomMm": 8,
+        "heightMm": 784,
+        "segments": 32,
+        "positionMm": [
+          -1422,
+          392,
+          -225
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała smukła noga stożkowa 1, styl jak referencja, H784 + płytka 6 mm"
+      },
+      {
+        "id": "SHORT-WING-LEG-PLATE-1",
+        "type": "box",
+        "sizeMm": [
+          70,
+          6,
+          70
+        ],
+        "positionMm": [
+          -1422,
+          787,
+          -225
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała płytka montażowa nogi 1, 70×70×6 mm",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-LEG-TAPER-2",
+        "type": "cylinder",
+        "radiusTopMm": 18,
+        "radiusBottomMm": 8,
+        "heightMm": 784,
+        "segments": 32,
+        "positionMm": [
+          -942,
+          392,
+          -225
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała smukła noga stożkowa 2, styl jak referencja, H784 + płytka 6 mm"
+      },
+      {
+        "id": "SHORT-WING-LEG-PLATE-2",
+        "type": "box",
+        "sizeMm": [
+          70,
+          6,
+          70
+        ],
+        "positionMm": [
+          -942,
+          787,
+          -225
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała płytka montażowa nogi 2, 70×70×6 mm",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-LEG-TAPER-3",
+        "type": "cylinder",
+        "radiusTopMm": 18,
+        "radiusBottomMm": 8,
+        "heightMm": 784,
+        "segments": 32,
+        "positionMm": [
+          -1422,
+          392,
+          855
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała smukła noga stożkowa 3, styl jak referencja, H784 + płytka 6 mm"
+      },
+      {
+        "id": "SHORT-WING-LEG-PLATE-3",
+        "type": "box",
+        "sizeMm": [
+          70,
+          6,
+          70
+        ],
+        "positionMm": [
+          -1422,
+          787,
+          855
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała płytka montażowa nogi 3, 70×70×6 mm",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-LEG-TAPER-4",
+        "type": "cylinder",
+        "radiusTopMm": 18,
+        "radiusBottomMm": 8,
+        "heightMm": 784,
+        "segments": 32,
+        "positionMm": [
+          -942,
+          392,
+          855
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała smukła noga stożkowa 4, styl jak referencja, H784 + płytka 6 mm"
+      },
+      {
+        "id": "SHORT-WING-LEG-PLATE-4",
+        "type": "box",
+        "sizeMm": [
+          70,
+          6,
+          70
+        ],
+        "positionMm": [
+          -942,
+          787,
+          855
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "white-matte",
+        "label": "Biała płytka montażowa nogi 4, 70×70×6 mm",
+        "bevelMm": 1
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-V2",
+        "type": "box",
+        "sizeMm": [
+          18,
+          564,
+          194
+        ],
+        "positionMm": [
+          -1182,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Podział pionowy: granica lewej otwartej połowy i trzeciej ćwiartki",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-V3",
+        "type": "box",
+        "sizeMm": [
+          18,
+          564,
+          194
+        ],
+        "positionMm": [
+          -1032,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Podział pionowy: granica trzeciej i prawej ćwiartki",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-Q3-H2",
+        "type": "box",
+        "sizeMm": [
+          150,
+          18,
+          194
+        ],
+        "positionMm": [
+          -1107,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Trzecia ćwiartka: pojedynczy podział poziomy",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-Q4-H1",
+        "type": "box",
+        "sizeMm": [
+          150,
+          18,
+          194
+        ],
+        "positionMm": [
+          -957,
+          950,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Prawa ćwiartka: podział poziomy 1/3 siatki 4×4",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-Q4-H2",
+        "type": "box",
+        "sizeMm": [
+          150,
+          18,
+          194
+        ],
+        "positionMm": [
+          -957,
+          1100,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Prawa ćwiartka: podział poziomy 2/3 siatki 4×4",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "SHORT-WING-CORAL-GRID-Q4-H3",
+        "type": "box",
+        "sizeMm": [
+          150,
+          18,
+          194
+        ],
+        "positionMm": [
+          -957,
+          1250,
+          1015
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "coral-light-matte",
+        "label": "Prawa ćwiartka: podział poziomy 3/3 siatki 4×4",
+        "bevelMm": 0.5
+      },
+      {
+        "id": "OPEN-MIRROR-BACK",
+        "type": "box",
+        "sizeMm": [
+          1764,
+          582,
+          6
+        ],
+        "positionMm": [
+          0,
+          1691,
+          -282
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "mirror-polished",
+        "label": "Lustrzane plecy całego otwartego rzędu",
+        "bevelMm": 0
+      },
+      {
+        "id": "OPEN-LED-TOP",
+        "type": "box",
+        "sizeMm": [
+          1728,
+          10,
+          18
+        ],
+        "positionMm": [
+          0,
+          1976,
+          -270
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "led-warm",
+        "label": "LED przy plecach — góra",
+        "bevelMm": 2
+      },
+      {
+        "id": "OPEN-LED-BOTTOM",
+        "type": "box",
+        "sizeMm": [
+          1728,
+          10,
+          18
+        ],
+        "positionMm": [
+          0,
+          1406,
+          -270
+        ],
+        "rotationDeg": [
+          0,
+          0,
+          0
+        ],
+        "material": "led-warm",
+        "label": "LED przy plecach — dół",
+        "bevelMm": 2
+      }
+    ]
+  },
+  "materials": {
+    "definitions": {
+      "white-matte": {
+        "type": "white",
+        "color": "#F5F5F2",
+        "roughness": 0.52,
+        "metalness": 0
+      },
+      "white-matte-front": {
+        "type": "white",
+        "color": "#F5F5F2",
+        "roughness": 0.48,
+        "metalness": 0
+      },
+      "white-matte-back": {
+        "type": "white",
+        "color": "#D8D8D5",
+        "roughness": 0.62,
+        "metalness": 0
+      },
+      "cobalt-matte": {
+        "type": "graphite",
+        "color": "#0047AB",
+        "roughness": 0.9,
+        "metalness": 0
+      },
+      "cobalt-matte-front": {
+        "type": "graphite",
+        "color": "#0047AB",
+        "roughness": 0.82,
+        "metalness": 0
+      },
+      "cobalt-matte-back": {
+        "type": "graphite",
+        "color": "#003E96",
+        "roughness": 0.94,
+        "metalness": 0
+      },
+      "maple-0375": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.58,
+        "metalness": 0
+      },
+      "maple-0375-front": {
+        "type": "wood",
+        "color": "#d8bd99",
+        "roughness": 0.54,
+        "metalness": 0
+      },
+      "maple-0375-back": {
+        "type": "wood",
+        "color": "#bea685",
+        "roughness": 0.64,
+        "metalness": 0
+      },
+      "mirror-polished": {
+        "type": "metal",
+        "color": "#DDE4E8",
+        "roughness": 0.03,
+        "metalness": 1
+      },
+      "led-warm": {
+        "type": "white",
+        "color": "#FFF4DB",
+        "roughness": 0.18,
+        "metalness": 0
+      },
+      "coral-light-matte": {
+        "type": "white",
+        "color": "#D8A08E",
+        "roughness": 0.82,
+        "metalness": 0
+      },
+      "coral-light-matte-front": {
+        "type": "white",
+        "color": "#D8A08E",
+        "roughness": 0.76,
+        "metalness": 0
+      },
+      "coral-light-matte-back": {
+        "type": "white",
+        "color": "#BE8D7D",
+        "roughness": 0.9,
+        "metalness": 0
+      }
+    }
+  },
+  "lights": {
+    "recesses": [
+      {
+        "id": "OPEN-MIRROR-ROW",
+        "name": "Otwarty rząd z lustrem",
+        "boundsMm": {
+          "min": [
+            -873,
+            1400,
+            -285
+          ],
+          "max": [
+            873,
+            1982,
+            135
+          ]
+        },
+        "ledStrips": [
+          {
+            "id": "LED-TOP",
+            "positionMm": [
+              0,
+              1976,
+              -270
+            ],
+            "targetMm": [
+              0,
+              1691,
+              -120
+            ],
+            "widthMm": 1728,
+            "heightMm": 10,
+            "direction": "forward-and-down"
+          },
+          {
+            "id": "LED-BOTTOM",
+            "positionMm": [
+              0,
+              1406,
+              -270
+            ],
+            "targetMm": [
+              0,
+              1691,
+              -120
+            ],
+            "widthMm": 1728,
+            "heightMm": 10,
+            "direction": "forward-and-up"
+          }
+        ]
+      }
+    ]
+  },
+  "mechanics": [
+    {
+      "id": "short-mech-1",
+      "part": "SHORT-WING-DOOR-FULL-LEFT",
+      "type": "hinge",
+      "pivotMm": [
+        -891,
+        1695,
+        895
+      ],
+      "axis": [
+        0,
+        1,
+        0
+      ],
+      "angleDeg": -100,
+      "label": "Jedne pełnowysokościowe drzwi krótszego skrzydła — zawias po LEWEJ stronie, front zlicowany"
+    }
+  ],
+  "interactions": [
+    {
+      "id": "inspect-furniture",
+      "type": "select",
+      "target": "geometry.parts"
+    }
+  ],
+  "states": {
+    "default": "installed",
+    "named": [
+      {
+        "id": "installed",
+        "mechanics": {},
+        "description": "Zatwierdzony stan projektowy; runtime state nie jest zapisywany."
+      }
+    ]
+  },
+  "constraints": [],
+  "assets": [],
+  "anchors": [],
+  "customParameters": {
+    "edgeProfile": {
+      "type": "round",
+      "defaultRadiusMm": 1
+    },
+    "frontGapMm": 2,
+    "frontRecessMm": 0,
+    "softGeometry": null,
+    "sourceRealizerVersion": "parametryczne-v1"
+  },
+  "extensions": {
+    "pl.mieszkanie.webgpu": {
+      "required": false,
+      "qualityHints": {
+        "baseline": "srednia",
+        "photo": "photo_raster"
+      },
+      "lightingPoolSize": 6
+    }
+  },
+  "designTime": {
+    "activeNamedState": "installed",
+    "placementApproved": true
+  },
+  "runtimeStatePolicy": {
+    "persist": "named-states-only",
+    "implicitRuntimeStateAllowed": false
+  },
+  "rendererDefaults": {
+    "qualityProfile": "srednia",
+    "toneMapping": "aces",
+    "antiAliasing": "smaa"
+  },
+  "rendererOverrides": {
+    "webgpu": {
+      "desktopGI": "current-ssgi",
+      "desktopSSR": "current",
+      "photoRasterSamples": 64
+    }
+  },
+  "notes": [
+    "Parametryczny korpus główny ma jednolity biały carcass/back/shelf; kobalt pozostaje na frontach dolnego rzędu.",
+    "Silnik parametryczny tworzy pełnowysokościowe piony między wszystkimi 3 kolumnami. W v0020 prawa szuflada 120 cm i biurko 120 cm nie miały środkowej konstrukcyjnej ścianki — tego wyjątku kontrakt carcass nie potrafi wyrazić.",
+    "plinthMm=200 odwzorowuje start korpusu na y=200, ale daje parametryczny cokół zamiast czterech osobnych nóg z v0020.",
+    "Lustro i wizualne listwy LED pozostały w geometry.parts; semantyczne LED są także w lights.recesses i nie są edytowalne przez sam rozwinParametryczny().",
+    "Dekoracyjne pionowe listwy na froncie szuflady 120 i biurka 120 nie zostały przeniesione do parametric."
+  ],
+  "parametric": {
+    "carcass": {
+      "sizeMm": [
+        1764,
+        2600,
+        570
+      ],
+      "boardMm": 18,
+      "material": "white-matte",
+      "backMm": 8,
+      "backMaterial": "white-matte-back",
+      "shelfMaterial": "white-matte",
+      "plinthMm": 200,
+      "plinthRecessMm": 70
+    },
+    "layout": {
+      "columns": {
+        "count": 3,
+        "distribution": "custom",
+        "custom": "582+582+582"
+      },
+      "rows": {
+        "count": 4,
+        "distribution": "custom",
+        "custom": "564+582+582+582"
+      }
+    },
+    "definitions": {
+      "drzwi": {
+        "label": "Drzwiczki",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "white-matte-front",
+            "label": "Front",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -4
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              0,
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          },
+          {
+            "id": "uchwyt",
+            "type": "box",
+            "material": "white-matte",
+            "label": "Uchwyt — frez",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -80
+              },
+              18,
+              8
+            ],
+            "positionMm": [
+              0,
+              {
+                "cell": "h",
+                "mul": 0.5,
+                "addMm": -60
+              },
+              22
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "joint": {
+          "type": "hinge",
+          "pivotMm": [
+            {
+              "cell": "w",
+              "mul": -0.5
+            },
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "angleDeg": 100
+        }
+      },
+      "drzwi-kobalt": {
+        "label": "Drzwiczki",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "cobalt-matte-front",
+            "label": "Front",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -4
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              0,
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          },
+          {
+            "id": "uchwyt",
+            "type": "box",
+            "material": "cobalt-matte",
+            "label": "Uchwyt — frez",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -80
+              },
+              18,
+              8
+            ],
+            "positionMm": [
+              0,
+              {
+                "cell": "h",
+                "mul": 0.5,
+                "addMm": -60
+              },
+              22
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "joint": {
+          "type": "hinge",
+          "pivotMm": [
+            {
+              "cell": "w",
+              "mul": -0.5
+            },
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "angleDeg": 100
+        }
+      },
+      "szuflada-120": {
+        "label": "Szuflada kobaltowa 120 cm",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "cobalt-matte-front",
+            "label": "Front szuflady 120",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "mul": 2,
+                "addMm": 14
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              {
+                "cell": "w",
+                "mul": 0.5,
+                "addMm": 9
+              },
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          }
+        ],
+        "joint": {
+          "type": "slide",
+          "axis": [
+            0,
+            0,
+            1
+          ],
+          "travelMm": 430
+        }
+      },
+      "biurko-60": {
+        "label": "Opuszczany blat 60 cm",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "white-matte-front",
+            "label": "Blat/front 60",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "addMm": -4
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              0,
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          }
+        ],
+        "joint": {
+          "type": "hinge",
+          "pivotMm": [
+            0,
+            {
+              "cell": "h",
+              "mul": -0.5,
+              "addMm": 2
+            },
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "angleDeg": 90
+        }
+      },
+      "biurko-120": {
+        "label": "Opuszczany blat 120 cm",
+        "parts": [
+          {
+            "id": "panel",
+            "type": "box",
+            "material": "white-matte-front",
+            "label": "Blat/front 120",
+            "sizeMm": [
+              {
+                "cell": "w",
+                "mul": 2,
+                "addMm": 14
+              },
+              {
+                "cell": "h",
+                "addMm": -4
+              },
+              18
+            ],
+            "positionMm": [
+              {
+                "cell": "w",
+                "mul": 0.5,
+                "addMm": 9
+              },
+              0,
+              9
+            ],
+            "rotationDeg": [
+              0,
+              0,
+              0
+            ],
+            "bevelMm": 1
+          }
+        ],
+        "joint": {
+          "type": "hinge",
+          "pivotMm": [
+            {
+              "cell": "w",
+              "mul": 0.5,
+              "addMm": 9
+            },
+            {
+              "cell": "h",
+              "mul": -0.5,
+              "addMm": 2
+            },
+            0
+          ],
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "angleDeg": 90
+        }
+      }
+    },
+    "instances": [
+      {
+        "id": "dolne-drzwi",
+        "definition": "drzwi-kobalt",
+        "label": "Dolne drzwi kobaltowe",
+        "cells": {
+          "rows": [
+            1
+          ],
+          "columns": [
+            1
+          ]
+        }
+      },
+      {
+        "id": "szuflada120",
+        "definition": "szuflada-120",
+        "label": "Szuflada 120",
+        "cells": {
+          "rows": [
+            1
+          ],
+          "columns": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "desk60",
+        "definition": "biurko-60",
+        "label": "Biurko 60",
+        "cells": {
+          "rows": [
+            2
+          ],
+          "columns": [
+            1
+          ]
+        }
+      },
+      {
+        "id": "desk120",
+        "definition": "biurko-120",
+        "label": "Biurko 120",
+        "cells": {
+          "rows": [
+            2
+          ],
+          "columns": [
+            2
+          ]
+        }
+      },
+      {
+        "id": "gorne-drzwi",
+        "definition": "drzwi",
+        "label": "Górne drzwi",
+        "cells": {
+          "rows": [
+            4
+          ],
+          "columns": [
+            1,
+            2,
+            3
+          ]
+        }
+      }
+    ]
+  }
+}
