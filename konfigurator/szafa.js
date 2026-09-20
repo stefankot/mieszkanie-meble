@@ -49,8 +49,11 @@ const REGAL_PRZY_LOZKU = [
   /* Biurka są osobnymi modułami, a nie ustawieniem komórki — każde ma własny kolor i głębokość. */
   {id: 'biurko-lewe', nazwa: 'Biurko lewe', definicja: 'biurko-60', kolor: 0,
    kotwica: {do: 'skrzydlo-glowne', strona: 'wnetrze', komorka: 'r1c1'}},
+  /* `biurko-120` jest zaprojektowane na DWIE kolumny: panel ma `mul: 2` i wlasne
+     przesuniecie o pol komorki w prawo. Bez wyrownania do lewej krawedzi komorki nasze
+     centrowanie kasowalo to przesuniecie i klapa konczyla sie w polowie sasiednich pol. */
   {id: 'biurko-prawe', nazwa: 'Biurko prawe', definicja: 'biurko-120', kolor: 0,
-   kotwica: {do: 'skrzydlo-glowne', strona: 'wnetrze', komorka: 'r1c2'}},
+   kotwica: {do: 'skrzydlo-glowne', strona: 'wnetrze', komorka: 'r1c2', poziomo: 'lewo'}},
   {id: 'skrzydlo-krotkie', nazwa: 'Skrzydło krótkie',
    zrodlo: 'regal-lozko-bok', szerokoscMm: 1200, wysokoscMm: 1792, glebokoscMm: 600,
    styl: 'custom', siatkaKol: '116.4', siatkaRzed: '115.6 + 58.2',
@@ -468,6 +471,7 @@ export function przebuduj(zapisujHistorie = true){
      każda przebudowa, więc każde drgnięcie suwaka wyrywało widok z powrotem na aktywny
      moduł i nie dało się pracować patrząc na całość. */
   if(obrocono) dopasujKamere(frontMebla(), true);
+  odswiezHistorie();
   /* Jeden wadliwy odświeżacz panelu nie może zabijać całej przebudowy sceny. */
   for(const f of odswiezacze){
     try{ f(); }catch(e){ console.error('odświeżanie panelu:', e); }
@@ -475,6 +479,18 @@ export function przebuduj(zapisujHistorie = true){
   odswiezNakladke();
   zapiszLokalnie();
   if(zapisujHistorie) zapisz();
+}
+
+/* Cofanie było dotąd wyłącznie pod Cmd/Ctrl+Z, a jedyna ikona, która je przypominała
+   (`rotate-ccw`), kasowała cały projekt. Teraz są dwa osobne przyciski, wyszarzane
+   na końcach historii, a reset ma kosz i stoi osobno. */
+function odswiezHistorie(){
+  const ustaw = (akcja, mozna) => {
+    const b = document.querySelector(`.ikona[data-akcja="${akcja}"]`);
+    if(b) b.disabled = !mozna;
+  };
+  ustaw('cofnij', stan.indeks > 0);
+  ustaw('ponow', stan.indeks < stan.historia.length - 1);
 }
 
 /* Wejście w moduł — dwuklik jak w Figmie. Ustawia ścieżkę, przełącza edycję na ten moduł
@@ -694,6 +710,8 @@ export function usunMebel(){
       document.querySelector('.ikona[data-akcja="wymiary"]').classList.toggle('aktywny', stan.wymiary);
       odswiezNakladke();
     }
+    if(akcja === 'cofnij') skok(-1);
+    if(akcja === 'ponow') skok(1);
     if(akcja === 'ikea') dociagnijDoIkea();
     if(akcja === 'reset') potwierdzReset(e.target.closest('button'));
     if(akcja === 'eksport') pobierzJSON();

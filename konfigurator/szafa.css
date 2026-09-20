@@ -68,6 +68,11 @@ body{
   border-radius:999px; padding:9px 16px; font-size:12px; letter-spacing:.02em;
 }
 .ikona.pracuje{opacity:.5; pointer-events:none}
+.ikona:disabled{opacity:.3; cursor:default}
+.ikona:disabled:hover{border-color:var(--obwodka)}
+/* Reset kasuje projekt — ma wyglądać inaczej niż reszta szyny i nie mylić się z cofaniem. */
+.ikona.grozna{margin-top:10px; color:var(--cena)}
+.ikona.grozna:hover{border-color:var(--cena)}
 /* Znaczniki mebli: pastylka nad każdą bryłą. Mebel obrócony bokiem prawie nie ma sylwetki
    do kliknięcia, więc to on jest pewnym celem — widać go pod każdym kątem. */
 .znaczniki{position:absolute; inset:0; z-index:4; pointer-events:none}
@@ -79,6 +84,11 @@ body{
   box-shadow:0 4px 14px rgba(28,30,35,.14); transition:background .15s, color .15s, transform .15s;
 }
 .znacznik .kropka{width:9px; height:9px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(28,30,35,.14)}
+/* Znacznik cichy to sama kropka - nazwa wraca po najechaniu albo po zaznaczeniu. */
+.znacznik.cicha{padding:5px; opacity:.55}
+.znacznik.cicha .opis{display:none}
+.znacznik.cicha:hover{opacity:1; padding:5px 10px}
+.znacznik.cicha:hover .opis{display:inline}
 .znacznik.aktywny{background:var(--atrament); color:var(--biel); border-color:var(--atrament); cursor:default}
 .znacznik.wybrany{border-color:var(--akcent); box-shadow:0 0 0 1px var(--akcent)}
 .znacznik:not(.aktywny):hover,.znacznik.blisko{
@@ -182,6 +192,8 @@ body{
 }
 .karta.od-prawej::before{left:auto; right:-9px; transform:rotate(225deg)}
 .karta .nota{margin:10px 0 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
+/* Podpis miniatury pod siatka ukladow - jedna linia, stala wysokosc, zeby karta nie skakala. */
+.karta .nazwa-ukladu{margin:8px 0 0; min-height:16px; color:var(--atrament); font-weight:500}
 .karta .nota.uwaga{color:#e9a23b; background:rgba(233,162,59,.12); border-radius:10px; padding:9px 11px}
 .karta .nota.zgodne{color:#4fb477}
 .karta .grupa button{font-size:12px}

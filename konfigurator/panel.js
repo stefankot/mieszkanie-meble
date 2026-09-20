@@ -572,7 +572,8 @@ export function zbudujPanel(){
 
   const uklad = sekcja(host, 'Layout');
   bezKorpusu.push(uklad.box);
-  uklad('Style', grupa(STYLE, () => stan.styl,
+  /* Rytm rzedow, nie Style - style Tylko nazywa kreator i znacza co innego (caly mebel). */
+  uklad('Row rhythm', grupa(STYLE, () => stan.styl,
     v => {
       const kolumny = [...stan.kolumny], rzedy = [...stan.rzedy];
       ustawPole('styl', v);

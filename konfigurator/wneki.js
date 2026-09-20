@@ -75,11 +75,15 @@ export function czesciWnek(){
       id: `wneka${i}-${id}`, type: 'box', sizeMm, positionMm, rotationDeg: [0, 0, 0],
       material, label: `Niche ${i + 1}`});
 
-    box('wyklad-plecy', [g.sz, g.wys, t], [srX, srY, zTyl + t / 2], wnetrze);
-    box('wyklad-l', [t, g.wys, glBokow], [g.x1 + t / 2, srY, zC], wnetrze);
-    box('wyklad-p', [t, g.wys, glBokow], [g.x2 - t / 2, srY, zC], wnetrze);
-    box('wyklad-d', [g.sz - 2 * t, t, glBokow], [srX, g.y1 + t / 2, zC], wnetrze);
-    box('wyklad-g', [g.sz - 2 * t, t, glBokow], [srX, g.y2 - t / 2, zC], wnetrze);
+    /* `goly` to zwykle scalone pole: znikaja przegrody, ale nie dokladamy drugiej warstwy
+       plyty. Wysciolka jest tym, co robi z otworu osobna skrzynke - i tego czesto nie chcemy. */
+    if(!w.goly){
+      box('wyklad-plecy', [g.sz, g.wys, t], [srX, srY, zTyl + t / 2], wnetrze);
+      box('wyklad-l', [t, g.wys, glBokow], [g.x1 + t / 2, srY, zC], wnetrze);
+      box('wyklad-p', [t, g.wys, glBokow], [g.x2 - t / 2, srY, zC], wnetrze);
+      box('wyklad-d', [g.sz - 2 * t, t, glBokow], [srX, g.y1 + t / 2, zC], wnetrze);
+      box('wyklad-g', [g.sz - 2 * t, t, glBokow], [srX, g.y2 - t / 2, zC], wnetrze);
+    }
 
     const swiatloSz = g.sz - 2 * t, swiatloWys = g.wys - 2 * t;   // otwór wewnątrz wyściółki
     if(w.tresc === 'polka') box('polka', [swiatloSz, t, glBokow * .86], [srX, srY, zC], wnetrze);

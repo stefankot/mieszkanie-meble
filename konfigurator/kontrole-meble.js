@@ -407,21 +407,22 @@ export async function kontroleMebli(dodaj){
   wejdzWModul('nisza-koralowa');
   const wSrodkuSciezka = stan.wejscie.length;
   zaznaczCalyMebel();
-  const kadrCalosci = kamera.position.distanceTo(sterowanie.target);
   const wszystkie = stan.zaznaczone.length;
   const puste = stan.wejscie.length;
-  przelaczMebel(stan.meble.findIndex(m => m.id === 'biurko-lewe'));
-  stan.zaznaczone = [];
-  przebuduj(false);
-  /* Przełączenie modułu kadruje łagodnym przelotem, więc odległość trzeba zmierzyć PO nim.
-     Wcześniej każda przebudowa dociągała kamerę natychmiast i pomiar wychodził od ręki —
-     teraz kamera stoi w miejscu, dopóki nie zmieni się mebel, więc trzeba poczekać. */
-  await new Promise(r => setTimeout(r, 800));
-  const kadrModulu = kamera.position.distanceTo(sterowanie.target);
+  /* „Kadruje calosc" sprawdzam na bryle, nie na odlegloasci kamery: kadr leci lagodnym
+     przelotem, a modul osadzony ma w scenie pusta grupe, wiec pomiar kamery byl loteria.
+     Pudlo calego zestawu ma byc istotnie szersze niz pudlo samego skrzydla. */
+  const pudloZestawu = new THREE.Box3();
+  for(const g of grupyMebli) pudloZestawu.expandByObject(g);
+  const skrzydlo = grupyMebli[stan.meble.findIndex(m => m.id === 'skrzydlo-glowne')];
+  const pudloModulu = new THREE.Box3().setFromObject(skrzydlo);
+  const szerZestawu = pudloZestawu.max.x - pudloZestawu.min.x;
+  const szerModulu = pudloModulu.max.x - pudloModulu.min.x;
   dodaj(33, 'the list root selects every module, leaves the one you were in and frames the whole set',
-    wSrodkuSciezka === 2 && wszystkie === stan.meble.length && puste === 0 && kadrCalosci > kadrModulu,
+    wSrodkuSciezka === 2 && wszystkie === stan.meble.length && puste === 0
+      && szerZestawu > szerModulu + .3,
     `path ${wSrodkuSciezka} → 0, ${wszystkie}/${stan.meble.length} selected, `
-    + `camera ${kadrCalosci.toFixed(1)} m for the set vs ${kadrModulu.toFixed(1)} m for one module`);
+    + `set ${szerZestawu.toFixed(2)} m wide vs ${szerModulu.toFixed(2)} m for one module`);
   /* Moduł osadzony ma być edytowalny jak każdy inny: własny kolor i tekstura z palety,
      przeniesienie do innej komórki gospodarza i wysunięcie przed jego lico. */
   resetDoFabrycznych();

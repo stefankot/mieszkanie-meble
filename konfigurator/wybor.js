@@ -146,7 +146,10 @@ function zastosujZaznaczenie(){
   stan.wneki = stan.wneki.filter(w => w.r2 < z.r1 || w.r1 > z.r2 || w.c2 < z.c1 || w.c1 > z.c2);
   if(!jedna){
     for(let r = z.r1; r <= z.r2; r++) for(let c = z.c1; c <= z.c2; c++) delete stan.uklady[`r${r}c${c}`];
-    stan.wneki.push({r1: z.r1, r2: z.r2, c1: z.c1, c2: z.c2, tresc: 'pusta', wysun: 0, kolor: null, otwarte: false});
+    /* Scalenie komorek ma dac wieksze POLE, a nie podszafke. Wysciolka, wlasny kolor
+       i wysuniecie to osobna decyzja - wlacza sie ja przelacznikiem Lining w karcie. */
+    stan.wneki.push({r1: z.r1, r2: z.r2, c1: z.c1, c2: z.c2, tresc: 'pusta', wysun: 0,
+                     kolor: null, otwarte: false, goly: true});
   }
   if(JSON.stringify(stan.wneki) !== bylo) przebuduj(); else odswiezNakladke();
 }

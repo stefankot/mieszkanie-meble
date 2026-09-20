@@ -165,6 +165,9 @@ export function odswiezZnaczniki(){
     const edytowany = stan.wejscie?.[0] === m.id;
     b.classList.toggle('aktywny', edytowany);
     b.classList.toggle('wybrany', !edytowany && i === stan.aktywny);
+    /* Szesc pigulek naraz zaslanialo mebel. Pelna nazwe pokazuje tylko ta, ktora cos znaczy:
+       edytowana, zaznaczona albo ta pod kursorem - reszta kurczy sie do samej kropki. */
+    b.classList.toggle('cicha', !edytowany && i !== stan.aktywny && !b.classList.contains('blisko'));
     b.title = edytowany ? 'This piece is being edited'
       : i === stan.aktywny ? 'Selected — double-click to edit' : 'Select this piece';
     b.querySelector('.kropka').style.background = KOLORY[m.kolor][1];

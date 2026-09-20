@@ -6,7 +6,7 @@ import {stan, KOLORY, UKLAD, MIN_KOMORKA, el, cm, suma, zacisk, ukladyDlaKomorki
 import {granicaWneki, WNEKA_TRESC} from './wneki.js';
 
 import {przebuduj, zapisz} from './szafa.js';
-import {zamknijKarte} from './nakladka.js';
+import {zamknijKarte, komorkiEkranu} from './nakladka.js';
 import {przesunPrzegrode, zakonczEdycje} from './wybor.js';
 
 export function miniatura(id, u, custom, aktywny){
@@ -91,6 +91,7 @@ export function trescKarty(klucz){
     <div class="pole"><div class="mini">Module layout</div>
       <div class="uklady" data-rola="uklad">${dostepne.map(([id, u]) =>
         miniatura(id, u, zgodnoscUkladu(u, w, h).length > 0, id === biezacyId)).join('')}</div>
+      <p class="nota nazwa-ukladu">${UKLAD[biezacyId]?.nazwa || 'Open'}</p>
       ${powodBraku ? `<p class="nota">${powodBraku}</p>` : ''}</div>
     <div class="pole"><div class="mini">Merge with neighbours</div>
       <div class="grupa" data-rola="scal">${[['l', '←'], ['p', '→'], ['g', '↑'], ['d', '↓']].map(([id, znak]) =>
@@ -122,13 +123,59 @@ function scalSasiada(r, c, kierunek){
   pokazKarteObszaru();
 }
 
+/* Karta ma stac OBOK mebla, nie na nim. Dotad odsuwala sie od samej komorki, wiec przy
+   komorce w srodku ladowala na reszcie bryly i zaslaniala to, co wlasnie zmieniasz.
+   Teraz odsuwa sie od calego obrysu mebla na ekranie i dopiero gdy tam nie ma miejsca,
+   wraca do starego zachowania. */
+function obrysMeblaNaEkranie(){
+  const k = komorkiEkranu();
+  if(!k.length) return null;
+  return {
+    x1: Math.min(...k.map(r => r.x1)), x2: Math.max(...k.map(r => r.x2)),
+    y1: Math.min(...k.map(r => r.y1)), y2: Math.max(...k.map(r => r.y2))
+  };
+}
+
+export function ustawKarte(karta, prostokat){
+  const sc = el('scena').getBoundingClientRect();
+  const m = obrysMeblaNaEkranie();
+  /* Przy prawej krawedzi sceny stoi szyna narzedzi - karta nie ma prawa jej przykryc. */
+  const SZYNA = 64, szer = karta.offsetWidth, luz = 16;
+  let lewo = null, odPrawej = false;
+  if(m){
+    if(m.x2 + luz + szer + SZYNA <= sc.width) lewo = m.x2 + luz;
+    else if(m.x1 - luz - szer >= 8){ lewo = m.x1 - luz - szer; odPrawej = true; }
+  }
+  if(lewo == null){                                    // mebel zajmuje caly kadr - stara regula
+    odPrawej = prostokat.left - sc.left + prostokat.width + luz + szer > sc.width;
+    lewo = odPrawej ? prostokat.left - sc.left - szer - luz
+                    : prostokat.left - sc.left + prostokat.width + luz;
+  }
+  karta.classList.toggle('od-prawej', odPrawej);
+  karta.style.left = zacisk(lewo, 8, Math.max(8, sc.width - szer - SZYNA)) + 'px';
+  karta.style.top = Math.min(Math.max(8, prostokat.top - sc.top + prostokat.height / 2 - karta.offsetHeight / 2),
+                             Math.max(8, sc.height - karta.offsetHeight - 8)) + 'px';
+}
+
 export function otworzKarte(klucz, prostokat){
   zamknijKarte();
+  const [, wr, wc] = /^r(\d+)c(\d+)$/.exec(klucz) || [];
+  /* Modul osadzony nie ma wlasnej siatki - bierze wymiary z komorki gospodarza. Karta
+     liczyla wtedy `NaNcm x NaNcm` i pokazywala pusta liste ukladow, bo `stan.kolumny`
+     i `stan.rzedy` naleza do poprzedniego mebla. Nie otwieramy jej tam w ogole. */
+  if(!Number.isFinite(stan.kolumny[+wc - 1]) || !Number.isFinite(stan.rzedy[+wr - 1])) return;
   const r = +/^r(\d+)/.exec(klucz)[1];
   const karta = document.createElement('div');
   karta.className = 'karta';
   karta.dataset.klucz = klucz;
   karta.innerHTML = trescKarty(klucz);
+  /* Pietnascie ikonek bez podpisu to zgadywanka - nazwa tej pod kursorem ma byc widoczna
+     od razu, nie po sekundzie czekania na natywny `title`. */
+  karta.addEventListener('pointerover', e => {
+    const m = e.target.closest('.uklad-mini');
+    const podpis = karta.querySelector('.nazwa-ukladu');
+    if(m && podpis) podpis.textContent = UKLAD[m.dataset.id]?.nazwa || 'Open';
+  });
   karta.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b) return;
@@ -144,13 +191,7 @@ export function otworzKarte(klucz, prostokat){
     window.lucide?.createIcons();
   });
   el('scena').append(karta);
-  const sc = el('scena').getBoundingClientRect();
-  const zaWaska = prostokat.left - sc.left + prostokat.width + 16 + karta.offsetWidth > sc.width;
-  karta.classList.toggle('od-prawej', zaWaska);
-  karta.style.left = (zaWaska ? prostokat.left - sc.left - karta.offsetWidth - 16
-                              : prostokat.left - sc.left + prostokat.width + 16) + 'px';
-  karta.style.top = Math.min(Math.max(8, prostokat.top - sc.top + prostokat.height / 2 - karta.offsetHeight / 2),
-                             sc.height - karta.offsetHeight - 8) + 'px';
+  ustawKarte(karta, prostokat);
   window.lucide?.createIcons();
 }
 
@@ -164,30 +205,44 @@ export function kartaWneki(i, prostokat){
     const g = granicaWneki(w);
     karta.innerHTML = `
       <button class="karta-zamknij" data-akcja="zamknij"><i data-lucide="x"></i></button>
-      <h3>Niche ${i + 1}</h3>
+      <h3>${w.goly ? 'Merged cells' : 'Niche'} ${i + 1}</h3>
       <p>${g ? cm(g.sz) + ' × ' + cm(g.wys) : ''} · rows ${w.r1}\u2013${w.r2}, columns ${w.c1}\u2013${w.c2}</p>
-      <div class="pole"><div class="mini">Inside</div>
+      <div class="pole"><div class="mini">Lining</div>
+        <div class="grupa" data-rola="wysciolka">
+          <button data-id="0" class="${w.goly ? 'aktywny' : ''}">Plain opening</button>
+          <button data-id="1" class="${w.goly ? '' : 'aktywny'}">Lined box</button></div>
+        <p class="nota">A plain opening just drops the dividers. A lined box adds a second
+          layer of board, so it can take its own colour and stick out past the fronts.</p></div>
+      ${w.goly ? '' : `<div class="pole"><div class="mini">Inside</div>
         <div class="grupa" data-rola="tresc">${Object.entries(WNEKA_TRESC).map(([id, n]) =>
-          `<button data-id="${id}" class="${w.tresc === id ? 'aktywny' : ''}">${n}</button>`).join('')}</div></div>
-      ${w.tresc === 'biurko' ? `<div class="pole"><div class="mini">Desk flap</div>
+          `<button data-id="${id}" class="${w.tresc === id ? 'aktywny' : ''}">${n}</button>`).join('')}</div></div>`}
+      ${!w.goly && w.tresc === 'biurko' ? `<div class="pole"><div class="mini">Desk flap</div>
         <div class="grupa" data-rola="klapa"><button data-id="0" class="${w.otwarte ? '' : 'aktywny'}">Closed</button><button data-id="1" class="${w.otwarte ? 'aktywny' : ''}">Open</button></div></div>` : ''}
-      <div class="pole"><div class="mini">Sticks out — ${cm(w.wysun || 0)}</div>
+      ${w.goly ? '' : `<div class="pole"><div class="mini">Sticks out — ${cm(w.wysun || 0)}</div>
         <div class="grupa" data-rola="wysun">${[0, 50, 100, 150, 200, 300].map(v =>
           `<button data-id="${v}" class="${(w.wysun || 0) === v ? 'aktywny' : ''}">${v ? cm(v) : 'flush'}</button>`).join('')}</div></div>
       <div class="pole"><div class="mini">Colour of this niche</div>
         <div class="probniki" data-rola="kolor"><button class="probnik ${w.kolor == null ? 'aktywny' : ''}" data-i="-1" title="Same as the wardrobe" style="background:repeating-linear-gradient(45deg,#fff,#fff 4px,#e5e3df 4px,#e5e3df 8px)"></button>${
-          KOLORY.map(([n, hex], k) => `<button class="probnik ${w.kolor === k ? 'aktywny' : ''}" data-i="${k}" title="${n}" style="background:${hex}"></button>`).join('')}</div></div>
+          KOLORY.map(([n, hex], k) => `<button class="probnik ${w.kolor === k ? 'aktywny' : ''}" data-i="${k}" title="${n}" style="background:${hex}"></button>`).join('')}</div></div>`}
       <button class="cta wtorna" data-akcja="usun">Split back into cells</button>`;
     window.lucide?.createIcons();
   };
   rysuj();
+  /* Pietnascie ikonek bez podpisu to zgadywanka - nazwa tej pod kursorem ma byc widoczna
+     od razu, nie po sekundzie czekania na natywny `title`. */
+  karta.addEventListener('pointerover', e => {
+    const m = e.target.closest('.uklad-mini');
+    const podpis = karta.querySelector('.nazwa-ukladu');
+    if(m && podpis) podpis.textContent = UKLAD[m.dataset.id]?.nazwa || 'Open';
+  });
   karta.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b) return;
     if(b.dataset.akcja === 'zamknij') return zakonczEdycje();
     if(b.dataset.akcja === 'usun'){ stan.wneki.splice(i, 1); zaznaczenie = null; zamknijKarte(); return przebuduj(); }
     const rola = b.closest('[data-rola]')?.dataset.rola, w = stan.wneki[i];
-    if(rola === 'tresc') w.tresc = b.dataset.id;
+    if(rola === 'wysciolka') w.goly = b.dataset.id === '0';
+    else if(rola === 'tresc') w.tresc = b.dataset.id;
     else if(rola === 'klapa') w.otwarte = b.dataset.id === '1';
     else if(rola === 'wysun') w.wysun = +b.dataset.id;
     else if(rola === 'kolor') w.kolor = +b.dataset.i < 0 ? null : +b.dataset.i;
@@ -234,6 +289,13 @@ export function kartaPrzegrody(os, i, prostokat){
     window.lucide?.createIcons();
   };
   rysuj();
+  /* Pietnascie ikonek bez podpisu to zgadywanka - nazwa tej pod kursorem ma byc widoczna
+     od razu, nie po sekundzie czekania na natywny `title`. */
+  karta.addEventListener('pointerover', e => {
+    const m = e.target.closest('.uklad-mini');
+    const podpis = karta.querySelector('.nazwa-ukladu');
+    if(m && podpis) podpis.textContent = UKLAD[m.dataset.id]?.nazwa || 'Open';
+  });
   karta.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b) return;

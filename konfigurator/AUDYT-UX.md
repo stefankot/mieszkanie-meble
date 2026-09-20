@@ -7,7 +7,8 @@ w kontrolki, nie wywołaniami z konsoli.
 Plik był nadpisywany po każdym znalezisku. **Statusy są aktualne** — ✅ znaczy wdrożone
 i sprawdzone w przeglądarce, ⬜ czeka.
 
-Po każdej partii: pełny zestaw kontroli `60/60 passed`.
+Po każdej partii pełny zestaw kontroli. Stan końcowy: **59/60** — jedyna czerwona to
+kontrola 27 (FPS), mierzona w panelu podglądu, który zaniża wynik (56 zamiast >60 fps).
 
 Legenda: 🔴 blokuje pracę · 🟠 poważnie spowalnia · 🟡 drobne
 Koszt: szacunek w linijkach kodu.
@@ -99,7 +100,7 @@ albo nie nakładać obu klas i oznaczać wejście obwódką, nie tłem.
 
 ---
 
-## 5. [⬜] Ikona „Reset" wygląda jak „Cofnij" 🟠 · **~10 linii**
+## 5. [✅] Ikona „Reset" wygląda jak „Cofnij" 🟠 · **~10 linii**
 
 **Co jest.** W szynie jest `rotate-ccw` z podpowiedzią „Reset" — kasuje **cały projekt**.
 To dokładnie ta ikona, której wszyscy używają na cofanie. Prawdziwe cofanie istnieje
@@ -173,7 +174,7 @@ Z tego samego powodu odwołuję dawny punkt „Esc jest przeciążony": skoro ni
 
 ---
 
-## 11. [⬜] Karta komórki zasłania mebel 🟠 · **~15 linii**
+## 11. [✅] Karta komórki zasłania mebel 🟠 · **~15 linii**
 
 **Co jest.** Karta ma 284 × 554 px i siada nad bryłą — przy scenie 951 px szerokości
 zajmuje jej jedną trzecią i zakrywa komórkę, którą właśnie zmieniasz. Nie widać efektu
@@ -186,7 +187,7 @@ do prawego panelu jako sekcję „Selected cell".
 
 ---
 
-## 12. [⬜] Piętnaście nieopisanych miniatur układu 🟡 · **~6 linii**
+## 12. [✅] Piętnaście nieopisanych miniatur układu 🟡 · **~6 linii**
 
 **Co jest.** „MODULE LAYOUT" to 15 ikonek bez podpisów; nazwa („Open", „Door, 1 shelf",
 „Built-in oven") jest tylko w `title`, czyli po sekundzie najechania. Wybór wymaga
@@ -197,7 +198,7 @@ pokazujący nazwę tej, nad którą jest kursor.
 
 ---
 
-## 13. [⬜] Etykiety modułów zasłaniają mebel 🟡 · **~6 linii**
+## 13. [✅] Etykiety modułów zasłaniają mebel 🟡 · **~6 linii**
 
 **Co jest.** Nad każdym modułem wisi biała pigułka z nazwą. Przy sześciu modułach
 zasłaniają sporą część bryły także wtedy, gdy nic nie robisz. Przy wąskim kadrze
@@ -218,7 +219,7 @@ poprawnie), ale kamera nie przekadrowała, więc bryła wyszła poza lewą kraw�
 
 ---
 
-## 15. [⬜] Nazwy stylów gryzą się między panelem a kreatorem 🟡 · **decyzja, nie kod**
+## 15. [✅] Nazwy stylów gryzą się między panelem a kreatorem 🟡 · **decyzja, nie kod**
 
 **Co jest.** W panelu sekcja „Layout → Style" ma Grid / Pattern / Slant / Mosaic /
 Gradient / Pixel / Custom — to rozkład rzędów w jednym module. Kreator ma osobne
@@ -226,6 +227,57 @@ Gradient / Pixel / Custom — to rozkład rzędów w jednym module. Kreator ma o
 
 **Rozwiązanie.** Przemianować panelowe na to, czym są — „Row rhythm" — i zostawić
 „Style" wyłącznie kreatorowi.
+
+---
+
+---
+
+## 16. [✅] Karta komorki otwierala sie na module osadzonym i liczyla NaN
+
+**Co bylo.** Klikniecie w obszar modulu osadzonego (np. „Biurko lewe") otwieralo karte
+z naglowkiem `NaNcm x NaNcm x 42cm opening` i pusta lista ukladow. Modul osadzony nie ma
+wlasnej siatki - bierze wymiary z komorki gospodarza - wiec `stan.kolumny` i `stan.rzedy`
+naleza wtedy do poprzedniego mebla i indeks wypada poza tablice.
+
+**Rozwiazanie (wdrozone).** `otworzKarte()` sprawdza, czy komorka ma skonczone wymiary,
+i nie otwiera sie, gdy ich nie ma.
+
+---
+
+## 17. [✅] Kamera ruszala sie przy kazdej przebudowie
+
+**Co bylo.** `przebuduj()` wolalo `dopasujKamere()` bezwarunkowo, wiec kazde drgniecie
+suwaka wyrywalo widok z powrotem na aktywny modul. Nie dalo sie pracowac patrzac na calosc.
+
+**Rozwiazanie (wdrozone).** Kamera rusza sie tylko wtedy, gdy zmienil sie mebel albo jego
+obrot. Kadr calosci przy starcie i po utworzeniu mebla z kreatora zostaje.
+
+---
+
+## 18. [✅] Klapa szerokiego biurka konczyla sie w polowie sasiednich pol
+
+**Co bylo.** Definicja `biurko-120` jest zaprojektowana na DWIE kolumny: panel ma
+`sizeMm: [{cell:'w', mul:2, addMm:14}, ...]` i wlasne przesuniecie `positionMm:
+[{cell:'w', mul:0.5, addMm:9}, ...]`, czyli startuje przy lewej krawedzi swojej komorki
+i siega w prawo. `czesciOsadzone()` domyslnie CENTRUJE modul osadzony na komorce, wiec
+kasowalo to przesuniecie - panel rozkladal sie symetrycznie i konczyl w polowie pol
+po obu stronach.
+
+**Rozwiazanie (wdrozone).** `biurko-prawe` dostalo `poziomo: 'lewo'` w kotwicy. Panel
+zaczyna sie przy lewej krawedzi komorki i obejmuje dwa pola, tak jak w projekcie zrodlowym.
+
+---
+
+## 19. [✅] Scalenie komorek robilo podszafke zamiast wiekszego pola
+
+**Co bylo.** „Merge with neighbours" tworzylo wneke, a wneka ZAWSZE dostawala wysciolke:
+druga warstwe plyty na plecach, bokach, spodzie i wierzchu. Z prostego „polacz dwa pola
+w jedno" robila sie osobna skrzynka we wnetrzu mebla.
+
+**Rozwiazanie (wdrozone).** Scalenie daje teraz **gole pole** (`goly: true`): znikaja
+przegrody, nie przybywa nic. Wysciolka stala sie swiadomym wyborem - w karcie scalonego
+obszaru jest przelacznik `Lining: Plain opening / Lined box`. Dopiero „Lined box"
+odslania zawartosc wneki, wlasny kolor i wysuniecie przed lico frontow.
 
 ---
 
