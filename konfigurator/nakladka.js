@@ -169,7 +169,7 @@ export function odswiezZnaczniki(){
        edytowana, zaznaczona albo ta pod kursorem - reszta kurczy sie do samej kropki. */
     b.classList.toggle('cicha', !edytowany && i !== stan.aktywny && !b.classList.contains('blisko'));
     b.title = edytowany ? 'This piece is being edited'
-      : i === stan.aktywny ? 'Selected — double-click to edit' : 'Select this piece';
+      : i === stan.aktywny ? 'Selected — click again to edit' : 'Select this piece';
     b.querySelector('.kropka').style.background = KOLORY[m.kolor][1];
     b.querySelector('.opis').textContent = nazwaModulu(m);
   });

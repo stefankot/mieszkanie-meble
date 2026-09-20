@@ -297,9 +297,14 @@ function listaModulow(){
     if(b.dataset.okruch != null) return wejdzWModul(stan.wejscie[+b.dataset.okruch]);
     if(b.dataset.id === '__mebel') return zaznaczCalyMebel();
     if(!b.dataset.id) return;
-    /* Pierwszy klik przebudowuje drzewo, więc natywne `dblclick` bywało tracone razem ze
-       starym węzłem. Drugi click zachowuje `detail === 2` także po tej podmianie. */
-    if(e.detail === 2) return wejdzWModul(b.dataset.id);
+    /* Dwuklik zalezal od tempa i dlatego najczesciej nie dzialal: pierwszy klik wola
+       `przelaczMebel`, ktore blokuje watek na 86-170 ms i PODMIENIA wezel drzewa, wiec
+       natywny `dblclick` nie ma wspolnego celu, a `detail === 2` gubi sie na nowym elemencie.
+       Wejscie nie zalezy juz od czasu: klikniecie w modul, ktory JUZ jest aktywny, wchodzi
+       w niego. Dwuklik dziala nadal, jako droga na skroty. */
+    const juzAktywny = stan.meble[stan.aktywny]?.id === b.dataset.id
+      && !stan.wejscie.includes(b.dataset.id);
+    if(e.detail === 2 || juzAktywny) return wejdzWModul(b.dataset.id);
     if(e.shiftKey){
       stan.zaznaczone = stan.zaznaczone.includes(b.dataset.id)
         ? stan.zaznaczone.filter(x => x !== b.dataset.id) : [...stan.zaznaczone, b.dataset.id];

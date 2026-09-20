@@ -339,7 +339,12 @@ export function wlaczHoverMebli(){
     if(i < 0) return;
     const zewnetrzny = sciezkaZawierania(stan.meble[i].id)[0];
     const k = stan.meble.findIndex(m => m.id === zewnetrzny);
-    if(k >= 0 && k !== stan.aktywny) przelaczMebel(k);
+    if(k < 0) return;
+    /* Ta sama zasada co w drzewie: klik w modul, ktory juz jest aktywny, wchodzi w niego.
+       Dwuklik przestal byc jedyna droga, bo pierwszy klik przebudowuje scene i rozbija
+       pare klikniec. */
+    if(k === stan.aktywny) return wejdzWModul(zewnetrzny);
+    przelaczMebel(k);
   });
 
   el('scena').addEventListener('pointerleave', () => { podswietlZnacznik(-1); podswietlWPunkcie(null); });

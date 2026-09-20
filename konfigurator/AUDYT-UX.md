@@ -281,6 +281,31 @@ odslania zawartosc wneki, wlasny kolor i wysuniecie przed lico frontow.
 
 ---
 
+## 20. [✅] Dwuklik „najczesciej w ogole nie dzialal"
+
+**Co bylo.** Wejscie w modul zalezalo od tempa klikania. Pierwszy klik wola `przelaczMebel`,
+ktore blokuje watek na **86-170 ms** (zmierzone) i PODMIENIA wezel drzewa, wiec natywny
+`dblclick` nie ma wspolnego celu, a `detail === 2` gubi sie na nowym elemencie. Efekt:
+dwuklik dzialal losowo.
+
+**Rozwiazanie (wdrozone).** Wejscie nie zalezy juz od czasu: **klikniecie w modul, ktory JUZ
+jest aktywny, wchodzi w niego** - i w drzewie, i w scenie. Dwuklik dziala dalej jako skrot.
+Sprawdzone: dwa klikniecia w odstepie 2,5 s wchodza w modul.
+
+---
+
+## 21. [✅] Zawieszony przelot kamery blokowal warstwe edycyjna na zawsze
+
+**Co bylo.** `naOsiCzolowej()` zwracalo `false`, dopoki trwa przelot kamery, a flage przelotu
+czysci dopiero petla renderowania. Gdy petla zwolni (karta w tle, throttling), flaga zostawala
+na stale i siatka juz nie wracala, mimo ze kamera dawno doleciala. Zmierzone: kat do frontu
+0,197 rad przy progu 0,42 - warunek spelniony, a mimo to `naOsi === false`.
+
+**Rozwiazanie (wdrozone).** Liczy sie uplyw czasu przelotu, nie to, czy petla zdazyla go
+domknac.
+
+---
+
 ## Kolejność, którą proponuję
 
 1. **Punkty 1, 4 — trzy linie CSS razem.** Wracają uchwyty przegród i widać, co jest

@@ -288,7 +288,10 @@ function zastosujLimity(l){
    całą warstwę edycyjną przy najmniejszym ruchu myszą. */
 export const NA_OSI = .30;
 export function naOsiCzolowej(){
-  if(przelot) return false;
+  /* Flage przelotu czysci dopiero petla renderowania. Gdy ta zwolni (karta w tle, throttling
+     przegladarki), flaga zostawala na zawsze i warstwa edycyjna juz nie wracala, mimo ze
+     kamera dawno doleciala. Liczy sie czas przelotu, nie to, czy petla zdazyla go domknac. */
+  if(przelot && performance.now() - przelot.t0 < przelot.czas) return false;
   const kier = kamera.position.clone().sub(sterowanie.target).normalize();
   const front = frontMebla();
   return kier.angleTo(front) < NA_OSI * 1.4 && Math.abs(kier.y) < NA_OSI;
