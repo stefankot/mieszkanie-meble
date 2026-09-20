@@ -54,7 +54,8 @@ export async function kontroleKreatora(dodaj){
   dodaj(55, 'all twelve Tylko styles build a consistent piece and keep their own pictogram',
     ile === 12 && zle.length === 0, `${ile} styles, broken: ${zle.join(', ') || 'none'}`);
 
-  /* 56 — Pixel to skrzyżowane słupy i pasy, a nie fronty rozrzucone po jednej siatce. */
+  /* 56 — Pixel to gęsta krata z poszarpanym obrysem, a nie fronty rozrzucone po jednej
+     siatce ani rzadki krzyż z piktogramu. */
   klik('[data-kategoria="bookcase"]');
   await chwila(250);
   klik('[data-styl="pixel"]');
@@ -62,14 +63,22 @@ export async function kontroleKreatora(dodaj){
   klik('.kreator [data-akcja="kreator-stworz"]');
   await chwila(150);
   klik('[data-akcja="kreator-zastap"]');
-  await chwila(1100);
-  const pasy = stan.meble.filter(m => /-pas-/.test(m.id));
-  const slupy = stan.meble.filter(m => /-(stopa|srodek|czubek)-/.test(m.id));
-  const stopyNaPodlodze = stan.meble.filter(m => /-stopa-/.test(m.id) && !m.kotwica).length;
-  dodaj(56, 'Pixel builds crossing full-width bands and full-height posts, not doors scattered on one grid',
-    stan.meble.length === 8 && pasy.length === 2 && slupy.length === 6 && stopyNaPodlodze === 2
-      && pasy.every(p => p.szerokoscMm > slupy[0].szerokoscMm * 2),
-    `${stan.meble.length} modules, ${pasy.length} bands, ${slupy.length} posts, ${stopyNaPodlodze} on the floor`);
+  await chwila(1200);
+  const krata = stan.meble.find(m => /-krata$/.test(m.id));
+  const skrzynki = stan.meble.filter(m => /-(stopa|gora|lewo|prawo)/.test(m.id));
+  const kolumnKraty = krata ? krata.siatkaKol.split('+').length : 0;
+  const rzedowKraty = krata ? krata.rzedyWlasne.length : 0;
+  const frontow = krata ? Object.keys(krata.uklady).length : 0;
+  const wystaje = ['gora', 'lewo', 'prawo', 'stopa']
+    .filter(s => stan.meble.some(m => new RegExp(`-${s}`).test(m.id))).length;
+  dodaj(56, 'Pixel builds a dense grid of square cells with boxes stepping out on every side',
+    !!krata && kolumnKraty >= 4 && rzedowKraty >= 3
+      && frontow > kolumnKraty * rzedowKraty * .6          // większość komórek ma front
+      && frontow < kolumnKraty * rzedowKraty               // ale nie wszystkie — reszta to ciemne pola
+      && wystaje === 4 && skrzynki.length >= 5
+      && skrzynki.every(m => m.szerokoscMm < krata.szerokoscMm / 3),
+    `grid ${kolumnKraty}×${rzedowKraty} with ${frontow} fronts, ${skrzynki.length} boxes `
+    + `stepping out on ${wystaje} of 4 sides`);
 
   /* 57 — para barw z linii Tone: korpus bierze pierwszy kolor, półki i plecy drugi. */
   await pokazKreator();

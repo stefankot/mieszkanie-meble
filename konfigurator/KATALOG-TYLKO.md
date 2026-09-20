@@ -81,8 +81,14 @@ a od dołu (45.25−y)/42.5.
 
 Linia Original zmienia GEOMETRIĘ, a przy Slant i Pixel także obrys bryły — takiego mebla
 nie da się zapisać jedną prostokątną siatką, więc styl zwraca kilka modułów zakotwiczonych
-w sobie. Pixel to dwa pionowe słupy skrzyżowane z dwoma poziomymi pasami; skrzynki wystają
-nad pasy, pod nie i na boki. Linia Edge zmienia tylko ROZKŁAD FRONTÓW na zwykłej siatce.
+w sobie. Linia Edge zmienia tylko ROZKŁAD FRONTÓW na zwykłej siatce.
+
+**Uwaga o Pixelu.** Ikona `Original-5` ma tylko dwa słupy i dwa pasy, bo to schemat 48 px.
+Wzięta dosłownie daje rzadki krzyż z wielkimi dziurami w narożnikach — nie mebel. Prawdziwy
+regał w tym układzie (zdjęcie referencyjne użytkownika) to GĘSTA KRATA kwadratowych komórek
+z frontami na większości pól, a poszarpany obrys robią pojedyncze skrzynki wystające o jeden
+moduł nad korpus, pod niego i na boki. Liczba komórek wynika z zamówionych wymiarów (komórka
+~43 cm), nie z liczby kresek na ikonie.
 
 ## Sylwetka i modele
 

@@ -64,42 +64,69 @@ function obok(slupy, ctx){
   return opisy;
 }
 
-/* Pixel: dwa pionowe słupy na całą wysokość skrzyżowane z dwoma poziomymi pasami na całą
-   szerokość. Z ikony: słupy zajmują x 10.75–19.25 i 28.75–37.25 (czyli ±0,2335 od środka,
-   każdy 0,221 szerokości), pasy y 27.75–38.25 i 10.75–21.25 (0,165–0,412 i 0,565–0,812
-   wysokości). Stąd obrys w kształcie kraty: skrzynki wystają nad pasy, pod nie i na boki. */
+/* Pixel. Ikona „Original-5" rysuje tylko dwa słupy i dwa pasy, bo to schemat 48 px —
+   wzięta dosłownie daje rzadki krzyż, a nie mebel. Regał w tym układzie to GĘSTA KRATA
+   kwadratowych komórek, której obrys jest poszarpany: pojedyncze skrzynki wystają o jeden
+   moduł nad korpus, pod niego i na boki. Stąd budowa: jedna siatka plus doklejone skrzynki.
+
+   Liczba komórek wynika z wymiarów, nie z ikony — komórka trzyma się ~43 cm, więc szafa
+   2,6 × 2,3 m dostaje sześć kolumn i pięć rzędów, a nie dwa słupy. Skrzynki są otwarte,
+   więc czytają się jako ciemne pudła między jasnymi frontami. */
 function krata(ctx){
-  const SLUP = .221, ODSUN = .2335;
-  const PAS = .247, STOPA = .165, SRODEK = .153, CZUBEK = .188;
-  const x = [mm(-ODSUN, ctx.w), mm(ODSUN, ctx.w)];
-  const kolPasma = Math.max(3, Math.round(ctx.w / 580));
+  const KOMORKA = 430;
+  /* Komórka jest kwadratem ~43 cm, a liczba rzędów i kolumn wynika z zamówionych wymiarów —
+     to stąd bierze się gęstość kraty. Wystające skrzynki wychodzą POZA obrys, więc nie
+     zjadają siatki: zamówiona szerokość i wysokość opisują korpus, tak jak u Tylko. */
+  const rzedow = Math.max(4, Math.min(7, Math.round(ctx.h / KOMORKA)));
+  const kom = ctx.h / rzedow;
+  const kolumn = Math.max(4, Math.min(8, Math.round(ctx.w / kom)));
+  const korpusW = ctx.w, szerKol = korpusW / kolumn;
+  const rzedowKraty = rzedow - 1;                      // jeden rząd oddaje skrzynce pod spodem
+  const srodekKolumny = c => Math.round(-korpusW / 2 + (c - 0.5) * szerKol);
+
   const opisy = [];
-  const dodaj = (id, nazwa, w, h, kol, uklady, kotwica, pozycjaMm) => {
-    opisy.push(opisMebla({id, nazwa, w, h, d: ctx.d, kol, rzed: [1000], uklady,
+  const skrzynka = (id, nazwa, kotwica, pozycjaMm) => {
+    opisy.push(opisMebla({id, nazwa, w: Math.round(szerKol), h: Math.round(kom), d: ctx.d,
+      kol: [Math.round(szerKol)], rzed: [1000], uklady: {},
       nogi: 'none', plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
       kolor: ctx.kolor, wnetrze: ctx.wnetrze, kotwica, pozycjaMm}));
     return id;
   };
-  const szerSlupa = mm(SLUP, ctx.w);
-  /* Obie stopy stoją na podłodze, więc obie są korzeniami — bez własnej pozycji łańcuch
-     korzeni ustawiłby je bok w bok zamiast w rozstawie kraty. */
-  const stopa = ['a', 'b'].map((lit, i) => dodaj(`${ctx.id}-stopa-${lit}`, `${ctx.nazwa} · foot ${i + 1}`,
-    szerSlupa, mm(STOPA, ctx.h), [szerSlupa], {}, null, [x[i], ctx.d / 2]));
-  /* Pas dolny wisi na pierwszej stopie i wraca na oś mebla; kolejne piętra skaczą tam i z powrotem. */
-  const pasA = dodaj(`${ctx.id}-pas-1`, `${ctx.nazwa} · band 1`, ctx.w, mm(PAS, ctx.h),
-    Array.from({length: kolPasma}, () => Math.round(ctx.w / kolPasma)),
-    klucze(Array.from({length: kolPasma}, (_, c) => c % 2 === 0 ? [1, c + 1] : null).filter(Boolean)),
-    {do: stopa[0], strona: 'gora', przesun: -x[0]});
-  const srodkowe = ['a', 'b'].map((lit, i) => dodaj(`${ctx.id}-srodek-${lit}`, `${ctx.nazwa} · post ${i + 1}`,
-    szerSlupa, mm(SRODEK, ctx.h), [szerSlupa], {},
-    {do: pasA, strona: 'gora', przesun: x[i]}));
-  const pasB = dodaj(`${ctx.id}-pas-2`, `${ctx.nazwa} · band 2`, ctx.w, mm(PAS, ctx.h),
-    Array.from({length: kolPasma}, () => Math.round(ctx.w / kolPasma)),
-    klucze(Array.from({length: kolPasma}, (_, c) => c % 2 === 1 ? [1, c + 1] : null).filter(Boolean)),
-    {do: srodkowe[0], strona: 'gora', przesun: -x[0]});
-  ['a', 'b'].forEach((lit, i) => dodaj(`${ctx.id}-czubek-${lit}`, `${ctx.nazwa} · top ${i + 1}`,
-    szerSlupa, mm(CZUBEK, ctx.h), [szerSlupa], {},
-    {do: pasB, strona: 'gora', przesun: x[i]}));
+
+  /* Skrzynka pod korpusem sięga podłogi i to na niej stoi cała krata — dlatego jest
+     korzeniem, a korpus wraca z niej na oś mebla. */
+  const xStopy = srodekKolumny(2);
+  const stopa = skrzynka(`${ctx.id}-stopa`, `${ctx.nazwa} · foot`, null, [xStopy, ctx.d / 2]);
+
+  /* Fronty pokrywają większość kraty; rozrzucone otwarte komórki to te ciemne pola
+     ze zdjęcia. Wzór jest deterministyczny, żeby ten sam mebel zawsze wyszedł tak samo. */
+  const uklady = {};
+  for(let r = 1; r <= rzedowKraty; r++)
+    for(let c = 1; c <= kolumn; c++)
+      if((r * 2 + c * 3) % 5 !== 0) uklady[`r${r}c${c}`] = 'door';
+
+  const korpus = `${ctx.id}-krata`;
+  opisy.push(opisMebla({
+    id: korpus, nazwa: `${ctx.nazwa} · grid`,
+    w: Math.round(korpusW), h: Math.round(kom * rzedowKraty), d: ctx.d,
+    kol: Array.from({length: kolumn}, () => Math.round(szerKol)),
+    rzed: Array.from({length: rzedowKraty}, () => 1000),
+    uklady, nogi: 'none', plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
+    kolor: ctx.kolor, wnetrze: ctx.wnetrze,
+    kotwica: {do: stopa, strona: 'gora', przesun: -xStopy}
+  }));
+
+  /* Skrzynki nad korpusem co druga kolumna, po bokach co drugi rząd — z tego bierze się
+     schodkowy obrys, który odróżnia Pixel od zwykłej siatki. */
+  for(let c = 2; c <= kolumn; c += 2)
+    skrzynka(`${ctx.id}-gora-${c}`, `${ctx.nazwa} · top ${c}`,
+      {do: korpus, strona: 'gora', przesun: srodekKolumny(c)});
+  for(let r = 2; r <= rzedowKraty; r += 2)
+    skrzynka(`${ctx.id}-lewo-${r}`, `${ctx.nazwa} · left ${r}`,
+      {do: korpus, strona: 'lewo', przesunY: Math.round((r - 1) * kom)});
+  for(let r = 3; r <= rzedowKraty; r += 2)
+    skrzynka(`${ctx.id}-prawo-${r}`, `${ctx.nazwa} · right ${r}`,
+      {do: korpus, strona: 'prawo', przesunY: Math.round((r - 1) * kom)});
   return opisy;
 }
 
@@ -146,7 +173,7 @@ export const STYLE_ORIGINAL = [
    ], ctx)},
 
   {id: 'pixel', nazwa: 'Pixel', ikona: 'ikony/styl-pixel.svg',
-   opis: 'Full-height posts crossing full-width bands — the outline is a grid of boxes.',
+   opis: 'A dense grid of square cells with single boxes stepping out on every side.',
    buduj: krata}
 ];
 

@@ -48,3 +48,6 @@ Plik jest uzupełniany przyrostowo. Każdy wpis opisuje wyłącznie wykonaną zm
 - Sylwetkę zastąpiono rysunkiem z Noun Project, dopasowanym do dokładnie 180 cm.
 - Dopisano trzy lampy z BlenderKit; lampa jest wyborem w panelu, stoi we wnęce, a po świadomym wybraniu także na najwyższej otwartej półce.
 - Weryfikacja: pełny zestaw `60/60 passed`.
+- Poprawiono Pixel: pierwsza wersja odtwarzała piktogram (dwa słupy i dwa pasy), a nie mebel — wychodził rzadki krzyż zamiast kraty ze zdjęcia. Teraz to gęsta siatka kwadratowych komórek z frontami na większości pól i pojedynczymi skrzynkami wystającymi na cztery strony; liczba komórek wynika z wymiarów, nie z ikony. Kontrola 56 sprawdza gęstość i obrys.
+- Kotwica boczna dostała `przesunY`, bez którego skrzynki doklejane z boku zawsze stały na podłodze.
+- Weryfikacja: pełny zestaw `60/60 passed`.

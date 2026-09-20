@@ -149,11 +149,13 @@ export function zKotwicy(m, r, poz){
     const y = strona.znak > 0 ? poz.y + r.wysokoscMm : poz.y - m.wysokoscMm;
     return {x: poz.x + przesun, y, z: poz.z};
   }
-  /* Bok: środek odsunięty o połowę własnej bryły od lica rodzica, plecy w jednej linii. */
+  /* Bok: środek odsunięty o połowę własnej bryły od lica rodzica, plecy w jednej linii.
+     `przesun` jedzie wzdłuż ściany styku (w głąb), a `przesunY` podnosi moduł — bez tego
+     skrzynka doklejona z boku zawsze stała na podłodze i nie dało się jej zawiesić. */
   const x = strona.znak > 0 ? obrysR.x2 + polowaWzdluz(m, 'x') : obrysR.x1 - polowaWzdluz(m, 'x');
   const glebR = obrysR.z2 - obrysR.z1, glebM = obrysModulu(m, 0, 0).sz;
   const doTylu = k.poziomuj === 'lico' ? (glebR - glebM) / 2 : (glebM - glebR) / 2;
-  return {x, y: poz.y, z: poz.z + doTylu + przesun};
+  return {x, y: poz.y + (k.przesunY || 0), z: poz.z + doTylu + przesun};
 }
 
 /* Rozmieszczenie całej sceny: korzenie idą łańcuchem bok w bok (albo mają własne `pozycjaMm`),
