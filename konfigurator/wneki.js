@@ -2,7 +2,7 @@
 
 import {stan, NOZKA_FI} from './dane.js';
 
-export const WNEKA_TRESC = {pusta: 'Empty', polka: 'Mid shelf', biurko: 'Drop-down desk'};
+export const WNEKA_TRESC = {pusta: 'Empty', polka: 'Mid shelf', biurko: 'Drop-down desk', kuchnia: 'Kitchen worktop + sink'};
 
 export function granicaWneki(w){
   const kom = stan.komorki.filter(k => k.r >= w.r1 && k.r <= w.r2 && k.c >= w.c1 && k.c <= w.c2);
@@ -90,6 +90,20 @@ export function czesciWnek(){
       else
         box('klapa', [swiatloSz - 4, swiatloWys * .58, 18], [srX, g.y2 - t - swiatloWys * .29, zPrzod - 9], plyta);
     }
+    if(w.tresc === 'kuchnia'){
+      const yBlatu = g.y1 + 36;
+      box('blat', [swiatloSz, 36, glBokow], [srX, yBlatu, zC], wnetrze);
+      /* Wiszące fronty należą do koralowej zabudowy. Osobny rząd korpusu zostawiał
+         nad blatem obcą poziomą belkę i rozcinał optycznie jedną wnękę. */
+      const wysFrontu = Math.min(400, swiatloWys * .36);
+      const szerFrontu = swiatloSz / 4;
+      for(let k = 0; k < 4; k++)
+        box(`front-gorny-${k + 1}`, [szerFrontu - 4, wysFrontu, 18],
+          [g.x1 + t + szerFrontu * (k + .5), g.y2 - t - wysFrontu / 2, zPrzod - 129], wnetrze);
+      box('zlew', [Math.min(620, swiatloSz * .25), 22, Math.min(420, glBokow * .68)],
+        [g.x2 - Math.min(520, swiatloSz * .22), yBlatu + 20, zC], 'mirror-dark');
+      box('bateria', [24, 260, 24], [g.x2 - Math.min(520, swiatloSz * .22), yBlatu + 145, zTyl + 55], 'mirror-dark');
+    }
   });
   return lista;
 }
@@ -107,4 +121,3 @@ export function czesciNozek(){
     material: 'nozka', label: `Leg ${i + 1}`
   }));
 }
-

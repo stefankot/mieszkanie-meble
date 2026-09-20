@@ -101,6 +101,12 @@ export function odswiezNakladke(){
     const [px, py] = rzutuj(-W / 2, y + stan.plytaMm / 2, z);
     return `<button class="olowek pion" data-os="r" data-i="${i}" title="Drag to move it, click to set the size" style="left:${px - 34}px;top:${py}px"><i data-lucide="chevrons-up-down"></i></button>`;
   }).join('');
+  const [xLewy, ySrodek] = rzutuj(-W / 2, H / 2, z);
+  const [xPrawy] = rzutuj(W / 2, H / 2, z);
+  olow += `<button class="dodaj-kolumne lewo" data-strona="lewo" title="Add 40cm of storage on the left"
+      aria-label="Add 40cm of storage on the left" style="left:${xLewy - 30}px;top:${ySrodek}px"><i data-lucide="plus"></i></button>
+    <button class="dodaj-kolumne prawo" data-strona="prawo" title="Add 40cm of storage on the right"
+      aria-label="Add 40cm of storage on the right" style="left:${xPrawy + 30}px;top:${ySrodek}px"><i data-lucide="plus"></i></button>`;
   olowki.innerHTML = olow;
   window.lucide?.createIcons();
 }
@@ -130,8 +136,11 @@ export function odswiezZnaczniki(){
     b.hidden = punktZnacznika.z > 1;
     b.style.left = (punktZnacznika.x * .5 + .5) * c.clientWidth + 'px';
     b.style.top = (-punktZnacznika.y * .5 + .5) * c.clientHeight + 'px';
-    b.classList.toggle('aktywny', i === stan.aktywny);
-    b.title = i === stan.aktywny ? 'This piece is being edited' : 'Edit this piece';
+    const edytowany = stan.wejscie?.[0] === m.id;
+    b.classList.toggle('aktywny', edytowany);
+    b.classList.toggle('wybrany', !edytowany && i === stan.aktywny);
+    b.title = edytowany ? 'This piece is being edited'
+      : i === stan.aktywny ? 'Selected — double-click to edit' : 'Select this piece';
     b.querySelector('.kropka').style.background = KOLORY[m.kolor][1];
     b.querySelector('.opis').textContent = nazwaModulu(m);
   });

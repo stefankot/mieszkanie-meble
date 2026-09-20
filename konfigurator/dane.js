@@ -37,7 +37,12 @@ export const KOLORY = [
   ['White', '#ffffff'], ['Cotton', '#fffdec'], ['Butter yellow', '#fef4ce'], ['Beige', '#dbd3cb'],
   ['Grey', '#c4c1c0'], ['Stone grey', '#afa7a3'], ['Sage green', '#b1caba'], ['Sky blue', '#9bbfe0'],
   ['Lilac', '#efe2e9'], ['Reisinger pink', '#edbacd'], ['Olive green', '#717a54'], ['Terracotta', '#a8442b'],
-  ['Burgundy', '#671112'], ['Dark brown', '#513228'], ['Indigo', '#283a57'], ['Matte black', '#191b1c']
+  ['Burgundy', '#671112'], ['Dark brown', '#513228'], ['Indigo', '#283a57'], ['Matte black', '#191b1c'],
+  /* Dopisane z linii Edge i Tone (ich `color-swatches/T03-*.svg`). Wyłącznie na koniec listy:
+     zapisane projekty trzymają `kolor` jako indeks, więc przestawienie zmieniłoby stare meble. */
+  ['Cashmere beige', '#cfc8c1'], ['Graphite grey', '#4c4c49'], ['Antique pink', '#ceafae'],
+  ['Misty blue', '#9ba9b6'], ['Clay brown', '#c88a64'], ['Deep plum', '#75263d'],
+  ['Dusk blue', '#637c8d'], ['Warm stone', '#a3968b']
 ];
 /* Przedmioty dekoracyjne: [szer, wys, głęb, kolor] w mm. */
 export const DEKORY = {
@@ -61,6 +66,9 @@ export const UKLAD = {
   door:    {nazwa: 'Door',          polki: 0, front: 'drzwi'},
   door1:   {nazwa: 'Door, 1 shelf', polki: 1, front: 'drzwi'},
   door2:   {nazwa: 'Door, 2 shelves', polki: 2, front: 'drzwi'},
+  sliding: {nazwa: 'Sliding doors', polki: 0, front: 'drzwi-przesuwne'},
+  oven:   {nazwa: 'Built-in oven', polki: 0, front: 'piekarnik'},
+  coralDoor: {nazwa: 'Coral door', polki: 0, front: 'drzwi-koral-kuchnia'},
   doorail: {nazwa: 'Door + rail',   polki: 0, front: 'drzwi', drazek: true, minH: 900},
   drawer:  {nazwa: 'Drawer',        polki: 0, front: 'szuflada', maxH: 700},
   komoda:  {nazwa: '4 drawers', polki: 0, front: 'komoda', minH: 700, maxH: 1300},
@@ -115,7 +123,7 @@ export const KONFIG = ['szerokoscMm', 'wysokoscMm', 'glebokoscMm', 'plecy', 'nog
                 'nozkiMm', 'nozkiKolor',
                 'kolumnyWlasne', 'rzedyWlasne', 'siatkaKol', 'siatkaRzed', 'roslina', 'zrodlo',
                 'pozycjaMm', 'id', 'nazwa', 'kotwica', 'wzorzec', 'odstepstwa',
-                'definicja', 'wysunMm', 'material', 'materialKorpusu'];
+                'definicja', 'wysunMm', 'material', 'materialKorpusu', 'kolorWnetrza'];
 export const ODSTEP_MEBLI = 0;                         // meble stoją bok w bok, bez szczeliny
 
 /* Konfiguracja pojedynczego mebla to pola z KONFIG; stan trzyma aktywny mebel „na wierzchu”,
@@ -202,6 +210,7 @@ export const stan = {
   szerokoscMm: 2400, wysokoscMm: 2200, glebokoscMm: 420, plytaMm: 18,
   plecy: true, nogi: 'standard', styl: 'gradient', gestosc: 40,
   kolor: 3, wykonczenie: 'plywood', drewno: null, dodatki: 55,   // ile rzeczy na półkach, 0–100%
+  kolorWnetrza: null,                                  // druga barwa pary Tone: półki i plecy; null = jak korpus
   nadstawka: false, uklady: {}, wneki: [], obrot: 0,
   nozkiMm: 0, nozkiKolor: 0,                            // nóżki prętowe ⌀15 mm, 0 = brak
   kolumnyWlasne: null, rzedyWlasne: null,

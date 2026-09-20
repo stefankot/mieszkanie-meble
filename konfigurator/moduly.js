@@ -100,6 +100,17 @@ export function sciezkaDo(id){
 }
 export const poziom = id => sciezkaDo(id).length - 1;
 
+/* Zawieranie to co innego niż przyleganie: moduł osadzony (`wnetrze`) siedzi w środku
+   gospodarza, ale moduł przystawiony bokiem czy postawiony na innym jest sąsiadem, nie
+   zawartością. Klik w scenie bierze najbardziej zewnętrzny pojemnik, a dwuklik schodzi
+   o jeden poziom zawierania — dokładnie jak wchodzenie w grupę w Figmie. */
+export function sciezkaZawierania(id){
+  const droga = [];
+  for(let m = modul(id); m && !droga.includes(m.id); m = wSrodku(m) ? modul(m.kotwica.do) : null)
+    droga.unshift(m.id);
+  return droga;
+}
+
 /* Kolejność do listy i do budowania: korzenie w kolejności dodania, pod każdym jego dzieci. */
 export function wszystkieWKolejnosci(){
   const wynik = [];

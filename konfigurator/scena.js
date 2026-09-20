@@ -5,6 +5,7 @@ import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {stan, MM, UDZIAL_SZER, UDZIAL_WYS, BARWY_DEKORU, plotno, zacisk} from './dane.js';
 
 import {odswiezNakladke} from './nakladka.js';
+import {sciezkaZawierania} from './moduly.js';
 import {egzemplarz} from './modele.js';
 
 /* ---------- scena ---------- */
@@ -103,9 +104,13 @@ export const grupyMebli = [];
    siatki na przygaszoną kopię i odkładam pełny w `userData`. */
 const przygaszone = new Map();
 export function przygasPozostale(){
-  const aktywny = stan.wejscie?.at(-1) || null;
+  /* Grupa sceny reprezentuje cały mebel, więc także przy edycji zagnieżdżonego modułu
+     pełny kontrast musi zachować jego pierwszy, nadrzędny element ścieżki — razem z tym,
+     co w nim siedzi. Moduł osadzony ma własną grupę, więc bez sprawdzenia zawierania
+     gasł właśnie ten, w który przed chwilą weszliśmy. */
+  const aktywny = stan.wejscie?.[0] || null;
   for(const grupa of grupyMebli){
-    const przygasic = !!aktywny && grupa.userData.id !== aktywny;
+    const przygasic = !!aktywny && sciezkaZawierania(grupa.userData.id)[0] !== aktywny;
     grupa.traverse(o => {
       if(!o.isMesh || !o.material) return;
       const pelny = o.userData.materialPelny ?? o.material;
@@ -214,6 +219,14 @@ export function dopasujKamere(kierunek, animuj = false){
   const hfov = 2 * Math.atan(Math.tan(vfov / 2) * kamera.aspect);
   const dystans = Math.max(rozmiar.x / (2 * UDZIAL_SZER * Math.tan(hfov / 2)),
                            rozmiar.y / (2 * UDZIAL_WYS * Math.tan(vfov / 2))) + rozmiar.z * .6;
+  /* Przy całym zestawie front aktywnego modułu chował moduły obrócone o 90°. Średnia
+     normalnych daje naturalny widok narożny i nadal działa dla zabudowy w jednej linii. */
+  if(stan.kadrCaly){
+    kierunek = stan.meble.reduce((v, m) => {
+      const a = THREE.MathUtils.degToRad(m.obrot || 0);
+      return v.add(new THREE.Vector3(Math.sin(a), 0, Math.cos(a)));
+    }, new THREE.Vector3());
+  }
   const kier = (kierunek || kamera.position.clone().sub(sterowanie.target)).normalize();
   if(!Number.isFinite(kier.x) || kier.lengthSq() < .5) kier.copy(frontMebla());
   const docelowa = srodek.clone().addScaledVector(kier, dystans);
@@ -306,4 +319,3 @@ export function petla(){
   sterowanie.update();
   if(sciezki) sciezki.klatka(); else renderer.render(scena, kamera);
 }
-

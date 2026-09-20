@@ -6,7 +6,7 @@ import {wWnece} from './wneki.js';
 import {zapisTorow} from './siatka.js';
 import {kamera, renderer, mebel, grupyMebli} from './scena.js';
 import {przebuduj, przelaczMebel, wejdzWModul} from './szafa.js';
-import {sciezkaDo} from './moduly.js';
+import {sciezkaZawierania} from './moduly.js';
 import {rzutuj, zamknijKarte, odswiezNakladke, komorkiEkranu, wnekiEkranu} from './nakladka.js';
 import {otworzKarte, kartaWneki, kartaPrzegrody} from './karty.js';
 
@@ -31,8 +31,37 @@ export function przesunPrzegrode(os, i, deltaMm){
   return true;
 }
 
+export function dodajKolumne(strona){
+  const K = stan.kolumny.length, szerokosc = 400;
+  const stareUklady = stan.uklady;
+  const noweUklady = {};
+  for(const [klucz, uklad] of Object.entries(stareUklady)){
+    const m = klucz.match(/^r(\d+)c(\d+)$/);
+    if(!m){ noweUklady[klucz] = uklad; continue; }
+    const r = +m[1], c = +m[2];
+    noweUklady[`r${r}c${strona === 'lewo' ? c + 1 : c}`] = uklad;
+  }
+  /* Pomijamy komórki zajęte przez wnękę, bo ich pusty układ tworzył w nowej
+     kolumnie atrapę przechowywania zamiast kompletu użytecznych frontów. */
+  for(let r = 1; r <= stan.rzedy.length; r++){
+    const kandydaci = Array.from({length: K}, (_, i) => strona === 'lewo' ? i + 1 : K - i);
+    const cWzoru = kandydaci.find(c => wWnece(r, c) < 0 && stareUklady[`r${r}c${c}`]);
+    const wzor = stareUklady[`r${r}c${cWzoru}`];
+    if(wzor) noweUklady[`r${r}c${strona === 'lewo' ? 1 : K + 1}`] = wzor;
+  }
+  if(strona === 'lewo') stan.wneki = stan.wneki.map(w => ({...w, c1: w.c1 + 1, c2: w.c2 + 1}));
+  stan.uklady = noweUklady;
+  stan.szerokoscMm += szerokosc;
+  stan.kolumnyWlasne = strona === 'lewo' ? [szerokosc, ...stan.kolumny] : [...stan.kolumny, szerokosc];
+  stan.siatkaKol = zapisTorow(stan.kolumnyWlasne);
+  stan.styl = 'custom';
+  przebuduj();
+}
+
 export function wlaczPrzeciaganie(){
   el('olowki').addEventListener('click', e => {        // klik (bez przeciągnięcia) otwiera kartę przegrody
+    const dodaj = e.target.closest('.dodaj-kolumne');
+    if(dodaj) return dodajKolumne(dodaj.dataset.strona);
     const b = e.target.closest('.olowek');
     if(b && Date.now() - ostatnieCiagniecie > 300) kartaPrzegrody(b.dataset.os, +b.dataset.i, b.getBoundingClientRect());
   });
@@ -273,7 +302,10 @@ export function wlaczHoverMebli(){
   /* Dwuklik wchodzi w moduł pod kursorem — tak jak dwuklik w grupę w Figmie. */
   renderer.domElement.addEventListener('dblclick', e => {
     const i = mebelWPunkcie(e.clientX, e.clientY);
-    if(i >= 0 && stan.meble[i]) wejdzWModul(stan.meble[i].id);
+    if(i < 0 || !stan.meble[i]) return;
+    /* Dwuklik schodzi o jeden poziom zawierania, a nie od razu na samo dno. */
+    const droga = sciezkaZawierania(stan.meble[i].id);
+    wejdzWModul(droga[Math.min(stan.wejscie.length, droga.length - 1)]);
   });
   renderer.domElement.addEventListener('pointerdown', e => { wcisniety = {x: e.clientX, y: e.clientY}; });
   renderer.domElement.addEventListener('pointerup', e => {
@@ -288,7 +320,7 @@ export function wlaczHoverMebli(){
        jak w Figmie. Klik poza wnętrzem wychodzi z modułu i przełącza się na trafiony. */
     if(wejsciowy){
       const trafiony = i >= 0 ? stan.meble[i]?.id : null;
-      if(trafiony && sciezkaDo(trafiony).includes(wejsciowy))
+      if(trafiony && sciezkaZawierania(trafiony).includes(wejsciowy))
         return zaznaczWPunkcie(e.clientX, e.clientY);
       if(i >= 0){
         stan.wejscie = [];
@@ -296,9 +328,13 @@ export function wlaczHoverMebli(){
       }
       return;
     }
-    if(i >= 0 && i !== stan.aktywny) przelaczMebel(i);
+    /* Poza modułem klik bierze najbardziej zewnętrzny pojemnik trafionego modułu — klikasz
+       w biurko stojące w regale i zaznacza się regał, tak jak w Figmie zaznacza się grupę. */
+    if(i < 0) return;
+    const zewnetrzny = sciezkaZawierania(stan.meble[i].id)[0];
+    const k = stan.meble.findIndex(m => m.id === zewnetrzny);
+    if(k >= 0 && k !== stan.aktywny) przelaczMebel(k);
   });
 
   el('scena').addEventListener('pointerleave', () => { podswietlZnacznik(-1); podswietlWPunkcie(null); });
 }
-

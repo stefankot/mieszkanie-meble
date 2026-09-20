@@ -197,7 +197,13 @@ export function kartaWneki(i, prostokat){
   el('scena').append(karta);
   window.lucide?.createIcons();                        // ikony podmieniamy dopiero po wstawieniu do DOM
   const sc = el('scena').getBoundingClientRect();
-  karta.style.left = zacisk(prostokat.left - sc.left + prostokat.width + 16, 8, sc.width - karta.offsetWidth - 8) + 'px';
+  /* Przy wnęce dochodzącej niemal do prawej krawędzi zaciskanie karty na prawej stronie
+     zasłaniało ostatnią kolumnę. Jeśli karta się tam nie mieści, otwieramy ją po lewej. */
+  const zaWaska = prostokat.left - sc.left + prostokat.width + 16 + karta.offsetWidth > sc.width;
+  karta.classList.toggle('od-prawej', zaWaska);
+  karta.style.left = zacisk(zaWaska ? prostokat.left - sc.left - karta.offsetWidth - 16
+                                   : prostokat.left - sc.left + prostokat.width + 16,
+                            8, sc.width - karta.offsetWidth - 8) + 'px';
   karta.style.top = zacisk(prostokat.top - sc.top, 8, sc.height - karta.offsetHeight - 8) + 'px';
 }
 

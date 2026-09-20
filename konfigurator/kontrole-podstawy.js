@@ -14,7 +14,7 @@ export async function kontrolePodstaw(dodaj){
   const odcisk = () => JSON.stringify(stan.czesci.map(c => [c.id, c.sizeMm, c.positionMm]));
   const eksport = () => JSON.stringify(eksportDokument());
   /* Nakładka, karty i uchwyty żyją dopiero w środku modułu — testy wchodzą tak jak człowiek. */
-  const wejdzWAktywny = () => wejdzWModul(stan.meble[stan.aktywny]?.id);
+  const wejdzWAktywny = () => { wejdzWModul(stan.meble[stan.aktywny]?.id); return stan.wejscie.length; };
   wejdzWAktywny();
   stan.szerokoscMm = 1000;
   przebuduj();
@@ -74,6 +74,11 @@ export async function kontrolePodstaw(dodaj){
   let linie = -1;
   try{ linie = (await (await fetch('szafa.js?' + Date.now())).text()).split('\n').filter(l => l.trim()).length; }catch(e){ }
   dodaj(7, 'own JS line count', linie > 0, `szafa.js = ${linie} non-blank lines`);
+  let statusBrak = 0;
+  try{ statusBrak = (await fetch(`__brak_${Date.now()}.js`)).status; }catch(e){ }
+  /* Przeglądarka sama pyta o brakujące zasoby, więc zwykłe 404 nie może zrywać odpowiedzi. */
+  dodaj(47, 'server returns a clean 404 for a missing file', statusBrak === 404,
+    `HTTP ${statusBrak || 'request failed'}`);
   let bledy = 0, prob = 0;
   for(const W of [400, 800, 1200, 2000, 2800, 3600]) for(const H of [400, 900, 1600, 2600])
     for(const D of [240, 420, 800]) for(const styl of ['grid', 'mosaic', 'pixel']){

@@ -20,7 +20,7 @@ import {wczytajKatalogModeli} from './modele.js';
    mógł wskazać, w której komórce rodzica siedzi. */
 export const komorkiRodzica = new Map();
 
-import {nowyId, rozmiescModuly, sciezkaDo, wszystkieWKolejnosci, wSrodku, czesciOsadzone,
+import {nowyId, rozmiescModuly, sciezkaZawierania, wszystkieWKolejnosci, wSrodku, czesciOsadzone,
         odniesienieModulu,
         mozliweKotwice, nazwaModulu, STRONY} from './moduly.js';
 import {parsujTory, naturalnaSuma} from './siatka.js';
@@ -67,12 +67,47 @@ const REGAL_PRZY_LOZKU = [
      kobaltowego cokołu ta nisza słucha próbnika, bo o to prosił użytkownik. */
   {id: 'nisza-koralowa', nazwa: 'Nisza koralowa', definicja: 'nisza-koral', kolor: 9,
    wykonczenie: 'board', drewno: null,
-   kotwica: {do: 'skrzydlo-krotkie', strona: 'wnetrze', komorka: 'r2c1'}}
+   kotwica: {do: 'skrzydlo-krotkie', strona: 'wnetrze', wzgledem: 'bryla',
+             pionowo: 'dol', poziomo: 'lewo', przesunX: -200}}
 ];
 
-function mebleFabryczne(){
+/* IKEA 295.646.78: 159,4 × 35 × 212,4 cm. Brak pleców jest częścią projektu — ściana
+   pozostaje widoczna w otwartych polach, tak jak na zdjęciu producenta. */
+const LADMAKARE = [{
+  id: 'ladmakare', nazwa: 'IKEA LÅDMAKARE', zrodlo: 'regal-lozko',
+  szerokoscMm: 1594, wysokoscMm: 2124, glebokoscMm: 350,
+  styl: 'custom', siatkaKol: '', siatkaRzed: '',
+  kolumnyWlasne: [797, 797], rzedyWlasne: [508, 508, 509, 509],
+  kolor: 3, wykonczenie: 'veneer', drewno: null, dodatki: 28,
+  roslina: 'brak',
+  plecy: false, nogi: 'none', nadstawka: false, obrot: 0,
+  uklady: {r1c1: 'sliding', r1c2: 'sliding', r4c1: 'sliding', r4c2: 'sliding'},
+  wneki: [], kotwica: null, pozycjaMm: null, nozkiMm: 0
+}];
+
+const KUCHNIA = [
+  {id: 'kuchnia-front', nazwa: 'Kuchnia — zabudowa główna', zrodlo: 'regal-lozko',
+   szerokoscMm: 3200, wysokoscMm: 2500, glebokoscMm: 600, styl: 'custom',
+   kolumnyWlasne: [600, 600, 600, 600, 400, 400], rzedyWlasne: [600, 800, 400, 700],
+   kolor: 4, wykonczenie: 'board', drewno: null, dodatki: 0, plecy: true, nogi: 'plinth',
+   roslina: 'brak', nadstawka: false, obrot: 0,
+   wneki: [{r1: 2, r2: 3, c1: 2, c2: 6, tresc: 'kuchnia', wysun: 0, kolor: 9, barwa: '#dc8178', otwarte: true}],
+   uklady: {r1c1:'komoda',r1c2:'door',r1c3:'oven',r1c4:'door',r1c5:'door',r1c6:'door',
+     r2c1:'door',r3c1:'door',
+     r4c1:'door',r4c2:'door',r4c3:'door',r4c4:'door',r4c5:'door',r4c6:'door'},
+   kotwica: null, pozycjaMm: null, nozkiMm: 0},
+  {id: 'kuchnia-bok', nazwa: 'Kuchnia — prawa ściana', zrodlo: 'regal-lozko',
+   szerokoscMm: 2400, wysokoscMm: 2500, glebokoscMm: 600, styl: 'custom',
+   kolumnyWlasne: [600, 600, 600, 600], rzedyWlasne: [600, 800, 400, 700], kolor: 4,
+   wykonczenie: 'board', drewno: null, dodatki: 0, plecy: true, nogi: 'plinth', roslina: 'brak',
+   nadstawka: false, obrot: 90, wneki: [],
+   uklady: Object.fromEntries(Array.from({length: 4}, (_, r) => Array.from({length: 4}, (_, c) => [`r${r+1}c${c+1}`, 'door'])).flat()),
+   kotwica: {do: 'kuchnia-front', strona: 'prawo', poziomuj: 'tyl'}, pozycjaMm: null, nozkiMm: 0}
+];
+
+function mebleZOpisu(opisy){
   const meble = [];
-  for(const opis of REGAL_PRZY_LOZKU){
+  for(const opis of opisy){
     wczytajDo(FABRYCZNY);
     Object.assign(stan, structuredClone(opis));
     /* Moduł osadzony bierze wymiary z komórki gospodarza — nie ma własnej siatki rzędów. */
@@ -87,8 +122,11 @@ function mebleFabryczne(){
   }
   stan.meble = meble;
   stan.aktywny = 0;
+  stan.zaznaczone = meble.length ? [meble[0].id] : [];
   wczytajDo(meble[0]);
 }
+
+function mebleFabryczne(){ mebleZOpisu(REGAL_PRZY_LOZKU); }
 
 export const pokazKomunikat = pokazBlad;
 
@@ -123,6 +161,7 @@ export function wczytajLokalnie(){
     stan.wzorce = zapis.wzorce || {};
     stan.aktywny = Math.min(zapis.aktywny || 0, zapis.meble.length - 1);
     wczytajDo(stan.meble[stan.aktywny]);
+    stan.zaznaczone = [stan.meble[stan.aktywny].id];
     return true;
   }catch(e){ return false; }
 }
@@ -199,13 +238,16 @@ function potwierdzReset(przycisk){
   karta.className = 'karta';
   karta.innerHTML = `<button class="karta-zamknij" data-id="nie"><i data-lucide="x"></i></button>
     <h3>Start over?</h3>
-    <p>This drops every piece, niche and layout change and replaces the design saved in this browser with a plain wardrobe.</p>
-    <div class="grupa" data-rola="reset"><button data-id="nie">Cancel</button><button data-id="tak" class="grozny">Reset everything</button></div>`;
+    <p>Choose the factory design that should replace the project saved in this browser.</p>
+    <div class="grupa" data-rola="reset"><button data-id="nie">Cancel</button><button data-id="pusty">Blank cabinet</button><button data-id="regal">Bed wall</button><button data-id="ladmakare">LÅDMAKARE</button><button data-id="kuchnia" class="cta">Kitchen</button></div>`;
   karta.addEventListener('click', e => {
     const b = e.target.closest('button');
     if(!b) return;
     zakonczEdycje();
-    if(b.dataset.id === 'tak') resetDoFabrycznych();
+    if(b.dataset.id === 'regal') resetDoFabrycznych();
+    if(b.dataset.id === 'ladmakare') resetDoLadmakare();
+    if(b.dataset.id === 'pusty') resetDoPustego();
+    if(b.dataset.id === 'kuchnia') resetDoKuchni();
   });
   el('scena').append(karta);
   window.lucide?.createIcons();
@@ -222,6 +264,62 @@ export function resetDoFabrycznych(){
   stan.historia = [];
   stan.indeks = -1;
   mebleFabryczne();
+  przebuduj();
+}
+
+export function resetDoLadmakare(){
+  zapomnijZapis();
+  stan.meble = [];
+  stan.aktywny = 0;
+  stan.historia = [];
+  stan.indeks = -1;
+  mebleZOpisu(LADMAKARE);
+  zamknijKarte();
+  czyscZaznaczenie();
+  przebuduj();
+}
+
+export function resetDoPustego(){
+  zapomnijZapis();
+  wczytajDo(FABRYCZNY);
+  Object.assign(stan, {id: 'mebel-1', nazwa: 'New cabinet', zrodlo: 'regal-lozko',
+    szerokoscMm: 2400, wysokoscMm: 2200, glebokoscMm: 600, styl: 'custom',
+    siatkaKol: '60 + 60 + 60 + 60', siatkaRzed: '60 + 80 + 40 + 40',
+    kolumnyWlasne: null, rzedyWlasne: null, uklady: {}, wneki: [], plecy: true,
+    nogi: 'plinth', nozkiMm: 0, kotwica: null, pozycjaMm: null, obrot: 0});
+  stan.meble = [polaMebla()];
+  stan.aktywny = 0;
+  stan.zaznaczone = ['mebel-1'];
+  stan.historia = [];
+  stan.indeks = -1;
+  zamknijKarte();
+  czyscZaznaczenie();
+  przebuduj();
+}
+
+export function resetDoKuchni(){
+  zapomnijZapis();
+  stan.meble = [];
+  stan.aktywny = 0;
+  stan.historia = [];
+  stan.indeks = -1;
+  mebleZOpisu(KUCHNIA);
+  zamknijKarte();
+  czyscZaznaczenie();
+  przebuduj();
+}
+
+/* Kreator mebli (kreator.js) podaje gotowy opis — układ startowy Tylko albo przeliczony
+   projekt z ich katalogu — i zastępuje nim to, co stoi w scenie. */
+export function resetDoOpisu(opisy){
+  zapomnijZapis();
+  stan.meble = [];
+  stan.aktywny = 0;
+  stan.historia = [];
+  stan.indeks = -1;
+  mebleZOpisu(opisy);
+  zamknijKarte();
+  czyscZaznaczenie();
   przebuduj();
 }
 
@@ -346,7 +444,7 @@ export function wejdzWModul(id){
   const m = stan.meble.find(x => x.id === id);
   if(!m) return;
   stan.kadrCaly = false;
-  stan.wejscie = sciezkaDo(id);
+  stan.wejscie = sciezkaZawierania(id);
   stan.zaznaczone = [id];
   przelaczMebel(stan.meble.indexOf(m));
 }
@@ -371,9 +469,14 @@ export function wyjdzZModulu(){
   return true;
 }
 
-export function przelaczMebel(i){
+export function przelaczMebel(i, zachowajZaznaczenie = false){
   zapiszAktywny();
   stan.aktywny = Math.max(0, Math.min(i, stan.meble.length - 1));
+  if(!zachowajZaznaczenie)
+    stan.zaznaczone = stan.meble[stan.aktywny] ? [stan.meble[stan.aktywny].id] : [];
+  /* Kliknięcie innego mebla kończy wejście w poprzedni. Inaczej ścieżka nadal wskazuje
+     starą grupę i nowo wybrany — mimo że jest aktywny w panelu — pozostaje przygaszony. */
+  if(stan.wejscie?.length && stan.wejscie.at(-1) !== stan.meble[stan.aktywny]?.id) stan.wejscie = [];
   wczytajDo(stan.meble[stan.aktywny]);
   zamknijKarte();
   czyscZaznaczenie();
@@ -455,7 +558,13 @@ export function usunMebel(){
   stan.meble.splice(stan.aktywny, 1);
   stan.wejscie = stan.wejscie.filter(id => id !== znikajacy.id);
   stan.zaznaczone = stan.zaznaczone.filter(id => id !== znikajacy.id);
-  przelaczMebel(Math.max(0, stan.aktywny - 1));
+  /* Nie wolno tu wołać `przelaczMebel`: zaczyna od `zapiszAktywny()` i po splice zapisałby
+     właśnie usunięty moduł w miejscu jego następcy. */
+  stan.aktywny = Math.max(0, stan.aktywny - 1);
+  wczytajDo(stan.meble[stan.aktywny]);
+  zamknijKarte();
+  czyscZaznaczenie();
+  przebuduj();
 }
 
 /* ---------- start ---------- */
@@ -541,5 +650,8 @@ export function usunMebel(){
     if(akcja === 'eksport') pobierzJSON();
     if(akcja === 'import') el('plik-json').click();
   });
+  /* Kontrole na żądanie z konsoli: `await __test()` albo `await __test('29-36')`. Zwraca
+     gotowy tekst wyniku, więc model testujący nie musi czekać na `window.__wynik`. */
+  window.__test = async zakres => (await import('./selftest.js')).selftest(zakres);
   if(TRYB_TESTU) (await import('./selftest.js')).selftest();
 })();

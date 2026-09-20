@@ -59,7 +59,7 @@ class Obsluga(http.server.SimpleHTTPRequestHandler):
         self.odpowiedz({'blad': 'nieznana ścieżka'}, 404)
 
     def log_message(self, *a):
-        if '/acg/' in (a[1] if len(a) > 1 else ''):
+        if '/acg/' in str(a[1] if len(a) > 1 else ''):
             super().log_message(*a)
 
 

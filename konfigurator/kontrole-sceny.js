@@ -30,7 +30,10 @@ const dwuklik = async (x, y) => { await klik(x, y);
 function punktModulu(id){
   const g = grupyMebli[stan.meble.findIndex(m => m.id === id)];
   if(!g) return null;
-  const p = new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).project(kamera);
+  /* Środek bryły bywa zasłonięty modułem osadzonym w środkowej komórce, więc celuję
+     w punkt między środkiem a górną krawędzią — tam jest sam korpus. */
+  const pudlo = new THREE.Box3().setFromObject(g), sr = pudlo.getCenter(new THREE.Vector3());
+  const p = new THREE.Vector3(sr.x, sr.y + (pudlo.max.y - sr.y) * .75, sr.z).project(kamera);
   const r = renderer.domElement.getBoundingClientRect();
   return [r.left + (p.x * .5 + .5) * r.width, r.top + (-p.y * .5 + .5) * r.height];
 }

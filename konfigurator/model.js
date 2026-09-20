@@ -191,6 +191,37 @@ export function normalizujDefinicje(p){
   const uchwyt = szuflada.parts.find(c => c.id === 'uchwyt');
   if(uchwyt) uchwyt.positionMm[1] = 0;
   p.definitions.szuflada = szuflada;
+  /* Każda szafka LÅDMAKARE ma dwa zachodzące na siebie skrzydła. Osobne tory są ważne
+     wizualnie: jedna płaska płyta wyglądałaby jak zwykły front uchylny. */
+  p.definitions['drzwi-przesuwne'] = {label: 'Sliding doors', parts: [
+    {id: 'lewe', type: 'box', material: 'maple-0375-front', label: 'Left sliding door',
+     sizeMm: [{cell: 'w', mul: .54, addMm: -4}, {cell: 'h', addMm: -8}, PLYTA_FRONTU],
+     positionMm: [{cell: 'w', mul: -.23}, 0, -(WNEKA_DRZWI + PLYTA_FRONTU / 2 + 5)], rotationDeg: [0, 0, 0]},
+    {id: 'prawe', type: 'box', material: 'maple-0375-front', label: 'Right sliding door',
+     sizeMm: [{cell: 'w', mul: .54, addMm: -4}, {cell: 'h', addMm: -8}, PLYTA_FRONTU],
+     positionMm: [{cell: 'w', mul: .23}, 0, -(WNEKA_DRZWI + PLYTA_FRONTU / 2 - 5)], rotationDeg: [0, 0, 0]},
+    {id: 'uchwyt-lewy', type: 'box', material: 'maple-0375-back', label: 'Left pull',
+     sizeMm: [12, 12, 8], positionMm: [{cell: 'w', mul: -.035}, 0, -(WNEKA_DRZWI + PLYTA_FRONTU + 10)], rotationDeg: [0, 0, 0]},
+    {id: 'uchwyt-prawy', type: 'box', material: 'maple-0375-back', label: 'Right pull',
+     sizeMm: [12, 12, 8], positionMm: [{cell: 'w', mul: .035}, 0, -(WNEKA_DRZWI + 8)], rotationDeg: [0, 0, 0]}
+  ]};
+  p.definitions.piekarnik = {label: 'Built-in oven', parts: [
+    /* Ciemna rama pozostaje czytelna także w uproszczonym podglądzie, który nie zawsze
+       pokazuje cienką szybę przed pełnym frontem. */
+    {id: 'rama', type: 'box', material: 'mirror-dark', label: 'Oven frame',
+     sizeMm: [{cell: 'w', addMm: -6}, {cell: 'h', addMm: -6}, 22],
+     positionMm: [0, 0, -(WNEKA_DRZWI + 11)], rotationDeg: [0, 0, 0]},
+    {id: 'szyba', type: 'box', material: 'mirror-dark', label: 'Oven glass',
+     sizeMm: [{cell: 'w', addMm: -60}, {cell: 'h', mul: .58}, 5],
+     positionMm: [0, {cell: 'h', mul: -.08}, -(WNEKA_DRZWI + 25)], rotationDeg: [0, 0, 0]},
+    {id: 'panel', type: 'box', material: 'maple-0375-back', label: 'Oven controls',
+     sizeMm: [{cell: 'w', addMm: -60}, 70, 10],
+     positionMm: [0, {cell: 'h', mul: .38}, -(WNEKA_DRZWI + 27)], rotationDeg: [0, 0, 0]}
+  ]};
+  const drzwiKoral = structuredClone(p.definitions.drzwi);
+  drzwiKoral.label = 'Coral kitchen door';
+  drzwiKoral.parts.forEach(cz => { cz.material = 'koral-kuchnia'; });
+  p.definitions['drzwi-koral-kuchnia'] = drzwiKoral;
   p.definitions['polka-1'] = definicjaPolki([0]);
   p.definitions['polka-2'] = definicjaPolki([-1 / 6, 1 / 6]);
   p.definitions['polka-3'] = definicjaPolki([-.25, 0, .25]);
@@ -281,17 +312,31 @@ export function konfigurujModel(){
     return d;
   }
   const rdzen = p.carcass.material;
+  d.materials.definitions['koral-kuchnia'] = {type: 'paint', color: '#dc8178', roughness: .3, metalness: 0, autorskie: true};
+  d.materials.definitions['mirror-dark'] = {type: 'paint', color: '#050607', roughness: .12, metalness: .15, autorskie: true};
   for(const [id, m] of Object.entries(d.materials.definitions)){
     if(!(id === rdzen || id.startsWith(rdzen + '-'))){ m.autorskie = true; continue; }
     m.color = id.endsWith('-back') ? ciemniej(barwa) : barwa;
     m.roughness = +(szorstkosc + (id.endsWith('-back') ? .08 : 0)).toFixed(2);
     delete m.assets;
   }
+  /* Para barw z linii Tone („Cashmere Beige + Antique Pink”): korpus i fronty biorą kolor
+     z palety, półki i plecy drugi. Osobne definicje, bo pętla wyżej przemalowuje wyłącznie
+     rodzinę materiału rdzenia, a te mają zostać nietknięte. */
+  if(stan.kolorWnetrza != null && KOLORY[stan.kolorWnetrza]){
+    const wn = KOLORY[stan.kolorWnetrza][1];
+    d.materials.definitions['wnetrze-tylko'] =
+      {type: 'paint', color: wn, roughness: szorstkosc, metalness: 0, autorskie: true};
+    d.materials.definitions['wnetrze-tylko-back'] =
+      {type: 'paint', color: ciemniej(wn), roughness: +(szorstkosc + .08).toFixed(2), metalness: 0, autorskie: true};
+    p.carcass.shelfMaterial = 'wnetrze-tylko';
+    if(p.carcass.backMm > 0) p.carcass.backMaterial = 'wnetrze-tylko-back';
+  }
   if((stan.nozkiMm || 0) > 0) d.materials.definitions.nozka =
     {type: 'paint', color: KOLORY[stan.nozkiKolor || 0][1], roughness: .35, metalness: .15};
   stan.wneki.forEach((w, i) => {
-    if(w.kolor != null) d.materials.definitions[`wneka-${i}`] =
-      {type: 'wood', color: KOLORY[w.kolor][1], roughness: szorstkosc, metalness: 0};
+    if(w.kolor != null || w.barwa) d.materials.definitions[`wneka-${i}`] =
+      {type: 'wood', color: w.barwa || KOLORY[w.kolor][1], roughness: szorstkosc, metalness: 0};
   });
   d.customParameters.wneki = structuredClone(stan.wneki);
   return d;

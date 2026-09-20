@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import {stan, KOLORY, el, suma, cm, stworzWzorzec, przywrocZeWzorca, policzOdstepstwa,
         wczytajDo, ustawPole, mieszanePole} from './dane.js';
 import {wnetrzeWys} from './model.js';
-import {granicaWneki} from './wneki.js';
+import {granicaWneki, czesciWnek} from './wneki.js';
 import {eksportDokument} from './eksport.js';
 import {ustawUjecie, grupyMebli, katalogDrewna, renderer, frontMebla, zbierzDekor, kamera,
         sterowanie} from './scena.js';
@@ -13,7 +13,7 @@ import {katalogModeli, modeleRoli} from './modele.js';
 import {mebelWPunkcie, obrysMebla} from './wybor.js';
 import {parsujTory, naturalnaSuma} from './siatka.js';
 import {przebuduj, duplikujMebel, usunMebel, przelaczMebel, wczytajJSON,
-        resetDoFabrycznych, wejdzWModul, wyjdzZModulu, zaznaczCalyMebel} from './szafa.js';
+        resetDoFabrycznych, resetDoLadmakare, resetDoKuchni, wejdzWModul, wyjdzZModulu, zaznaczCalyMebel} from './szafa.js';
 
 export async function kontroleMebli(dodaj){
   const eksport = () => JSON.stringify(eksportDokument());
@@ -294,7 +294,7 @@ export async function kontroleMebli(dodaj){
   resetDoFabrycznych();
   const skrzydla = stan.meble.map(m => m.id);
   const osadzone = stan.meble.filter(m => m.kotwica?.strona === 'wnetrze').map(m => m.definicja);
-  przelaczMebel(stan.meble.findIndex(m => m.id === 'skrzydlo-glowne'));
+  przelaczMebel(stan.meble.findIndex(m => m.id === 'skrzydlo-glowne'), true);
   const komorki = stan.komorki.map(k => `${Math.round(k.w)}×${Math.round(k.h)}`);
   const wymiaryOk = komorki.every(o => o === '564×564' || o === '564×582');
   stan.kolor = 12;                                     // Burgundy — korpus tak, fronty kobaltowe nie
@@ -343,12 +343,33 @@ export async function kontroleMebli(dodaj){
   const przedWejsciem = policzPrzygaszone();
   wejdzWModul('skrzydlo-krotkie');
   const wSrodkuIle = policzPrzygaszone();
+  const aktywnyKryjacy = id => {
+    const g = grupyMebli[stan.meble.findIndex(m => m.id === id)];
+    let ok = true;
+    g?.traverse(o => {
+      if(!o.isMesh || !o.material) return;
+      const materialy = Array.isArray(o.material) ? o.material : [o.material];
+      if(o.userData?.materialPelny || materialy.some(m => m.transparent || m.opacity < .999)) ok = false;
+    });
+    return ok;
+  };
+  const skrzydloKryjace = aktywnyKryjacy('skrzydlo-krotkie');
   const sciezka = [...stan.wejscie];
   wyjdzZModulu();
   wyjdzZModulu();
+  wejdzWModul('nisza-koralowa');
+  const niszaKryjaca = aktywnyKryjacy('nisza-koralowa');
+  wyjdzZModulu();
+  wyjdzZModulu();
+  wejdzWModul('skrzydlo-krotkie');
+  przelaczMebel(stan.meble.findIndex(m => m.id === 'skrzydlo-glowne'));
+  const zmienionyKryjacy = aktywnyKryjacy('skrzydlo-glowne');
+  const zmianaWyszla = stan.wejscie.length === 0 && policzPrzygaszone() === 0;
   dodaj(30, 'entering a module dims the rest and Esc walks back out',
-    przedWejsciem === 0 && wSrodkuIle > 0 && sciezka.length === 2 && policzPrzygaszone() === 0,
-    `${przedWejsciem} dimmed outside, ${wSrodkuIle} inside, path ${sciezka.join(' › ')}, ${policzPrzygaszone()} after Esc`);
+    przedWejsciem === 0 && wSrodkuIle > 0 && skrzydloKryjace && niszaKryjaca
+      && sciezka.length === 1 && zmienionyKryjacy && zmianaWyszla,
+    `${przedWejsciem} dimmed outside, ${wSrodkuIle} inside, active opaque ${skrzydloKryjace}/${niszaKryjaca}, `
+    + `switched opaque ${zmienionyKryjacy}, exited ${zmianaWyszla}`);
 
   /* Wzorzec i instancje: odstępstwo powstaje z różnicy wobec komponentu, nie z klikania. */
   resetDoFabrycznych();
@@ -370,7 +391,7 @@ export async function kontroleMebli(dodaj){
   /* Edycja zbiorcza: jedno pole ustawia wszystkie zaznaczone i tylko je. */
   resetDoFabrycznych();
   stan.zaznaczone = ['skrzydlo-glowne', 'skrzydlo-krotkie'];
-  przelaczMebel(stan.meble.findIndex(m => m.id === 'skrzydlo-glowne'));
+  przelaczMebel(stan.meble.findIndex(m => m.id === 'skrzydlo-glowne'), true);
   const mieszaneNaStarcie = mieszanePole('glebokoscMm');
   ustawPole('glebokoscMm', 500);
   przebuduj(false);
@@ -394,13 +415,17 @@ export async function kontroleMebli(dodaj){
   przebuduj(false);
   const kadrModulu = kamera.position.distanceTo(sterowanie.target);
   dodaj(33, 'the list root selects every module, leaves the one you were in and frames the whole set',
-    wSrodkuSciezka === 3 && wszystkie === stan.meble.length && puste === 0 && kadrCalosci > kadrModulu,
+    wSrodkuSciezka === 2 && wszystkie === stan.meble.length && puste === 0 && kadrCalosci > kadrModulu,
     `path ${wSrodkuSciezka} → 0, ${wszystkie}/${stan.meble.length} selected, `
     + `camera ${kadrCalosci.toFixed(1)} m for the set vs ${kadrModulu.toFixed(1)} m for one module`);
   /* Moduł osadzony ma być edytowalny jak każdy inny: własny kolor i tekstura z palety,
      przeniesienie do innej komórki gospodarza i wysunięcie przed jego lico. */
   resetDoFabrycznych();
   wejdzWModul('nisza-koralowa');
+  /* Fabrycznie nisza wisi na bryle; tutaj jawnie przełączamy ją na komórkę, bo ta kontrola
+     sprawdza właśnie przenoszenie modułu między komórkami gospodarza. */
+  stan.kotwica = {...stan.kotwica, wzgledem: 'komorka', komorka: 'r2c1'};
+  przebuduj(false);
   const barwaNiszy = () => {
     const g = grupyMebli[stan.meble.findIndex(m => m.id === 'nisza-koralowa')];
     let h = null;
@@ -466,5 +491,78 @@ export async function kontroleMebli(dodaj){
     przyDole === gospodarz.nozkiMm && przyGorze > przyDole,
     `bottom-aligned at ${przyDole} mm (host carcass starts at ${gospodarz.nozkiMm} mm), `
     + `top-aligned at ${przyGorze} mm`);
+  resetDoFabrycznych();
+  const niszaFabryczna = stan.meble.find(m => m.id === 'nisza-koralowa');
+  wejdzWModul('nisza-koralowa');
+  const brylaNiszy = new THREE.Box3()
+    .setFromObject(grupyMebli[stan.meble.findIndex(m => m.id === 'nisza-koralowa')]);
+  const brylaGospodarza = new THREE.Box3()
+    .setFromObject(grupyMebli[stan.meble.findIndex(m => m.id === 'skrzydlo-krotkie')]);
+  /* Nisza 600×600×200 pokrywa pełną głębokość krótkiego skrzydła, ale jej 200 mm
+     szerokości musi leżeć poza zewnętrzną ścianką, nie wewnątrz drewnianego korpusu. */
+  const pelnaGlebokosc = Math.abs(brylaNiszy.min.x - brylaGospodarza.min.x) < 0.002
+    && Math.abs(brylaNiszy.max.x - brylaGospodarza.max.x) < 0.002;
+  const pozaScianka = Math.abs(brylaNiszy.min.z - brylaGospodarza.max.z) < 0.002;
+  dodaj(48, 'the coral niche starts on the front face at the bottom of the wooden cabinet',
+    niszaFabryczna.kotwica?.wzgledem === 'bryla' && niszaFabryczna.kotwica?.pionowo === 'dol'
+      && niszaFabryczna.kotwica?.poziomo === 'lewo' && niszaFabryczna.kotwica?.przesunX === -200
+      && Math.round(brylaNiszy.min.y * 1000) === gospodarz.nozkiMm && pelnaGlebokosc && pozaScianka,
+    `reference ${niszaFabryczna.kotwica?.wzgledem || 'cell'}, vertical ${niszaFabryczna.kotwica?.pionowo || 'middle'}, `
+    + `bottom ${Math.round(brylaNiszy.min.y * 1000)} mm, side gap ${Math.round((brylaNiszy.min.z - brylaGospodarza.max.z) * 1000)} mm, `
+    + `depth ${Math.round((brylaNiszy.max.x - brylaNiszy.min.x) * 1000)} mm`);
+  resetDoLadmakare();
+  const pudloLadmakare = new THREE.Box3().setFromObject(grupyMebli[0]);
+  const rozmiarLadmakare = pudloLadmakare.getSize(new THREE.Vector3()).multiplyScalar(1000);
+  const przesuwne = stan.model.parametric.instances.filter(i => i.definition === 'drzwi-przesuwne');
+  const definicjaPrzesuwnych = stan.model.parametric.definitions['drzwi-przesuwne'];
+  dodaj(49, 'LÅDMAKARE keeps its real dimensions, open back, shelves and paired sliding doors',
+    stan.meble.length === 1 && stan.meble[0].id === 'ladmakare' && !stan.plecy && stan.roslina === 'brak'
+      && stan.kolumny.length === 2 && stan.rzedy.length === 4
+      && Math.max(...stan.rzedy) - Math.min(...stan.rzedy) <= 1
+      && przesuwne.length === 4 && definicjaPrzesuwnych.parts.length === 4
+      && Math.abs(rozmiarLadmakare.x - 1594) < 2 && Math.abs(rozmiarLadmakare.y - 2124) < 2
+      && Math.abs(rozmiarLadmakare.z - 350) < 35,
+    `${Math.round(rozmiarLadmakare.x)}×${Math.round(rozmiarLadmakare.z)}×${Math.round(rozmiarLadmakare.y)} mm, `
+    + `${przesuwne.length} cabinets, ${definicjaPrzesuwnych.parts.length / 2} door-and-pull pairs, back ${stan.plecy}`);
+  resetDoFabrycznych();
+  const usuwany = stan.meble[0].id, nastepny = structuredClone(stan.meble[1]);
+  usunMebel();
+  dodaj(50, 'Delete removes the active module instead of overwriting its successor',
+    !stan.meble.some(m => m.id === usuwany) && stan.meble.some(m => m.id === nastepny.id)
+      && stan.meble.find(m => m.id === nastepny.id)?.nazwa === nastepny.nazwa,
+    `removed ${usuwany}: ${!stan.meble.some(m => m.id === usuwany)}, kept ${nastepny.id}: ${stan.meble.some(m => m.id === nastepny.id)}`);
+  resetDoLadmakare();
+  const polaCm = [...document.querySelectorAll('#wiersze input[type="number"]')];
+  const poleSzer = polaCm[0];
+  poleSzer.value = '159.3';
+  poleSzer.dispatchEvent(new Event('change', {bubbles: true}));
+  dodaj(51, 'dimension number fields accept tenths of a centimetre without slider rounding',
+    stan.szerokoscMm === 1593 && polaCm.length === 3,
+    `${polaCm.length} fields, width entered as 159.3 cm → ${stan.szerokoscMm} mm`);
+  resetDoFabrycznych();
+  przelaczMebel(1);
+  dodaj(52, 'the navigator selection always follows the object being edited',
+    stan.zaznaczone.length === 1 && stan.zaznaczone[0] === stan.meble[stan.aktywny].id
+      && document.querySelector('.drzewo .modul[aria-current="true"]')?.getAttribute('aria-pressed') === 'true',
+    `active ${stan.meble[stan.aktywny].id}, selected ${stan.zaznaczone.join(', ') || 'none'}`);
+  resetDoKuchni();
+  const frontKuchni = stan.meble.find(m => m.id === 'kuchnia-front');
+  const bokKuchni = stan.meble.find(m => m.id === 'kuchnia-bok');
+  const maPiekarnik = stan.model.parametric.instances.some(i => i.definition === 'piekarnik');
+  const czesciPiekarnika = stan.model.parametric.definitions.piekarnik?.parts || [];
+  const maCiemnyFrontPiekarnika = ['rama', 'szyba'].every(id =>
+    czesciPiekarnika.some(cz => cz.id === id && cz.material === 'mirror-dark'));
+  const niszaKuchenna = frontKuchni.wneki.find(w => w.tresc === 'kuchnia');
+  const czesciGornychFrontow = czesciWnek().filter(cz => /^wneka\d+-front-gorny-/.test(cz.id));
+  const gorneFronty = czesciGornychFrontow.length;
+  const frontyCofniete = czesciGornychFrontow.every(cz => cz.positionMm[2] === frontKuchni.glebokoscMm / 2 - 129);
+  dodaj(53, 'the kitchen has an L-shaped run, coral work niche, sink and built-in oven',
+    stan.meble.length === 2 && frontKuchni.szerokoscMm === 3200 && frontKuchni.wysokoscMm === 2500
+      && bokKuchni.obrot === 90 && bokKuchni.kotwica?.do === frontKuchni.id
+      && !!niszaKuchenna && niszaKuchenna.r2 === 3 && niszaKuchenna.kolor === 9
+      && gorneFronty === 4 && frontyCofniete && maPiekarnik && maCiemnyFrontPiekarnika,
+    `${frontKuchni.szerokoscMm}×${frontKuchni.wysokoscMm} mm front, side ${bokKuchni.obrot}°, `
+    + `coral niche ${!!niszaKuchenna}, upper fronts ${gorneFronty}, recessed ${frontyCofniete}, `
+    + `oven ${maPiekarnik}, dark front ${maCiemnyFrontPiekarnika}`);
   resetDoFabrycznych();
 }

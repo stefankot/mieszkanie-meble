@@ -13,6 +13,7 @@ import {zamknijKarte} from './nakladka.js';
 import {przebuduj, zapisz, pobierzJSON, duplikujZPytaniem, usunMebel, przelaczMebel, wejdzWModul,
         zaznaczCalyMebel, komorkiRodzica} from './szafa.js';
 import {pokazBlad, bladEl} from './dane.js';
+import {przyciskKreatora} from './kreator.js';
 
 /* ---------- panel ---------- */
 export const odswiezacze = [];
@@ -57,16 +58,31 @@ export function grupa(opcje, czytaj, zapiszWartosc){
   return box;
 }
 
-export function suwak(min, max, krok, czytaj, zapiszWartosc, format, progi){
+export function suwak(min, max, krok, czytaj, zapiszWartosc, format, progi, poleCm = false){
   const box = document.createElement('div');
   box.className = 'kontrolka';
-  box.innerHTML = `<div class="tor"><sl-range class="suwak" min="${min}" max="${max}" step="${krok}" value="${czytaj()}" tooltip="none"></sl-range><div class="progi"></div></div><span class="banka">${format(czytaj())}</span>`;
+  box.innerHTML = `<div class="tor"><sl-range class="suwak" min="${min}" max="${max}" step="${krok}" value="${czytaj()}" tooltip="none"></sl-range><div class="progi"></div></div>${poleCm
+    ? `<label class="banka pole-cm"><input type="number" step="0.1" inputmode="decimal" aria-label="${poleCm} in centimetres"><span>cm</span></label>`
+    : `<span class="banka">${format(czytaj())}</span>`}`;
   const s = box.querySelector('sl-range'), b = box.querySelector('.banka'), kropki = box.querySelector('.progi');
+  const pole = box.querySelector('input');
   s.addEventListener('sl-input', () => { zapiszWartosc(+s.value); przebuduj(false); });
   s.addEventListener('sl-change', () => zapisz());
+  const zatwierdzPole = () => {
+    const mm = Math.max(min, Math.min(max, Math.round((+pole.value || 0) * 10)));
+    if(mm === czytaj()) return;
+    zapiszWartosc(mm);
+    przebuduj();
+  };
+  if(pole){
+    pole.addEventListener('input', zatwierdzPole);
+    pole.addEventListener('change', zatwierdzPole);
+    pole.addEventListener('blur', zatwierdzPole);
+    pole.addEventListener('keydown', e => { if(e.key === 'Enter'){ zatwierdzPole(); pole.blur(); } });
+  }
   odswiezacze.push(() => {
     s.value = czytaj();
-    b.textContent = format(czytaj());
+    if(pole) pole.value = +(czytaj() / 10).toFixed(1); else b.textContent = format(czytaj());
     if(progi) kropki.innerHTML = progi().filter(v => v >= min && v <= max)
       .map(v => `<i style="left:${(v - min) / (max - min) * 100}%"></i>`).join('');
   });
@@ -205,13 +221,17 @@ export function podsumowanie(){
   const box = document.createElement('div');
   box.className = 'wiersz kolumna podsumowanie';
   odswiezacze.push(() => {
-    const custom = stan.kolumny.filter(w => !zgodnaKolumna(w)).length;
+    const custom = stan.id === 'ladmakare' ? [] : stan.kolumny
+      .map((w, i) => zgodnaKolumna(w) ? null : `C${i + 1} ${Math.round(w / 10)}cm`)
+      .filter(Boolean);
+    const drzwi = ile('drzwi') + ile('drzwi-przesuwne') * 2;
     box.innerHTML = `<b>${cm(stan.szerokoscMm)} × ${cm(stan.wysokoscMm)} × ${cm(stan.glebokoscMm)}</b> ·
       ${stan.kolumny.length} columns (${stan.kolumny.map(v => Math.round(v / 10)).join(' + ')} cm) ·
       ${stan.rzedy.length} rows · ${stan.komorki.length} cells<br>
-      ${ile('drzwi')} doors, ${ile('szuflada')} drawers, ${ile('drazek')} rails ·
+      ${drzwi} doors, ${ile('szuflada')} drawers, ${ile('drazek')} rails ·
       ${stan.czesci.filter(c => c.type === 'box').length} parts · board ${stan.plytaMm} mm<br>
-      ${custom ? `<span class="ostrzezenie">${custom} column${custom > 1 ? 's' : ''} too narrow or too wide for stock IKEA fittings</span>`
+      ${custom.length ? `<span class="ostrzezenie">Custom-width columns: ${custom.join(', ')} · made-to-measure fittings</span>`
+               : stan.id === 'ladmakare' ? 'original IKEA LÅDMAKARE dimensions'
                : 'every opening takes stock IKEA fittings (40/60/80 cm)'}`;
   });
   return box;
@@ -254,13 +274,15 @@ function listaModulow(){
           <span class="strona">${stan.meble.length}</span></button></li>
         ${wszystkieWKolejnosci().map(m => {
         const i = stan.meble.indexOf(m);
-        const klasy = [m.id === wejsciowy ? 'wejsciowy' : '',
-                       stan.zaznaczone.includes(m.id) || i === stan.aktywny ? 'zaznaczony' : ''].join(' ');
-        return `<li><button class="modul ${klasy}" data-id="${m.id}" style="padding-left:${22 + poziom(m.id) * 14}px">
+        const klasy = [m.id === wejsciowy ? 'wejsciowy' : '', i === stan.aktywny ? 'aktywny-modul' : '',
+                       stan.zaznaczone.includes(m.id) ? 'zaznaczony' : ''].join(' ');
+        return `<li><button class="modul ${klasy}" data-id="${m.id}" aria-current="${i === stan.aktywny ? 'true' : 'false'}"
+          aria-pressed="${stan.zaznaczone.includes(m.id)}" style="padding-left:${22 + poziom(m.id) * 14}px">
           <i data-lucide="${m.kotwica ? 'diamond' : 'component'}"></i>
           <span class="kropka" style="background:${KOLORY[m.kolor][1]}"></span>
           <span class="nazwa">${nazwaModulu(m)}</span>
-          ${m.kotwica ? `<span class="strona">${STRONY[m.kotwica.strona]?.nazwa || ''}</span>` : ''}
+          ${m.id === wejsciowy ? '<span class="strona">Editing</span>'
+            : m.kotwica ? `<span class="strona">${STRONY[m.kotwica.strona]?.nazwa || ''}</span>` : ''}
         </button></li>`;
       }).join('')}</ul>
       ${stan.wejscie.length ? `<div class="okruchy">${stan.wejscie.map((id, k) =>
@@ -275,6 +297,9 @@ function listaModulow(){
     if(b.dataset.okruch != null) return wejdzWModul(stan.wejscie[+b.dataset.okruch]);
     if(b.dataset.id === '__mebel') return zaznaczCalyMebel();
     if(!b.dataset.id) return;
+    /* Pierwszy klik przebudowuje drzewo, więc natywne `dblclick` bywało tracone razem ze
+       starym węzłem. Drugi click zachowuje `detail === 2` także po tej podmianie. */
+    if(e.detail === 2) return wejdzWModul(b.dataset.id);
     if(e.shiftKey){
       stan.zaznaczone = stan.zaznaczone.includes(b.dataset.id)
         ? stan.zaznaczone.filter(x => x !== b.dataset.id) : [...stan.zaznaczone, b.dataset.id];
@@ -450,7 +475,10 @@ function poleSiatki(os){
   odswiezacze.push(() => {
     box.closest('.wiersz').hidden = stan.styl !== 'custom';
     if(document.activeElement === pole) return;         // nie podmieniam tekstu pod palcami
-    pole.value = (os === 'c' ? stan.siatkaKol : stan.siatkaRzed) || '';
+    /* Presety mogą mieć gotowe kolumnyWlasne bez tekstowego zapisu siatki. Puste pole
+       wyglądało wtedy jak nieaktywne i Safari wybierało placeholder zamiast ustawić kursor. */
+    pole.value = (os === 'c' ? stan.siatkaKol : stan.siatkaRzed)
+      || zapisTorow(os === 'c' ? stan.kolumny : stan.rzedy);
     opisz();
   });
   return box;
@@ -500,19 +528,18 @@ function sekcja(host, tytul, zwijana){
 
 export function zbudujPanel(){
   const host = el('wiersze');
-  host.append(listaModulow(), pasekZaznaczenia());
-  const reset = () => { stan.rzedyWlasne = null; stan.kolumnyWlasne = null; };
+  host.append(przyciskKreatora(), listaModulow(), pasekZaznaczenia());
 
   /* Moduł osadzony nie ma własnego korpusu — wymiary, siatka i konstrukcja bierze z komórki
      gospodarza, więc te sekcje nie mają czym sterować i chowam je. */
   const bezKorpusu = [];
   const rozmiar = sekcja(host, 'Size & position');
   bezKorpusu.push(rozmiar.box);
-  rozmiar('Width', suwak(400, 5000, 10, () => stan.szerokoscMm, v => { ustawPole('szerokoscMm', v); stan.kolumnyWlasne = null; }, cm), false, 'szerokoscMm');
+  rozmiar('Width', suwak(400, 5000, 10, () => stan.szerokoscMm, v => { ustawPole('szerokoscMm', v); stan.kolumnyWlasne = null; }, cm, null, 'Width'), false, 'szerokoscMm');
   rozmiar('Height', suwak(400, 3400, 10, () => stan.wysokoscMm, v => { ustawPole('wysokoscMm', v); stan.rzedyWlasne = null; },
-    v => cm(v) + ` · ${liczbaRzedow()} rows`, progiWysokosci), false, 'wysokoscMm');
+    v => cm(v) + ` · ${stan.rzedyWlasne?.length || liczbaRzedow()} rows`, progiWysokosci, 'Height'), false, 'wysokoscMm');
   rozmiar('Depth', suwak(240, 800, 10, () => stan.glebokoscMm, v => ustawPole('glebokoscMm', v),
-    v => cm(v) + (GLEB_LASTARE.includes(v) ? ' · fits IKEA' : ''), () => GLEB_LASTARE), false, 'glebokoscMm');
+    v => cm(v) + (GLEB_LASTARE.includes(v) ? ' · fits IKEA' : ''), () => GLEB_LASTARE, 'Depth'), false, 'glebokoscMm');
   rozmiar('Rotation', grupa([['0', 'Front'], ['90', '90°'], ['180', '180°'], ['270', '270°']],
     () => String(stan.obrot || 0), v => ustawPole('obrot', +v)), false, 'obrot');
 
@@ -523,10 +550,20 @@ export function zbudujPanel(){
   const uklad = sekcja(host, 'Layout');
   bezKorpusu.push(uklad.box);
   uklad('Style', grupa(STYLE, () => stan.styl,
-    v => { ustawPole('styl', v); reset(); if(v === 'custom') przygotujSiatke(); }), true, 'styl');
+    v => {
+      const kolumny = [...stan.kolumny], rzedy = [...stan.rzedy];
+      ustawPole('styl', v);
+      /* Styl określa rytm frontów, nie zgodę na skasowanie geometrii wpisanej ręcznie. */
+      stan.kolumnyWlasne = kolumny;
+      stan.rzedyWlasne = rzedy;
+      stan.siatkaKol = zapisTorow(kolumny);
+      stan.siatkaRzed = zapisTorow(rzedy);
+      if(v === 'custom') przygotujSiatke();
+      przebuduj();
+    }), true, 'styl');
   uklad('Columns', poleSiatki('c'), true);
   uklad('Rows', poleSiatki('r'), true);
-  const gestosc = wiersz('Density', suwak(0, 100, 10, () => stan.gestosc, v => { ustawPole('gestosc', v); reset(); }, v => v + '%'));
+  const gestosc = wiersz('Density', suwak(0, 100, 10, () => stan.gestosc, v => ustawPole('gestosc', v), v => v + '%'));
   uklad.box.append(gestosc);
   odswiezacze.push(() => gestosc.hidden = stan.styl === 'custom');   // w trybie ręcznym nic nie robi
 
@@ -566,6 +603,9 @@ export function zbudujPanel(){
     bezKorpusu.forEach(s => s.hidden = wSrodkuModul(stan.meble[stan.aktywny]));
     const w = stan.wejscie.length > 0 || stan.zaznaczone.length > 1;
     host.querySelectorAll('.sekcja').forEach(s => s.classList.toggle('zablokowana', !w));
+    podpowiedz.textContent = stan.zaznaczone.length === 1
+      ? 'Selected, not editing — double-click the module to edit it.'
+      : 'Double-click a module to edit it. Esc goes back up.';
     podpowiedz.hidden = w;
   });
   window.lucide?.createIcons();
