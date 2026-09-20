@@ -68,3 +68,29 @@ mówi o tym wprost pod listą projektów.
 `ikony/tylko-*.webp` to przeskalowane do 144 px miniatury z
 `media.tylko.com/cloudinary/common/menu/categories/<kategoria>/A.webp`. Leżą lokalnie,
 bo ich CDN odrzuca żądania spoza tylko.com — odwołanie po URL-u dałoby puste kafelki.
+
+## Style
+
+Sześć stylów każdej linii to ich piktogramy „Available styles" z kroku 2 kreatora:
+`media.tylko.com/cloudinary/comparison-page/geometry-icons/high/Original*.svg` (linie
+Original Classic i Modern) oraz `Edge*.svg` (Edge i Tone). Kopie leżą w `ikony/styl-*.svg`.
+
+Proporcje w `style-tylko.js` są odczytane wprost z tych plików: ikona rysuje korpus
+w prostokącie x 4.75–43.25 i y 2.75–45.25, więc ułamek od lewej to (x−4.75)/38.5,
+a od dołu (45.25−y)/42.5.
+
+Linia Original zmienia GEOMETRIĘ, a przy Slant i Pixel także obrys bryły — takiego mebla
+nie da się zapisać jedną prostokątną siatką, więc styl zwraca kilka modułów zakotwiczonych
+w sobie. Pixel to dwa pionowe słupy skrzyżowane z dwoma poziomymi pasami; skrzynki wystają
+nad pasy, pod nie i na boki. Linia Edge zmienia tylko ROZKŁAD FRONTÓW na zwykłej siatce.
+
+## Sylwetka i modele
+
+`ikony/sylwetka.svg` — „Human" Pelega Reda z Noun Project, licencja CC BY. Plik przycięty
+do obrysu postaci; atrybucja siedzi w `<desc>` pliku i tutaj, bo napis wyrenderowany
+w scenie 3D wisiałby w powietrzu obok mebla.
+
+Modele na półki, podłogę i lampy pobiera `modele/pobierz.py` z BlenderKit (assety
+royalty-free). Rola `lampa` dostaje w katalogu blok `swiatlo` i naprawdę świeci —
+punktowe światło siada na 4/5 wysokości bryły, a klosz dostaje emisję.
+

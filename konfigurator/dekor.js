@@ -100,19 +100,36 @@ export function zbierzDekor(){
     ustawDekor(los, k.x - k.w / 2, k.y - k.h / 2 + polka * wysPrzegrody,
                k.d * .5 - stan.glebokoscMm / 2 + 30, k.w, wysPrzegrody - 30, zbior, gestosc);
   }
-  /* Lampa stoi we wnęce — to jedyne miejsce, gdzie światło ma sens: zamknięta z trzech stron
-     półka odbija je i widać, że naprawdę świeci. */
+  /* Którą lampę postawić — katalog ma ich kilka, więc wybór jest polem mebla, nie losem. */
   const lampy = modeleRoli('lampa');
-  if(lampy.length) stan.wneki.forEach((w, i) => {
-    const g = granicaWneki(w);
-    const r = wymiaryModelu(lampy[0].id);
-    if(!g || !r || w.tresc === 'biurko') return;
-    const skala = Math.min(1, (g.wys - 40) / r.h, (g.sz - 60) / r.w);
-    if(skala < .25) return;
-    zbior.push({model: lampy[0].id, skala, obrotY: .3,
+  const wybrana = stan.lampa === 'brak' ? null
+    : lampy.find(m => m.id === stan.lampa) || lampy[0];
+  const r = wybrana && wymiaryModelu(wybrana.id);
+  const postaw = (x, y, sz, wys, wysun = 0) => {
+    const skala = Math.min(1, (wys - 40) / r.h, (sz - 60) / r.w);
+    if(skala < .25) return false;
+    zbior.push({model: wybrana.id, skala, obrotY: .3,
                 w: r.w * skala, h: r.h * skala, d: r.d * skala, dol: r.dol * skala,
-                x: g.x1 + g.sz / 2, y: g.y1 + 9, z: stan.glebokoscMm / 2 - r.d * skala / 2 - 20 + (w.wysun || 0)});
+                x, y: y + 9, z: stan.glebokoscMm / 2 - r.d * skala / 2 - 20 + wysun});
+    return true;
+  };
+  /* Wnęka jest najlepszym miejscem na światło: zamknięta z trzech stron odbija je i widać,
+     że lampa naprawdę świeci. */
+  let stoi = false;
+  if(r) stan.wneki.forEach(w => {
+    const g = granicaWneki(w);
+    if(!g || w.tresc === 'biurko') return;
+    if(postaw(g.x1 + g.sz / 2, g.y1, g.sz, g.wys, w.wysun || 0)) stoi = true;
   });
+  /* Szafa bez wnęki też ma gdzie postawić lampę — bierze najwyższą otwartą komórkę,
+     bo tam światło pada na całą zawartość, a nie tylko na własną półkę. Ale dopiero gdy
+     lampa jest wybrana świadomie: sama z siebie nie ma prawa wejść na cudzą półkę. */
+  if(r && !stoi && stan.lampa && stan.lampa !== 'brak'){
+    const otwarte = stan.komorki.filter(k => !frontKomorki(`r${k.r}c${k.c}`)
+      && wWnece(k.r, k.c) < 0 && k.h > r.h * .3 + 40);
+    const gora = otwarte.sort((a, b) => b.y - a.y)[0];
+    if(gora) postaw(gora.x, gora.y - gora.h / 2, gora.w, gora.h);
+  }
 
   const naGorze = zacisk(Math.round(stan.szerokoscMm / 1100), 0, 3);
   for(let i = 0; i < naGorze; i++){

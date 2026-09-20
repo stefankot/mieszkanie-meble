@@ -335,8 +335,11 @@ export function konfigurujModel(){
   if((stan.nozkiMm || 0) > 0) d.materials.definitions.nozka =
     {type: 'paint', color: KOLORY[stan.nozkiKolor || 0][1], roughness: .35, metalness: .15};
   stan.wneki.forEach((w, i) => {
+    /* Wnęka kuchenna to gładka lakierowana skrzynka, a nie fornir — słój na niej wyglądał
+       jak druga okleina zamiast kontrastowej płyty ze zdjęć referencyjnych. */
     if(w.kolor != null || w.barwa) d.materials.definitions[`wneka-${i}`] =
-      {type: 'wood', color: w.barwa || KOLORY[w.kolor][1], roughness: szorstkosc, metalness: 0};
+      {type: w.gladka ? 'paint' : 'wood', color: w.barwa || KOLORY[w.kolor][1],
+       roughness: w.gladka ? .34 : szorstkosc, metalness: 0};
   });
   d.customParameters.wneki = structuredClone(stan.wneki);
   return d;

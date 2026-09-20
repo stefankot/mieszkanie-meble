@@ -20,7 +20,7 @@ API = 'https://www.blenderkit.com/api/v1'
 BLENDER = '/Applications/Blender.app/Contents/MacOS/Blender'
 NAGLOWKI = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
                           'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'}
-BUDZET = {'podloga': (40000, 1024), 'polka': (6000, 512)}      # (trójkąty, bok tekstury)
+BUDZET = {'podloga': (40000, 1024), 'polka': (6000, 512), 'lampa': (6000, 512)}   # (trójkąty, bok tekstury)
 
 SKRYPT = r'''
 import bpy, sys
@@ -134,6 +134,10 @@ def pobierz(identyfikator, rola):
             wpis['podglad'] = ''
     wpis.update({'plik': cel.name, 'rola': rola, 'budzetTrojkatow': limit, 'zrodloPliku': rodzaj})
     w = wpis['wymiaryMm']
+    # Lampa ma świecić, a nie tylko stać: punkt światła siada tuż pod kloszem, czyli na
+    # 4/5 wysokości bryły. Barwę i strumień da się potem poprawić ręcznie w katalogu.
+    if rola == 'lampa':
+        wpis['swiatlo'] = {'kelwiny': 2700, 'lumeny': 400, 'wysokoscMm': round(w[2] * 0.8)}
     print(f"  {wpis['nazwa']}: {cel.stat().st_size // 1024} kB, {w[0]}×{w[1]}×{w[2]} mm, rola {rola}")
     return wpis
 
@@ -143,7 +147,7 @@ def main():
     p.add_argument('identyfikatory', nargs='*', help='assetBaseId, np. fafdbaf8-70f0-4965-a76d-5f096a22b7d5')
     p.add_argument('--szukaj', help='fraza do wyszukania w BlenderKit')
     p.add_argument('--ile', type=int, default=20)
-    p.add_argument('--rola', choices=['polka', 'podloga'], default='polka')
+    p.add_argument('--rola', choices=['polka', 'podloga', 'lampa'], default='polka')
     p.add_argument('--pobierz', action='store_true', help='pobierz znalezione, nie tylko wypisz')
     args = p.parse_args()
 

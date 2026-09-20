@@ -2,6 +2,98 @@
   "wersja": 2,
   "modele": [
     {
+      "id": "c74aa83d-3689-49a2-9ee6-bf9007fd3018",
+      "nazwa": "Cactus bedside table lamp",
+      "autor": "Flareworks Studio",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/c74aa83d-3689-49a2-9ee6-bf9007fd3018/",
+      "wymiaryMm": [
+        462,
+        304,
+        580
+      ],
+      "trojkatyZrodla": 67968,
+      "podglad": "c74aa83d-3689-49a2-9ee6-bf9007fd3018.jpg",
+      "plik": "c74aa83d-3689-49a2-9ee6-bf9007fd3018.glb",
+      "rola": "lampa",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K",
+      "swiatlo": {
+        "kelwiny": 2700,
+        "lumeny": 400,
+        "wysokoscMm": 464
+      }
+    },
+    {
+      "id": "aad6c5f8-0b6f-4abd-9bc1-1b1e9a0c99b7",
+      "nazwa": "Ceramic table lamp",
+      "autor": "Flareworks Studio",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/aad6c5f8-0b6f-4abd-9bc1-1b1e9a0c99b7/",
+      "wymiaryMm": [
+        147,
+        378,
+        218
+      ],
+      "trojkatyZrodla": 971840,
+      "podglad": "aad6c5f8-0b6f-4abd-9bc1-1b1e9a0c99b7.jpg",
+      "plik": "aad6c5f8-0b6f-4abd-9bc1-1b1e9a0c99b7.glb",
+      "rola": "lampa",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "resolution_0_5K",
+      "swiatlo": {
+        "kelwiny": 2700,
+        "lumeny": 400,
+        "wysokoscMm": 174
+      }
+    },
+    {
+      "id": "3d83f702-3bd2-40bb-8752-d1bf4c90a641",
+      "nazwa": "Opaque glass table lamp",
+      "autor": "Joris LM",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/3d83f702-3bd2-40bb-8752-d1bf4c90a641/",
+      "wymiaryMm": [
+        528,
+        359,
+        415
+      ],
+      "trojkatyZrodla": 10884,
+      "podglad": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.jpg",
+      "plik": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.glb",
+      "rola": "lampa",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "gltf",
+      "swiatlo": {
+        "kelwiny": 2700,
+        "lumeny": 400,
+        "wysokoscMm": 300
+      }
+    },
+    {
+      "id": "affd7398-7af6-44d5-9b0d-a827aeb1a23a",
+      "nazwa": "Table Lamp",
+      "autor": "MNDV ",
+      "licencja": "royalty_free",
+      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/affd7398-7af6-44d5-9b0d-a827aeb1a23a/",
+      "wymiaryMm": [
+        406,
+        511,
+        1002
+      ],
+      "trojkatyZrodla": 321120,
+      "podglad": "affd7398-7af6-44d5-9b0d-a827aeb1a23a.jpg",
+      "plik": "affd7398-7af6-44d5-9b0d-a827aeb1a23a.glb",
+      "rola": "lampa",
+      "budzetTrojkatow": 6000,
+      "zrodloPliku": "gltf",
+      "swiatlo": {
+        "kelwiny": 2700,
+        "lumeny": 400,
+        "wysokoscMm": 802
+      }
+    },
+    {
       "id": "fafdbaf8-70f0-4965-a76d-5f096a22b7d5",
       "nazwa": "Indoor Plant  - Cuban Cigar",
       "autor": "Pandora Land",
@@ -72,29 +164,6 @@
       "rola": "polka",
       "budzetTrojkatow": 6000,
       "zrodloPliku": "resolution_0_5K"
-    },
-    {
-      "id": "3d83f702-3bd2-40bb-8752-d1bf4c90a641",
-      "nazwa": "Opaque glass table lamp",
-      "autor": "Joris LM",
-      "licencja": "royalty_free",
-      "zrodlo": "https://www.blenderkit.com/asset-gallery-detail/3d83f702-3bd2-40bb-8752-d1bf4c90a641/",
-      "wymiaryMm": [
-        528,
-        359,
-        415
-      ],
-      "trojkatyZrodla": 10884,
-      "podglad": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.jpg",
-      "plik": "3d83f702-3bd2-40bb-8752-d1bf4c90a641.glb",
-      "rola": "lampa",
-      "budzetTrojkatow": 6000,
-      "zrodloPliku": "gltf",
-      "swiatlo": {
-        "kelwiny": 2700,
-        "lumeny": 400,
-        "wysokoscMm": 300
-      }
     },
     {
       "id": "75a9fa8a-b105-4965-9e1d-e5f5d5253842",

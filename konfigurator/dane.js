@@ -122,7 +122,7 @@ export const KONFIG = ['szerokoscMm', 'wysokoscMm', 'glebokoscMm', 'plecy', 'nog
                 'kolor', 'wykonczenie', 'drewno', 'dodatki', 'nadstawka', 'uklady', 'wneki', 'obrot',
                 'nozkiMm', 'nozkiKolor',
                 'kolumnyWlasne', 'rzedyWlasne', 'siatkaKol', 'siatkaRzed', 'roslina', 'zrodlo',
-                'pozycjaMm', 'id', 'nazwa', 'kotwica', 'wzorzec', 'odstepstwa',
+                'pozycjaMm', 'id', 'nazwa', 'kotwica', 'wzorzec', 'odstepstwa', 'lampa',
                 'definicja', 'wysunMm', 'material', 'materialKorpusu', 'kolorWnetrza'];
 export const ODSTEP_MEBLI = 0;                         // meble stoją bok w bok, bez szczeliny
 
@@ -216,6 +216,7 @@ export const stan = {
   kolumnyWlasne: null, rzedyWlasne: null,
   siatkaKol: '', siatkaRzed: '',                       // styl Custom: podziały wpisane ręcznie
   roslina: null,                                       // doniczka obok: id modelu, 'brak' albo null (najwyższa)
+  lampa: null,                                         // lampa we wnęce: id modelu, 'brak' albo null (pierwsza z katalogu)
   pozycjaMm: null,                                     // [x, z] środka bryły; null = moduł idzie w łańcuchu
   id: null, nazwa: '',                                 // tożsamość modułu — po niej chodzą kotwice i lista
   kotwica: null,                                       // {do, strona:'prawo'|'lewo'|'gora'|'dol', przesun, poziomuj}

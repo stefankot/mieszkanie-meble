@@ -508,6 +508,29 @@ function roslinaDoWyboru(){
   return box;
 }
 
+/* Lampa — ten sam próbnik co rośliny, ale z katalogu `rola: 'lampa'`. Staje we wnęce,
+   a gdy mebel jej nie ma, na najwyższej otwartej półce. */
+function lampaDoWyboru(){
+  const box = document.createElement('div');
+  box.className = 'kontrolka';
+  odswiezacze.push(() => {
+    const lampy = modeleRoli('lampa');
+    box.closest('.wiersz').hidden = !lampy.length;
+    if(!lampy.length) return;
+    box.innerHTML = `<div class="probniki drewno">
+      <button class="probnik bez-rosliny" data-id="brak" title="No lamp"></button>${
+      lampy.map(m => `<button class="probnik" data-id="${m.id}" title="${m.nazwa} · ${Math.round(m.wymiaryMm[2] / 10)} cm"
+        style="background-image:url(modele/${m.podglad || ''});background-size:cover"></button>`).join('')}</div>`;
+    const teraz = stan.lampa || lampy[0].id;
+    box.querySelectorAll('.probnik').forEach(b => b.classList.toggle('aktywny', b.dataset.id === teraz));
+  });
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if(b){ ustawPole('lampa', b.dataset.id); przebuduj(); }
+  });
+  return box;
+}
+
 /* Sekcja panelu — nagłówek 40 px jak w Inspektorze edytora. Rzeczy ustawiane raz startują
    zwinięte; kolumna ma 300 px, więc płaska lista dwudziestu wierszy była nie do przejrzenia. */
 function sekcja(host, tytul, zwijana){
@@ -589,6 +612,7 @@ export function zbudujPanel(){
   const scena = sekcja(host, 'Scene', true);
   scena('Items on shelves', suwak(0, 100, 5, ileDodatkow, v => ustawPole('dodatki', v), v => v ? v + '%' : 'none'));
   scena('Plant beside it', roslinaDoWyboru(), true);
+  scena('Lamp', lampaDoWyboru(), true);
 
   host.append(podsumowanie(), przyciski());
   /* „Edycja dopiero po wejściu w moduł" — sekcje parametrów są nieklikalne, dopóki nie

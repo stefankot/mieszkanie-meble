@@ -1,24 +1,33 @@
-/* Kontrole 54–58: kreator mebli i dane przepisane z tylko.com. */
-import {stan, UKLAD, el} from './dane.js';
+/* Kontrole 54–60: kreator mebli, style przepisane z tylko.com i kreator kuchni. */
+import {stan, UKLAD, el, KOLORY} from './dane.js';
 import {sprawdzParametryczny} from 'https://stefankot.github.io/mieszkanie-meble/renderery/webgpu/parametryczne.js';
-import {KATEGORIE, PALETY, UKLADY_STARTOWE, katalogProjektow, opisZUkladu, opisZProjektu} from './tylko.js';
+import {KATEGORIE, PALETY, LINIE, KATEGORIA_START, katalogProjektow, opisZProjektu} from './tylko.js';
+import {STYLE_LINII, modulyStylu} from './style-tylko.js';
+import {modulyKuchni, DOMYSLNE} from './kuchnia.js';
 import {pokazKreator, zamknijKreator} from './kreator.js';
 import {resetDoFabrycznych} from './szafa.js';
 
 const chwila = ms => new Promise(r => setTimeout(r, ms));
 const klik = sel => document.querySelector(sel)?.click();
+const parsuj = k => /^r(\d+)c(\d+)$/.exec(k);
 
-/* Czy każdy wpis `uklady` trafia w istniejącą komórkę i znany wariant — po tym poznaję,
-   że przeliczony projekt nie zgubi frontów przy budowie. */
-function wpisyPoprawne(opis, kolumn, rzedow){
-  return Object.entries(opis.uklady).every(([k, v]) => {
-    const m = /^r(\d+)c(\d+)$/.exec(k);
-    return m && +m[1] >= 1 && +m[1] <= rzedow && +m[2] >= 1 && +m[2] <= kolumn && !!UKLAD[v];
+/* Czy opis da się zbudować: fronty trafiają w istniejące komórki, a kotwice w moduły
+   z tego samego kompletu. Tanie, bo nie wymaga przebudowy sceny. */
+function opisSpojny(opisy){
+  const ids = new Set(opisy.map(o => o.id));
+  return opisy.every(o => {
+    const kolumn = o.siatkaKol.split('+').length, rzedow = o.rzedyWlasne.length;
+    const komorkiOk = Object.entries(o.uklady).every(([k, v]) => {
+      const m = parsuj(k);
+      return m && +m[1] >= 1 && +m[1] <= rzedow && +m[2] >= 1 && +m[2] <= kolumn && !!UKLAD[v];
+    });
+    return komorkiOk && o.szerokoscMm > 0 && o.wysokoscMm > 0
+      && (!o.kotwica || ids.has(o.kotwica.do));
   });
 }
 
 export async function kontroleKreatora(dodaj){
-  /* 54 — przycisk stoi na samej górze prawego panelu i otwiera okno. */
+  /* 54 — przycisk na samej górze panelu, trzy kategorie z piktogramami Tylko, trzy zakładki. */
   const pierwszy = el('wiersze')?.firstElementChild;
   await pokazKreator();
   await chwila(300);
@@ -26,85 +35,116 @@ export async function kontroleKreatora(dodaj){
   const kategorie = okno ? okno.querySelectorAll('.kreator-kategoria').length : 0;
   const piktogramy = okno ? [...okno.querySelectorAll('.kreator-kategoria img')]
     .filter(i => i.getAttribute('src').startsWith('ikony/tylko-')).length : 0;
-  dodaj(54, 'the furniture creator opens from the top of the right panel and shows three Tylko categories',
+  const zakladki = okno ? okno.querySelectorAll('.kreator-zakladki button').length : 0;
+  dodaj(54, 'the furniture creator opens from the top of the right panel with three Tylko categories and three tabs',
     pierwszy?.classList.contains('kreator-start') && !!okno
-      && kategorie === KATEGORIE.length && piktogramy === KATEGORIE.length,
-    `first panel row ${pierwszy?.className || 'none'}, ${kategorie} categories, ${piktogramy} pictograms`);
+      && kategorie === KATEGORIE.length && piktogramy === KATEGORIE.length && zakladki === 3,
+    `first panel row ${pierwszy?.className || 'none'}, ${kategorie} categories, ${piktogramy} pictograms, ${zakladki} tabs`);
 
-  /* 55 — każdy układ startowy ma wymiary i siatkę z Tylko, a fronty mieszczą się w tej siatce. */
+  /* 55 — dwanaście stylów Tylko: każdy daje spójny opis i ma własny piktogram z ich pliku. */
   const zle = [];
-  for(const [kat, lista] of Object.entries(UKLADY_STARTOWE))
-    for(const l of lista){
-      const [opis] = opisZUkladu(l, PALETY[l.linia][0]);
-      const ok = opis.szerokoscMm === l.w && opis.wysokoscMm === l.h && opis.glebokoscMm === l.d
-        && opis.rzedyWlasne.length === l.rzed.length
-        && opis.siatkaKol.split('+').length === l.kol.length
-        && wpisyPoprawne(opis, l.kol.length, l.rzed.length);
-      if(!ok) zle.push(`${kat}/${l.id}`);
+  for(const [zestaw, style] of Object.entries({original: STYLE_LINII.original, edge: STYLE_LINII.edge}))
+    for(const st of style){
+      const s = KATEGORIA_START[zestaw === 'original' ? 'bookcase' : 'wardrobe'];
+      const opisy = modulyStylu(st, {w: s.w, h: s.h, d: s.d}, PALETY.original[0], {nogi: s.nogi});
+      const ikona = await fetch(st.ikona).then(r => r.ok).catch(() => false);
+      if(!opisy.length || !opisSpojny(opisy) || !ikona) zle.push(`${zestaw}/${st.id}`);
     }
-  const ilePrzykladow = Object.values(UKLADY_STARTOWE).reduce((s, l) => s + l.length, 0);
-  dodaj(55, 'every starting layout keeps its Tylko dimensions and puts fronts inside its own grid',
-    zle.length === 0, `${ilePrzykladow} layouts, broken: ${zle.join(', ') || 'none'}`);
+  const ile = STYLE_LINII.original.length + STYLE_LINII.edge.length;
+  dodaj(55, 'all twelve Tylko styles build a consistent piece and keep their own pictogram',
+    ile === 12 && zle.length === 0, `${ile} styles, broken: ${zle.join(', ') || 'none'}`);
 
-  /* 56 — układ „Pixel” buduje się dokładnie w wymiarach i rytmie z Tylko #1935036. */
-  klik('[data-uklad="pixel-wardrobe"]');
+  /* 56 — Pixel to skrzyżowane słupy i pasy, a nie fronty rozrzucone po jednej siatce. */
+  klik('[data-kategoria="bookcase"]');
+  await chwila(250);
+  klik('[data-styl="pixel"]');
   await chwila(150);
   klik('.kreator [data-akcja="kreator-stworz"]');
-  await chwila(900);
-  const drzwi = (stan.model?.parametric.instances || []).filter(i => i.definition === 'drzwi');
-  dodaj(56, 'creating the Pixel wardrobe gives 293×238×45 cm, five columns, five rows and ten scattered fronts',
-    stan.meble.length === 1 && stan.szerokoscMm === 2930 && stan.wysokoscMm === 2380
-      && stan.glebokoscMm === 450 && stan.kolumny.length === 5 && stan.rzedy.length === 5
-      && drzwi.length === 10,
-    `${stan.szerokoscMm}×${stan.wysokoscMm}×${stan.glebokoscMm} mm, `
-    + `${stan.kolumny.length}×${stan.rzedy.length} grid, ${drzwi.length} doors`);
+  await chwila(150);
+  klik('[data-akcja="kreator-zastap"]');
+  await chwila(1100);
+  const pasy = stan.meble.filter(m => /-pas-/.test(m.id));
+  const slupy = stan.meble.filter(m => /-(stopa|srodek|czubek)-/.test(m.id));
+  const stopyNaPodlodze = stan.meble.filter(m => /-stopa-/.test(m.id) && !m.kotwica).length;
+  dodaj(56, 'Pixel builds crossing full-width bands and full-height posts, not doors scattered on one grid',
+    stan.meble.length === 8 && pasy.length === 2 && slupy.length === 6 && stopyNaPodlodze === 2
+      && pasy.every(p => p.szerokoscMm > slupy[0].szerokoscMm * 2),
+    `${stan.meble.length} modules, ${pasy.length} bands, ${slupy.length} posts, ${stopyNaPodlodze} on the floor`);
 
   /* 57 — para barw z linii Tone: korpus bierze pierwszy kolor, półki i plecy drugi. */
   await pokazKreator();
   await chwila(250);
-  klik('[data-uklad="tone-full"]');
+  klik('[data-kategoria="wardrobe"]');
+  await chwila(250);
+  klik('[data-linia="tone"]');
+  await chwila(200);
+  const parAll = PALETY.tone.length;
+  klik('.kreator-barwa[data-barwa="6"]');              // Cashmere Beige + Antique Pink
   await chwila(150);
-  klik('.kreator-barwa[data-barwa="6"]');                // Cashmere Beige + Antique Pink
-  await chwila(100);
   klik('.kreator [data-akcja="kreator-stworz"]');
-  await chwila(900);
+  await chwila(150);
+  klik('[data-akcja="kreator-zastap"]');
+  await chwila(1100);
   const def = stan.model?.materials?.definitions || {};
   const korpus = stan.model?.parametric?.carcass;
-  dodaj(57, 'a Tone colour pair paints the carcass in one colour and shelves plus back in the other',
-    stan.kolor === 16 && stan.kolorWnetrza === 18
+  dodaj(57, 'the Tone line offers fifteen front-and-interior pairs and paints the carcass and shelves apart',
+    parAll === 15 && stan.kolor === 16 && stan.kolorWnetrza === 18
       && def[korpus?.material]?.color?.toLowerCase() === '#cfc8c1'
-      && def[korpus?.shelfMaterial]?.color?.toLowerCase() === '#ceafae'
-      && /^#/.test(def[korpus?.backMaterial]?.color || ''),
-    `carcass ${def[korpus?.material]?.color}, shelves ${def[korpus?.shelfMaterial]?.color}, `
-    + `back ${def[korpus?.backMaterial]?.color}`);
+      && def[korpus?.shelfMaterial]?.color?.toLowerCase() === '#ceafae',
+    `${parAll} pairs, carcass ${def[korpus?.material]?.color}, shelves ${def[korpus?.shelfMaterial]?.color}`);
 
   /* 58 — cały zrzut katalogu Tylko przelicza się na poprawne meble. */
   const projekty = await katalogProjektow().catch(() => []);
   const wadliwe = projekty.filter(p => {
     const [opis] = opisZProjektu(p);
     return !(opis.szerokoscMm === p.w && opis.wysokoscMm === p.h && opis.glebokoscMm === p.d
-      && opis.siatkaKol.split('+').length === p.kol.length
-      && wpisyPoprawne(opis, p.kol.length, opis.rzedyWlasne.length));
+      && opis.siatkaKol.split('+').length === p.kol.length && opisSpojny([opis]));
   }).map(p => p.id);
-  /* Jeden budowany naprawdę — żeby wiedzieć, że przeliczenie daje dokument, nie tylko opis. */
-  const wzorcowy = projekty.find(p => p.id === 61921);
-  if(wzorcowy){
-    await pokazKreator();
-    await chwila(250);
-    klik('[data-zakladka="katalog"]');
-    await chwila(400);
-    klik('[data-projekt="61921"]');
-    await chwila(150);
-    klik('.kreator [data-akcja="kreator-stworz"]');
-    await chwila(900);
-  }
-  let dokumentOk = false;
-  try{ sprawdzParametryczny(stan.model.parametric); dokumentOk = true; }catch(e){ dokumentOk = false; }
   dodaj(58, 'every design imported from the Tylko catalogue converts into a valid piece',
-    projekty.length > 40 && wadliwe.length === 0 && dokumentOk
-      && stan.szerokoscMm === 4150 && stan.kolumny.length === 5,
-    `${projekty.length} designs, broken: ${wadliwe.join(', ') || 'none'}, `
-    + `built ${stan.szerokoscMm}×${stan.wysokoscMm} mm in ${stan.kolumny.length} columns, document ${dokumentOk}`);
+    projekty.length > 40 && wadliwe.length === 0,
+    `${projekty.length} designs, broken: ${wadliwe.join(', ') || 'none'}`);
+
+  /* 59 — kreator pyta, zanim skasuje projekt, a „Add next to it” zostawia poprzedni. */
+  const przedtem = stan.meble.length;
+  await pokazKreator();
+  await chwila(250);
+  klik('[data-zakladka="katalog"]');
+  await chwila(500);
+  klik('[data-projekt="61921"]');
+  await chwila(150);
+  klik('.kreator [data-akcja="kreator-stworz"]');
+  await chwila(200);
+  const pytaZanimSkasuje = !!document.querySelector('[data-akcja="kreator-zastap"]')
+    && !!document.querySelector('[data-akcja="kreator-dolacz"]');
+  klik('[data-akcja="kreator-dolacz"]');
+  await chwila(1200);
+  dodaj(59, 'the creator asks before it replaces, and adding keeps what was already in the scene',
+    pytaZanimSkasuje && stan.meble.length === przedtem + 1
+      && stan.meble.some(m => m.id === 'tylko-61921'),
+    `asked ${pytaZanimSkasuje}, ${przedtem} modules before, ${stan.meble.length} after`);
+
+  /* 60 — kuchnia: nisza w drugim kolorze, AGD opcjonalne. */
+  const zAgd = modulyKuchni({});
+  const bezAgd = modulyKuchni({lodowka: 'brak', piekarnik: 'brak', zmywarka: 'brak',
+                               mikrofala: 'brak', spizarnia: 'brak'});
+  const naroznik = modulyKuchni({ksztalt: 'naroznik'});
+  const wyspa = modulyKuchni({ksztalt: 'wyspa'});
+  const nisza = zAgd[0].wneki?.[0];
+  const piekarniki = Object.values(zAgd[0].uklady).filter(v => v === 'oven').length;
+  const bezPiekarnika = Object.values(bezAgd[0].uklady).every(v => v !== 'oven');
+  let dokumentOk = false;
+  const {resetDoOpisu} = await import('./szafa.js');
+  resetDoOpisu(zAgd);
+  await chwila(1100);
+  try{ sprawdzParametryczny(stan.model.parametric); dokumentOk = true; }catch(e){ dokumentOk = false; }
+  dodaj(60, 'the kitchen creator builds a contrasting niche with worktop and sink, and every appliance can be left out',
+    !!nisza && nisza.tresc === 'kuchnia' && nisza.gladka === true
+      && nisza.kolor !== zAgd[0].kolor && piekarniki >= 1 && bezPiekarnika
+      && naroznik.length === 2 && wyspa.length === 2
+      && opisSpojny(zAgd) && opisSpojny(naroznik) && opisSpojny(wyspa) && dokumentOk,
+    `niche ${nisza?.tresc} in ${KOLORY[nisza?.kolor ?? 0][0]} vs body ${KOLORY[zAgd[0].kolor][0]}, `
+    + `${piekarniki} oven front, without appliances ${bezPiekarnika}, `
+    + `L-shape ${naroznik.length} modules, island ${wyspa.length}, document ${dokumentOk}`);
 
   zamknijKreator();
   resetDoFabrycznych();

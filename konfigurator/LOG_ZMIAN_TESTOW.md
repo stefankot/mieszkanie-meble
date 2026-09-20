@@ -38,3 +38,13 @@ Plik jest uzupełniany przyrostowo. Każdy wpis opisuje wyłącznie wykonaną zm
 - Dodano import gotowych projektów z katalogu tylko.com (46 sztuk w `tylko-projekty.json`). Ich API jest za Cloudflare, więc katalog jest zrzutem, a nie połączeniem na żywo — sposób odświeżenia opisany w `KATALOG-TYLKO.md`. Kontrola 58.
 - Naprawiono kontrolę 30: wejście w moduł osadzony gasiło jego własną grupę sceny, bo `przygasPozostale()` porównywało identyfikator grupy wprost z korzeniem ścieżki. Teraz pełny kontrast zachowuje całe drzewo zawierania aktywnego ramienia.
 - Weryfikacja: pełny zestaw `58/58 passed`.
+- Kreator pyta, co zrobić z projektem, który już stoi w scenie: zastąpić czy dostawić obok. Dostawianie zmienia identyfikatory razem z kotwicami, więc dwa te same układy nie przyklejają się do siebie. Kontrola 59.
+- Ujednolicono marginesy panelu: jeden margines boczny (`--marg`) i jeden rytm pionowy (`--blok`) dla wszystkich bloków. Lista modułów i podsumowanie przylegały wcześniej do krawędzi, reszta miała 13 px.
+- Naprawiono nieczytelny stan wybrany w paskach segmentowych — biały tekst na jasnoszarym tle zastąpiono ciemnym tłem.
+- Scena dostała narożnik pokoju (podłoga + dwie ściany) i sylwetkę 180 cm jako miarkę, tak jak konfigurator Tylko. Sylwetka znika na czas pathtracingu, bo to płaski wycinak z maską alfa.
+- Naprawiono brakujący import `przebuduj` w `materialy.js`: doczytanie tekstury rzucało `ReferenceError` i mebel zostawał w kolorze zastępczym.
+- Sześć stylów Original i sześć Edge odtworzonych 1:1 z piktogramów Tylko. Pixel przestał być zestawem losowych drzwiczek — to skrzyżowane słupy i pasy, z obrysem w kształcie kraty. Kontrole 55 i 56.
+- Dodano kreator kuchni: kształt (prosta / narożnik / z wyspą), wymiary, wysokość blatu i niszy, para barw i pięć AGD, każde z pozycją albo wyłączone. Kontrola 60.
+- Sylwetkę zastąpiono rysunkiem z Noun Project, dopasowanym do dokładnie 180 cm.
+- Dopisano trzy lampy z BlenderKit; lampa jest wyborem w panelu, stoi we wnęce, a po świadomym wybraniu także na najwyższej otwartej półce.
+- Weryfikacja: pełny zestaw `60/60 passed`.

@@ -2,6 +2,9 @@
    Sama scena, światło i kamera są w scena.js. */
 import * as THREE from 'three';
 import {cm, ziarno} from './dane.js';
+/* Doczytanie tekstury kończy się poza pętlą przebudowy, więc musi ją wywołać samo —
+   bez tego mebel zostawał w kolorze zastępczym aż do następnego kliknięcia. */
+import {przebuduj} from './szafa.js';
 
 export const materialy = new Map();
 let teksturaBazowa = null;

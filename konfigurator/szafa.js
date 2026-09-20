@@ -105,7 +105,9 @@ const KUCHNIA = [
    kotwica: {do: 'kuchnia-front', strona: 'prawo', poziomuj: 'tyl'}, pozycjaMm: null, nozkiMm: 0}
 ];
 
-function mebleZOpisu(opisy){
+/* Opis → gotowe pola mebla, bez dotykania sceny. Osobno od `mebleZOpisu`, bo dostawianie
+   projektu obok istniejącego potrzebuje tych samych mebli, ale nie kasowania listy. */
+function opisyNaMeble(opisy){
   const meble = [];
   for(const opis of opisy){
     wczytajDo(FABRYCZNY);
@@ -120,6 +122,11 @@ function mebleZOpisu(opisy){
     }
     meble.push(polaMebla());
   }
+  return meble;
+}
+
+function mebleZOpisu(opisy){
+  const meble = opisyNaMeble(opisy);
   stan.meble = meble;
   stan.aktywny = 0;
   stan.zaznaczone = meble.length ? [meble[0].id] : [];
@@ -321,6 +328,35 @@ export function resetDoOpisu(opisy){
   zamknijKarte();
   czyscZaznaczenie();
   przebuduj();
+  /* Styl złożony z kilku modułów zaczyna się od stopki wielkości pudełka — bez tego kamera
+     kadrowałaby ją, a nie mebel. Kadr całości pokazuje to, co użytkownik właśnie wybrał. */
+  if(opisy.length > 1) zaznaczCalyMebel();
+}
+
+/* Dostawienie projektu obok tego, co już stoi — druga odpowiedź na pytanie kreatora. */
+export function dolaczOpisy(opisy){
+  if(!stan.meble.length) return resetDoOpisu(opisy);
+  zapiszAktywny();
+  const zajete = new Set(stan.meble.map(m => m.id));
+  /* Dostawiany projekt bywa tym samym układem co ten w scenie, więc niesie te same
+     identyfikatory. Zmieniam je razem z kotwicami — inaczej nowe moduły przykleiłyby się
+     do cudzego rodzica. */
+  let n = 2;
+  while(opisy.some(o => zajete.has(`${o.id}-${n}`))) n++;
+  const zmien = id => zajete.has(id) ? `${id}-${n}` : id;
+  const kopie = structuredClone(opisy).map(o => ({...o, id: zmien(o.id),
+    kotwica: o.kotwica ? {...o.kotwica, do: zmien(o.kotwica.do)} : o.kotwica}));
+  const istniejace = stan.meble;
+  const nowe = opisyNaMeble(kopie);
+  stan.meble = istniejace.concat(nowe);
+  stan.aktywny = istniejace.length;
+  stan.zaznaczone = [nowe[0].id];
+  stan.wejscie = [];
+  wczytajDo(nowe[0]);
+  zamknijKarte();
+  czyscZaznaczenie();
+  przebuduj();
+  if(nowe.length > 1) zaznaczCalyMebel();
 }
 
 /* Import: dokument z tego konfiguratora wraca w całości, obcy v2 wczytuję po wymiarach korpusu. */

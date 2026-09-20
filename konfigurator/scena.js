@@ -6,10 +6,11 @@ import {stan, MM, UDZIAL_SZER, UDZIAL_WYS, BARWY_DEKORU, plotno, zacisk} from '.
 
 import {odswiezNakladke} from './nakladka.js';
 import {sciezkaZawierania} from './moduly.js';
+import {stworzTlo} from './tlo.js';
 import {egzemplarz} from './modele.js';
 
 /* ---------- scena ---------- */
-export let renderer, scena, kamera, sterowanie, mebel, dekor, cien;
+export let renderer, scena, kamera, sterowanie, mebel, dekor, cien, tlo;
 export let swiatloKluczowe, gotowa = false;
 let sciezki = null;                                    // sterownik pathtracingu, gdy tryb włączony
 
@@ -21,10 +22,14 @@ export async function przelaczSciezki(raport){
   if(sciezki){
     sciezki.zatrzymaj();
     sciezki = null;
+    if(tlo) tlo.sylwetka.visible = true;
     dopasujRozmiar();
     return false;
   }
   const modul = await import('./sciezki.js');
+  /* Sylwetka to płaski wycinak z maską alfa — ścieżki widzą sam prostokąt, więc na czas
+     fotograficznego podglądu znika. Ściany i podłoga zostają: dają światłu co odbijać. */
+  if(tlo) tlo.sylwetka.visible = false;
   sciezki = await modul.uruchom(renderer, scena, kamera, sterowanie, raport);
   return true;
 }
@@ -92,7 +97,8 @@ export function stworzScene(){
   mebel = new THREE.Group();
   dekor = new THREE.Group();
   cien = cienKontaktowy();
-  scena.add(mebel, dekor, cien);
+  tlo = stworzTlo();
+  scena.add(mebel, dekor, cien, tlo);
   gotowa = true;
 }
 
@@ -172,6 +178,9 @@ export function zbudujBryle(grupy){
     const sr = pudlo.getCenter(new THREE.Vector3());
     mebel.position.set(-sr.x, 0, -sr.z);               // cały zestaw wyśrodkowany na scenie
     mebel.updateMatrixWorld(true);
+    /* Narożnik pokoju i sylwetka dosuwają się do nowej bryły — bez tego ściana zostawałaby
+       tam, gdzie stał poprzedni mebel. */
+    tlo?.ustaw(new THREE.Box3().setFromObject(mebel));
   }
 }
 

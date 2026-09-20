@@ -6,6 +6,9 @@
   --akcent:#0d99ff; --cena:#e4002b; --panel:300px;
   --pole:#f7f8f9; --wypelnienie:#e4e6ea; --najazd:#f1f2f4; --slaby:#9aa0a6;
   --cien:0 10px 30px rgba(28,30,35,.14);
+  /* Jeden margines boczny i jeden rytm pionowy na cały panel — wcześniej każdy blok miał
+     swój, więc lista modułów i podsumowanie przylegały do krawędzi, a reszta nie. */
+  --marg:13px; --blok:12px;
 }
 *{box-sizing:border-box}
 /* `.wiersz{display:flex}` i `.sekcja{...}` to style autora, więc wygrywały z regułą
@@ -89,7 +92,7 @@ body{
   padding:10px 13px; font:inherit; font-size:13px; color:var(--atrament); outline-offset:2px;
 }
 .pole-siatki:focus{outline:2px solid var(--akcent); border-color:transparent}
-.nota-siatki{margin:8px 2px 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
+.nota-siatki{margin:8px 0 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
 .nota-siatki.uwaga{color:#e9a23b}
 .podpowiedz{
   position:absolute; left:50%; bottom:88px; transform:translateX(-50%); margin:0; z-index:3;
@@ -198,14 +201,14 @@ body{
   flex:0 0 var(--panel); width:var(--panel); background:var(--biel);
   overflow-y:auto; overflow-x:hidden; border-left:1px solid var(--linia);
 }
-.panel-naglowek{display:flex; align-items:baseline; gap:8px; height:44px; padding:0 13px; border-bottom:1px solid var(--obwodka)}
+.panel-naglowek{display:flex; align-items:baseline; gap:8px; height:44px; padding:0 var(--marg); border-bottom:1px solid var(--obwodka)}
 .panel-etykieta{display:none}
 .panel-tytul{margin:0; font-size:12px; font-weight:600; color:var(--atrament)}
 .panel-opis{margin:0; font-size:10.5px; color:var(--szary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 
 /* Sekcje jak w Inspektorze edytora: nagłówek 40 px, tytuł 12 px pogrubiony, linia na dole.
    Rzeczy ustawiane raz (konstrukcja, scena) startują zwinięte — kolumna ma 300 px, nie 470. */
-.sekcja{border-bottom:1px solid var(--obwodka); padding:0 13px 12px}
+.sekcja{border-bottom:1px solid var(--obwodka); padding:0 var(--marg) var(--blok)}
 .sekcja-naglowek{
   display:flex; align-items:center; gap:6px; height:40px; width:100%; padding:0;
   background:none; border:0; font:inherit; font-size:12px; font-weight:600; color:var(--atrament);
@@ -217,10 +220,13 @@ body{
 .sekcja.zwinieta .sekcja-naglowek svg{transform:rotate(-90deg)}
 .sekcja.zwinieta .wiersz{display:none}
 
-.wiersz{display:flex; align-items:center; gap:10px; padding:3px 0}
+.wiersz{display:flex; align-items:center; gap:10px; padding:4px 0}
 .wiersz > .etykieta{flex:0 0 78px; width:78px; color:var(--szary); font-size:11px}
 .wiersz > .kontrolka{flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:8px}
 .wiersz.kolumna{display:block; padding:4px 0}
+/* Wiersze wstawione wprost do panelu (lista modułów, podsumowanie) nie siedzą w sekcji,
+   więc margines boczny muszą wziąć same — inaczej jako jedyne dotykają krawędzi. */
+#wiersze > .wiersz{padding:var(--blok) var(--marg)}
 .wiersz.kolumna > .etykieta{width:auto; flex:none; margin-bottom:6px}
 /* W wierszu pionowym kontrolka jest blokiem na pełną szerokość — bez tego siatka próbników
    z `auto-fill` nie zna swojej szerokości i układa się w jedną kolumnę. */
@@ -235,7 +241,9 @@ body{
   flex:1 0 auto; border:0; background:none; border-radius:8px; padding:5px 8px;
   font:inherit; font-size:11.5px; color:var(--szary); cursor:pointer; white-space:nowrap;
 }
-.grupa button.aktywny{background:var(--wypelnienie); color:#fff; box-shadow:none}
+/* Biały tekst na jasnoszarym wypełnieniu był nieczytelny — wybrana opcja dostaje ciemne
+   tło, tak jak zaznaczony wiersz listy modułów. */
+.grupa button.aktywny{background:var(--atrament); color:#fff; box-shadow:none}
 
 .tor{flex:1 1 auto; position:relative}
 .suwak{width:100%; --track-color-active:var(--atrament); --thumb-size:18px}
@@ -284,7 +292,7 @@ body{
 .cena-oszczednosc{font-size:13px; color:var(--cena); margin-left:8px}
 .cena-glowna{font-size:34px; font-weight:600; color:var(--cena); line-height:1.1; margin:4px 0 2px}
 .cena-nota{font-size:11px; color:var(--szary)}
-.podsumowanie{font-size:10.5px; color:var(--szary); line-height:1.6; padding:10px 13px; border-bottom:1px solid var(--obwodka)}
+.podsumowanie{font-size:10.5px; color:var(--szary); line-height:1.6; border-bottom:1px solid var(--obwodka)}
 .podsumowanie b{color:var(--atrament); font-weight:600}
 .podsumowanie .ostrzezenie{color:var(--cena)}
 
@@ -294,7 +302,7 @@ body{
   background:var(--akcent); color:#fff; font:inherit; font-size:12px; font-weight:500; cursor:pointer;
 }
 .cta.wtorna{background:var(--tor); color:var(--atrament); border:1px solid var(--obwodka); margin-top:6px}
-.przyciski-panelu{padding:10px 13px 14px}
+.przyciski-panelu{padding:var(--blok) var(--marg)}
 
 .wymiary{
   position:absolute; z-index:3; transform:translate(-50%,0); background:var(--biel);
@@ -318,7 +326,7 @@ body{
 /* ---------- lista modułów ---------- */
 /* Wzorzec panelu „Object" z D5: wiersz 24 px, wcięcie pokazuje przyleganie, ikona odróżnia
    moduł samodzielny od zakotwiczonego. Zachowanie z Figmy — klik, Shift-klik, dwuklik. */
-.lista-modulow .lista-glowka{display:flex; align-items:center; gap:6px; margin-bottom:4px}
+.lista-modulow .lista-glowka{display:flex; align-items:center; gap:6px; margin-bottom:6px}
 .lista-modulow .licznik{color:var(--slaby); font-size:10px}
 .lista-modulow .ikonka{
   margin-left:auto; display:flex; width:20px; height:20px; align-items:center; justify-content:center;
@@ -349,7 +357,7 @@ body{
 .okruchy svg{width:9px; height:9px}
 .sekcja.zablokowana{opacity:.4; pointer-events:none}
 .podpowiedz-modulu{
-  margin:0; padding:8px 13px 10px; font-size:10.5px; line-height:1.5; color:var(--szary);
+  margin:0; padding:var(--blok) var(--marg); font-size:10.5px; line-height:1.5; color:var(--szary);
   border-bottom:1px solid var(--obwodka);
 }
 .lista-wyboru{
@@ -372,7 +380,7 @@ body{
 .wiersz.mieszany > .etykieta::after{content:' · mixed'; color:var(--akcent)}
 .wiersz.mieszany .banka{color:var(--akcent)}
 .pasek-zaznaczenia{
-  margin:0; padding:7px 13px; font-size:10.5px; color:var(--akcent);
+  margin:0; padding:8px var(--marg); font-size:10.5px; color:var(--akcent);
   background:rgba(13,153,255,.08); border-bottom:1px solid var(--obwodka);
 }
 .modul.korzen{font-weight:600}
@@ -382,7 +390,7 @@ body{
 /* ---------- kreator mebli ---------- */
 /* Pierwszy ekran nowego projektu. Trzyma się tej samej palety co panel, ale leży nad całą
    aplikacją, bo wybór kategorii i układu to decyzja przed edycją, nie w jej trakcie. */
-.kreator-start{padding:12px 13px; border-bottom:1px solid var(--obwodka)}
+.kreator-start{padding:var(--blok) var(--marg); border-bottom:1px solid var(--obwodka)}
 .kreator-start .cta{display:flex; align-items:center; justify-content:center; gap:7px; width:100%}
 .kreator-start .cta svg{width:15px; height:15px}
 .kreator-tlo{
@@ -444,6 +452,8 @@ body{
   box-shadow:inset 0 0 0 1px rgba(28,30,35,.2);
 }
 .kreator-uklad .mini{width:100%; height:74px; display:block; background:var(--tor); border-radius:4px}
+/* Piktogram stylu to kwadratowy rysunek Tylko — nie rozciągam go na szerokość kafelka. */
+img.mini{object-fit:contain; padding:6px}
 .mini .otwarte{fill:#fff; stroke:var(--wypelnienie); stroke-width:.6}
 .mini .front{fill:var(--atrament); opacity:.72; stroke:#fff; stroke-width:.6}
 .kreator-wymiary{display:flex; gap:10px; flex-wrap:wrap}
@@ -468,8 +478,24 @@ body{
   border-top:1px solid var(--obwodka); background:var(--pole);
 }
 .kreator footer .kreator-nota{margin:0; flex:1 1 auto; min-width:0}
-.kreator footer .cta{flex:0 0 auto; width:auto; min-width:190px}
+.kreator footer .cta{flex:0 0 auto; width:auto; min-width:150px}
+.kreator footer .cta.wtorna{margin-top:0; min-width:auto}
 @media (max-width:760px){
   .kreator-kategorie{grid-template-columns:1fr}
   .kreator header{flex-wrap:wrap; height:auto; padding:10px 14px; gap:8px}
+}
+/* Wiersz pytania w kreatorze kuchni: nazwa po lewej, odpowiedzi po prawej — ten sam rytm
+   co wiersze panelu, ale z miejscem na zdanie wyjaśnienia pod nazwą. */
+.kreator-pytanie{display:flex; align-items:center; gap:12px; padding:5px 0}
+.kreator-pytanie > span{
+  flex:0 0 168px; display:flex; flex-direction:column; gap:2px;
+  font-size:12.5px; color:var(--atrament);
+}
+.kreator-pytanie > span em{font-style:normal; font-size:10.5px; color:var(--szary); line-height:1.4}
+.kreator-pytanie .grupa{flex:1 1 auto; min-width:0}
+.kreator-pytanie .kreator-barwy{flex:1 1 auto}
+.kreator-linie{max-width:420px}
+@media (max-width:760px){
+  .kreator-pytanie{align-items:flex-start; flex-direction:column; gap:4px}
+  .kreator-pytanie > span{flex:none}
 }

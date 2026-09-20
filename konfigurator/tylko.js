@@ -56,10 +56,18 @@ export const PALETY = {
     para(wn ? `${fn} + ${wn}` : fn, fi, wi)))
 };
 
+/* Linie produktowe z kroku 2 ich kreatora. Original Classic i Modern mają te same style
+   i tę samą paletę — różni je wykończenie krawędzi: sklejka na wierzchu albo owinięty kant.
+   Tone to linia szaf z parami barw front + wnętrze. */
 export const LINIE = {
-  original: {nazwa: 'Original', opis: 'Classic plywood in timeless colours with hand-oiled, exposed edges.'},
-  edge:     {nazwa: 'Edge',     opis: 'Vertical lines, full-length aluminium details, generous fronts.'},
-  tone:     {nazwa: 'Tone',     opis: 'Smooth fronts, soft tones and a colour-rich interior.'}
+  'original-classic': {nazwa: 'Original Classic', style: 'original', paleta: 'original', wykonczenie: 'plywood',
+   opis: 'Classic plywood in timeless colours with hand-oiled, exposed edges.'},
+  'original-modern': {nazwa: 'Original Modern', style: 'original', paleta: 'original', wykonczenie: 'board',
+   opis: 'Bold colour, seamless wrapped edges, a clean contemporary silhouette.'},
+  edge: {nazwa: 'Edge', style: 'edge', paleta: 'edge', wykonczenie: 'board',
+   opis: 'Vertical lines, full-length aluminium details, generous fronts.'},
+  tone: {nazwa: 'Tone', style: 'edge', paleta: 'tone', wykonczenie: 'board',
+   opis: 'Smooth fronts, soft tones and a colour-rich interior.'}
 };
 
 export const KATEGORIE = [
@@ -71,78 +79,16 @@ export const KATEGORIE = [
    opis: 'Full-height fronts, rails and internal drawers.'}
 ];
 
-/* Układy startowe: wymiary i podziały przepisane z konkretnych projektów Tylko (`zrodlo`
-   to ich numer). `rzed` jest proporcją — `wysokosciRzedow()` skaluje ją do wnętrza korpusu,
-   więc mebel zawsze wychodzi dokładnie w podanej wysokości. */
-export const UKLADY_STARTOWE = {
-  bookcase: [
-    {id: 'narrow', nazwa: 'Narrow', linia: 'original', zrodlo: 521669,
-     w: 740, h: 1980, d: 270, kol: [722], rzed: [330, 330, 330, 330, 330, 330],
-     uklady: {r1c1: 'door'}, nogi: 'none', plecy: true, wykonczenie: 'plywood'},
-    {id: 'classic', nazwa: 'Classic', linia: 'original', zrodlo: 532154,
-     w: 1530, h: 2280, d: 360, kol: [756, 756], rzed: [380, 320, 320, 320, 320, 320, 320],
-     uklady: {r1c1: 'drawer', r1c2: 'drawer', r2c1: 'door', r2c2: 'door'},
-     nogi: 'none', plecy: true, wykonczenie: 'plywood'},
-    {id: 'pixel', nazwa: 'Pixel', linia: 'original', zrodlo: 1932478,
-     w: 3100, h: 2290, d: 360, kol: [1028, 1027, 1027], rzed: [380, 300, 340, 300, 360, 300, 310],
-     uklady: {r1c3: 'door', r3c1: 'door', r5c2: 'door', r7c3: 'door'},
-     nogi: 'none', plecy: true, wykonczenie: 'board'},
-    {id: 'slant', nazwa: 'Slant', linia: 'original', zrodlo: 1650847,
-     w: 2100, h: 2280, d: 360, kol: [694, 694, 694], rzed: [400, 376, 376, 376, 376, 376],
-     uklady: {r1c1: 'drawer', r1c3: 'drawer'}, nogi: 'none', plecy: true, wykonczenie: 'board'},
-    {id: 'low', nazwa: 'Low unit', linia: 'original', zrodlo: 522196,
-     w: 2430, h: 1380, d: 360, kol: [804, 804, 804], rzed: [360, 340, 340, 340],
-     uklady: {r1c1: 'drawer', r1c2: 'drawer', r1c3: 'drawer'},
-     nogi: 'none', plecy: true, wykonczenie: 'veneer'}
-  ],
-  wallstorage: [
-    {id: 'pixel-wall', nazwa: 'Pixel wall', linia: 'original', zrodlo: 1933654,
-     w: 2580, h: 1980, d: 360, kol: [854, 854, 854], rzed: [330, 330, 330, 330, 330, 330],
-     uklady: {r1c3: 'door', r2c3: 'door', r5c3: 'door', r3c1: 'door', r6c2: 'door'},
-     nogi: 'none', plecy: true, wykonczenie: 'board'},
-    {id: 'grid-wall', nazwa: 'Grid wall', linia: 'original', zrodlo: 539931,
-     w: 1980, h: 1980, d: 360, kol: [654, 654, 654], rzed: [340, 328, 328, 328, 328, 328],
-     uklady: {r1c1: 'drawer', r1c2: 'drawer', r1c3: 'drawer'},
-     nogi: 'none', plecy: true, wykonczenie: 'plywood'},
-    {id: 'tall-wall', nazwa: 'Wall to wall', linia: 'original', zrodlo: 540446,
-     w: 3140, h: 2280, d: 360, kol: [781, 781, 780, 780], rzed: [380, 320, 320, 320, 320, 320, 300],
-     uklady: {r1c1: 'drawer', r1c2: 'drawer', r1c3: 'drawer', r1c4: 'drawer'},
-     nogi: 'none', plecy: true, wykonczenie: 'board'},
-    {id: 'compact', nazwa: 'Compact', linia: 'original', zrodlo: 521154,
-     w: 1450, h: 1080, d: 450, kol: [716, 716], rzed: [360, 360, 360],
-     uklady: {r1c1: 'door', r2c1: 'door', r3c1: 'door', r1c2: 'drawer'},
-     nogi: 'none', plecy: true, wykonczenie: 'board'}
-  ],
-  wardrobe: [
-    {id: 'edge-rail', nazwa: 'Rail + shelves', linia: 'edge', zrodlo: 1409889,
-     w: 1990, h: 1980, d: 600, kol: [658, 657, 657], rzed: [1900],
-     uklady: {r1c1: 'doorail', r1c2: 'doorail', r1c3: 'shelf3'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'},
-    {id: 'edge-wide', nazwa: 'Wide Edge', linia: 'edge', zrodlo: 1936868,
-     w: 2560, h: 1980, d: 450, kol: [848, 847, 847], rzed: [700, 1220],
-     uklady: {r1c1: 'komoda', r2c1: 'doorail', r1c2: 'door', r2c2: 'door2',
-              r1c3: 'door', r2c3: 'door2'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'},
-    /* Układ „pixel”: pięć wąskich słupków i nierówny rytm rzędów — z niego wychodzi
-       szafa ze zrzutu, w której fronty są porozrzucane po siatce. */
-    {id: 'pixel-wardrobe', nazwa: 'Pixel', linia: 'edge', zrodlo: 1935036,
-     w: 2930, h: 2380, d: 450, kol: [583, 583, 582, 582, 582], rzed: [560, 420, 460, 480, 460],
-     uklady: {r1c1: 'door', r1c2: 'door', r1c3: 'door', r1c4: 'door', r1c5: 'door',
-              r3c2: 'door', r5c1: 'door', r4c4: 'door', r2c5: 'door', r5c5: 'door'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'},
-    {id: 'tone-full', nazwa: 'Full height', linia: 'tone', zrodlo: 62131,
-     w: 2360, h: 3000, d: 630, kol: [927, 464, 927], rzed: [2900],
-     uklady: {r1c1: 'doorail', r1c2: 'door2', r1c3: 'doorail'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'},
-    {id: 'tone-wall', nazwa: 'Wall to wall', linia: 'tone', zrodlo: 70134,
-     w: 3850, h: 2910, d: 530, kol: [952, 952, 952, 952], rzed: [2800],
-     uklady: {r1c1: 'doorail', r1c2: 'doorail', r1c3: 'door2', r1c4: 'doorail'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'},
-    {id: 'tone-single', nazwa: 'Single column', linia: 'tone', zrodlo: 92275,
-     w: 600, h: 2750, d: 630, kol: [558], rzed: [700, 2000],
-     uklady: {r1c1: 'komoda', r2c1: 'doorail'},
-     nogi: 'plinth', plecy: true, wykonczenie: 'board'}
-  ]
+/* Domyślne wymiary kategorii — wzięte z prawdziwych projektów Tylko, żeby mebel ze
+   startu miał ich proporcje, a nie okrągłe liczby. `linia` decyduje, którą szóstkę stylów
+   i którą paletę dostaje kategoria. */
+export const KATEGORIA_START = {
+  bookcase:    {linie: ['original-classic', 'original-modern', 'edge'],
+                w: 1530, h: 2280, d: 360, nogi: 'none',   zrodlo: 532154},
+  wallstorage: {linie: ['original-classic', 'original-modern', 'edge'],
+                w: 2580, h: 1980, d: 360, nogi: 'none',   zrodlo: 1933654},
+  wardrobe:    {linie: ['edge', 'tone'],
+                w: 2560, h: 1980, d: 450, nogi: 'plinth', zrodlo: 1936868}
 };
 
 const cmTekst = lista => lista.map(v => String(+(v / 10).toFixed(1)).replace(/\.0$/, '')).join(' + ');
@@ -150,7 +96,8 @@ const cmTekst = lista => lista.map(v => String(+(v / 10).toFixed(1)).replace(/\.
 /* Wspólny szkielet opisu mebla — te same pola, których używa `mebleZOpisu` w szafa.js.
    Siatka kolumn idzie tekstem (skaluje się do szerokości), rzędy listą (skalują się do
    wnętrza), dzięki czemu mebel wychodzi dokładnie w wymiarach z Tylko. */
-function opisMebla({id, nazwa, w, h, d, kol, rzed, uklady, nogi, plecy, wykonczenie, kolor, wnetrze}){
+export function opisMebla({id, nazwa, w, h, d, kol, rzed, uklady, nogi, plecy, wykonczenie,
+                           kolor, wnetrze, kotwica = null, pozycjaMm = null}){
   return {
     id, nazwa, zrodlo: 'regal-lozko',
     szerokoscMm: w, wysokoscMm: h, glebokoscMm: d,
@@ -160,20 +107,9 @@ function opisMebla({id, nazwa, w, h, d, kol, rzed, uklady, nogi, plecy, wykoncze
     dodatki: 0, roslina: 'brak', nadstawka: false, obrot: 0,
     plecy, nogi, nozkiMm: 0, nozkiKolor: 0,
     uklady: {...uklady}, wneki: [],
-    kotwica: null, pozycjaMm: null, materialKorpusu: null, definicja: null,
+    kotwica, pozycjaMm, materialKorpusu: null, definicja: null,
     wzorzec: null, odstepstwa: []
   };
-}
-
-/* Układ startowy + wybrana barwa i wymiary z kreatora → jednoelementowy projekt. */
-export function opisZUkladu(uklad, barwa, wymiary = {}){
-  return [opisMebla({
-    id: 'tylko-' + uklad.id, nazwa: `${uklad.nazwa} · ${barwa.nazwa}`,
-    w: wymiary.w ?? uklad.w, h: wymiary.h ?? uklad.h, d: wymiary.d ?? uklad.d,
-    kol: uklad.kol, rzed: uklad.rzed, uklady: uklad.uklady,
-    nogi: uklad.nogi, plecy: uklad.plecy, wykonczenie: uklad.wykonczenie,
-    kolor: barwa.kolor, wnetrze: barwa.wnetrze
-  })];
 }
 
 /* ---------- import gotowych projektów Tylko ---------- */
