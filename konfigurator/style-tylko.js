@@ -66,65 +66,55 @@ function obok(slupy, ctx){
 
 /* Pixel. Ikona „Original-5" rysuje tylko dwa słupy i dwa pasy, bo to schemat 48 px —
    wzięta dosłownie daje rzadki krzyż, a nie mebel. Regał w tym układzie to GĘSTA KRATA
-   kwadratowych komórek, której obrys jest poszarpany: pojedyncze skrzynki wystają o jeden
-   moduł nad korpus, pod niego i na boki. Stąd budowa: jedna siatka plus doklejone skrzynki.
+   kwadratowych komórek z frontami na większości pól; poszarpany obrys robią pojedyncze
+   skrzynki wystające o jeden moduł poza korpus.
 
-   Liczba komórek wynika z wymiarów, nie z ikony — komórka trzyma się ~43 cm, więc szafa
-   2,6 × 2,3 m dostaje sześć kolumn i pięć rzędów, a nie dwa słupy. Skrzynki są otwarte,
-   więc czytają się jako ciemne pudła między jasnymi frontami. */
+   Korpus stoi na podłodze całą szerokością — skrzynki są doczepione do niego, a nie on
+   do nich. Dolne wcięcie z fotografii to komórka bez frontu w dolnym rzędzie, nie osobna
+   noga: mebel tej wielkości nie ma prawa stać na jednym pudełku. */
 function krata(ctx){
   const KOMORKA = 430;
-  /* Komórka jest kwadratem ~43 cm, a liczba rzędów i kolumn wynika z zamówionych wymiarów —
-     to stąd bierze się gęstość kraty. Wystające skrzynki wychodzą POZA obrys, więc nie
-     zjadają siatki: zamówiona szerokość i wysokość opisują korpus, tak jak u Tylko. */
+  /* Gęstość wynika z zamówionych wymiarów, nie z liczby kresek na ikonie. Skrzynki wystają
+     POZA obrys, więc zamówiona szerokość i wysokość opisują korpus — tak jak u Tylko. */
   const rzedow = Math.max(4, Math.min(7, Math.round(ctx.h / KOMORKA)));
   const kom = ctx.h / rzedow;
   const kolumn = Math.max(4, Math.min(8, Math.round(ctx.w / kom)));
-  const korpusW = ctx.w, szerKol = korpusW / kolumn;
-  const rzedowKraty = rzedow - 1;                      // jeden rząd oddaje skrzynce pod spodem
-  const srodekKolumny = c => Math.round(-korpusW / 2 + (c - 0.5) * szerKol);
+  const szerKol = ctx.w / kolumn;
+  const srodekKolumny = c => Math.round(-ctx.w / 2 + (c - 0.5) * szerKol);
 
-  const opisy = [];
-  const skrzynka = (id, nazwa, kotwica, pozycjaMm) => {
-    opisy.push(opisMebla({id, nazwa, w: Math.round(szerKol), h: Math.round(kom), d: ctx.d,
-      kol: [Math.round(szerKol)], rzed: [1000], uklady: {},
-      nogi: 'none', plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
-      kolor: ctx.kolor, wnetrze: ctx.wnetrze, kotwica, pozycjaMm}));
-    return id;
-  };
-
-  /* Skrzynka pod korpusem sięga podłogi i to na niej stoi cała krata — dlatego jest
-     korzeniem, a korpus wraca z niej na oś mebla. */
-  const xStopy = srodekKolumny(2);
-  const stopa = skrzynka(`${ctx.id}-stopa`, `${ctx.nazwa} · foot`, null, [xStopy, ctx.d / 2]);
-
-  /* Fronty pokrywają większość kraty; rozrzucone otwarte komórki to te ciemne pola
-     ze zdjęcia. Wzór jest deterministyczny, żeby ten sam mebel zawsze wyszedł tak samo. */
+  /* Fronty pokrywają kratę poza rozrzuconymi ciemnymi polami. Wzór jest deterministyczny,
+     żeby ten sam mebel zawsze wychodził tak samo; dolny lewy róg zostaje otwarty, bo to
+     on daje wcięcie widoczne na zdjęciu. */
   const uklady = {};
-  for(let r = 1; r <= rzedowKraty; r++)
+  for(let r = 1; r <= rzedow; r++)
     for(let c = 1; c <= kolumn; c++)
-      if((r * 2 + c * 3) % 5 !== 0) uklady[`r${r}c${c}`] = 'door';
+      if((r * 3 + c * 4) % 7 > 1 && !(r === 1 && c === 1)) uklady[`r${r}c${c}`] = 'door';
 
   const korpus = `${ctx.id}-krata`;
-  opisy.push(opisMebla({
+  const opisy = [opisMebla({
     id: korpus, nazwa: `${ctx.nazwa} · grid`,
-    w: Math.round(korpusW), h: Math.round(kom * rzedowKraty), d: ctx.d,
+    w: Math.round(ctx.w), h: Math.round(ctx.h), d: ctx.d,
     kol: Array.from({length: kolumn}, () => Math.round(szerKol)),
-    rzed: Array.from({length: rzedowKraty}, () => 1000),
-    uklady, nogi: 'none', plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
-    kolor: ctx.kolor, wnetrze: ctx.wnetrze,
-    kotwica: {do: stopa, strona: 'gora', przesun: -xStopy}
-  }));
+    rzed: Array.from({length: rzedow}, () => 1000),
+    uklady, nogi: ctx.nogi, plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
+    kolor: ctx.kolor, wnetrze: ctx.wnetrze
+  })];
 
-  /* Skrzynki nad korpusem co druga kolumna, po bokach co drugi rząd — z tego bierze się
-     schodkowy obrys, który odróżnia Pixel od zwykłej siatki. */
+  /* Skrzynki: co druga kolumna nad korpusem, co drugi rząd na bokach. Każda jest otwarta,
+     więc czyta się jako ciemne pudło między jasnymi frontami. */
+  const skrzynka = (id, nazwa, kotwica) => opisy.push(opisMebla({
+    id, nazwa, w: Math.round(szerKol), h: Math.round(kom), d: ctx.d,
+    kol: [Math.round(szerKol)], rzed: [1000], uklady: {},
+    nogi: 'none', plecy: ctx.plecy, wykonczenie: ctx.wykonczenie,
+    kolor: ctx.kolor, wnetrze: ctx.wnetrze, kotwica}));
+
   for(let c = 2; c <= kolumn; c += 2)
     skrzynka(`${ctx.id}-gora-${c}`, `${ctx.nazwa} · top ${c}`,
       {do: korpus, strona: 'gora', przesun: srodekKolumny(c)});
-  for(let r = 2; r <= rzedowKraty; r += 2)
+  for(let r = 2; r <= rzedow - 1; r += 2)
     skrzynka(`${ctx.id}-lewo-${r}`, `${ctx.nazwa} · left ${r}`,
       {do: korpus, strona: 'lewo', przesunY: Math.round((r - 1) * kom)});
-  for(let r = 3; r <= rzedowKraty; r += 2)
+  for(let r = 3; r <= rzedow - 1; r += 2)
     skrzynka(`${ctx.id}-prawo-${r}`, `${ctx.nazwa} · right ${r}`,
       {do: korpus, strona: 'prawo', przesunY: Math.round((r - 1) * kom)});
   return opisy;

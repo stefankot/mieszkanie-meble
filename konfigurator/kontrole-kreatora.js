@@ -65,20 +65,25 @@ export async function kontroleKreatora(dodaj){
   klik('[data-akcja="kreator-zastap"]');
   await chwila(1200);
   const krata = stan.meble.find(m => /-krata$/.test(m.id));
-  const skrzynki = stan.meble.filter(m => /-(stopa|gora|lewo|prawo)/.test(m.id));
+  const skrzynki = stan.meble.filter(m => /-(gora|lewo|prawo)-/.test(m.id));
   const kolumnKraty = krata ? krata.siatkaKol.split('+').length : 0;
   const rzedowKraty = krata ? krata.rzedyWlasne.length : 0;
   const frontow = krata ? Object.keys(krata.uklady).length : 0;
-  const wystaje = ['gora', 'lewo', 'prawo', 'stopa']
-    .filter(s => stan.meble.some(m => new RegExp(`-${s}`).test(m.id))).length;
-  dodaj(56, 'Pixel builds a dense grid of square cells with boxes stepping out on every side',
-    !!krata && kolumnKraty >= 4 && rzedowKraty >= 3
-      && frontow > kolumnKraty * rzedowKraty * .6          // większość komórek ma front
-      && frontow < kolumnKraty * rzedowKraty               // ale nie wszystkie — reszta to ciemne pola
-      && wystaje === 4 && skrzynki.length >= 5
+  const komorek = kolumnKraty * rzedowKraty;
+  const wystaje = ['gora', 'lewo', 'prawo']
+    .filter(x => stan.meble.some(m => new RegExp(`-${x}-`).test(m.id))).length;
+  /* Najważniejsze: krata jest korzeniem, czyli stoi na podłodze całą szerokością.
+     Skrzynki wiszą na niej, a nie ona na skrzynce — mebel tej wielkości nie ma prawa
+     stać na jednym pudełku. */
+  const stoiNaPodlodze = !!krata && !krata.kotwica
+    && skrzynki.every(m => m.kotwica?.do === krata.id);
+  dodaj(56, 'Pixel is a dense grid standing on the floor, with boxes stepping out of its outline',
+    stoiNaPodlodze && kolumnKraty >= 4 && rzedowKraty >= 4
+      && frontow > komorek * .6 && frontow < komorek
+      && wystaje === 3 && skrzynki.length >= 5
       && skrzynki.every(m => m.szerokoscMm < krata.szerokoscMm / 3),
-    `grid ${kolumnKraty}×${rzedowKraty} with ${frontow} fronts, ${skrzynki.length} boxes `
-    + `stepping out on ${wystaje} of 4 sides`);
+    `grid ${kolumnKraty}×${rzedowKraty} with ${frontow}/${komorek} fronts, on the floor `
+    + `${stoiNaPodlodze}, ${skrzynki.length} boxes on ${wystaje} of 3 sides`);
 
   /* 57 — para barw z linii Tone: korpus bierze pierwszy kolor, półki i plecy drugi. */
   await pokazKreator();

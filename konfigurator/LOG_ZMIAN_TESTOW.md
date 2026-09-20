@@ -51,3 +51,5 @@ Plik jest uzupełniany przyrostowo. Każdy wpis opisuje wyłącznie wykonaną zm
 - Poprawiono Pixel: pierwsza wersja odtwarzała piktogram (dwa słupy i dwa pasy), a nie mebel — wychodził rzadki krzyż zamiast kraty ze zdjęcia. Teraz to gęsta siatka kwadratowych komórek z frontami na większości pól i pojedynczymi skrzynkami wystającymi na cztery strony; liczba komórek wynika z wymiarów, nie z ikony. Kontrola 56 sprawdza gęstość i obrys.
 - Kotwica boczna dostała `przesunY`, bez którego skrzynki doklejane z boku zawsze stały na podłodze.
 - Weryfikacja: pełny zestaw `60/60 passed`.
+- Poprawiono konstrukcję Pixela: cała krata stała na jednej skrzynce pod dolnym rzędem, co jest fizycznie niemożliwe. Korpus jest teraz korzeniem i stoi na podłodze całą szerokością, a skrzynki wiszą na nim. Dolne wcięcie ze zdjęcia to komórka bez frontu, nie osobna noga. Kontrola 56 sprawdza odtąd, że krata nie ma kotwicy, a każda skrzynka jest zakotwiczona w niej.
+- Weryfikacja: pełny zestaw `60/60 passed`.

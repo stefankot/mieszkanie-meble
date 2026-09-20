@@ -88,7 +88,8 @@ Wzięta dosłownie daje rzadki krzyż z wielkimi dziurami w narożnikach — nie
 regał w tym układzie (zdjęcie referencyjne użytkownika) to GĘSTA KRATA kwadratowych komórek
 z frontami na większości pól, a poszarpany obrys robią pojedyncze skrzynki wystające o jeden
 moduł nad korpus, pod niego i na boki. Liczba komórek wynika z zamówionych wymiarów (komórka
-~43 cm), nie z liczby kresek na ikonie.
+~43 cm), nie z liczby kresek na ikonie. Korpus stoi na podłodze całą szerokością —
+skrzynki są doczepione do niego, a nie on do nich.
 
 ## Sylwetka i modele
 
