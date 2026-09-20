@@ -617,9 +617,13 @@ export function zbudujPanel(){
   host.append(podsumowanie(), przyciski());
   /* „Edycja dopiero po wejściu w moduł" — sekcje parametrów są nieklikalne, dopóki nie
      wejdziesz dwuklikiem. Lista modułów i przyciski na dole zostają czynne. */
+  /* Powód wyszarzenia panelu musi być czytelny i klikalny — szary drobiazg 10,5 px pod
+     drzewem był poza polem widzenia kogoś, kto właśnie próbuje ruszyć suwak. */
   const podpowiedz = document.createElement('p');
   podpowiedz.className = 'podpowiedz-modulu';
-  podpowiedz.textContent = 'Double-click a module to edit it. Esc goes back up.';
+  podpowiedz.addEventListener('click', e => {
+    if(e.target.closest('button') && stan.meble[stan.aktywny]) wejdzWModul(stan.meble[stan.aktywny].id);
+  });
   host.querySelector('.lista-modulow').after(podpowiedz);
   odswiezacze.push(() => {
     /* Parametry edytujesz po wejściu w moduł albo gdy zaznaczysz kilka naraz — zaznaczenie
@@ -627,9 +631,8 @@ export function zbudujPanel(){
     bezKorpusu.forEach(s => s.hidden = wSrodkuModul(stan.meble[stan.aktywny]));
     const w = stan.wejscie.length > 0 || stan.zaznaczone.length > 1;
     host.querySelectorAll('.sekcja').forEach(s => s.classList.toggle('zablokowana', !w));
-    podpowiedz.textContent = stan.zaznaczone.length === 1
-      ? 'Selected, not editing — double-click the module to edit it.'
-      : 'Double-click a module to edit it. Esc goes back up.';
+    podpowiedz.innerHTML = `<span>Controls are locked until you open a module.</span>
+      <button type="button">Edit ${nazwaModulu(stan.meble[stan.aktywny] || {})}</button>`;
     podpowiedz.hidden = w;
   });
   window.lucide?.createIcons();

@@ -46,7 +46,7 @@ body{
 .olowki{position:absolute; inset:0; pointer-events:none; z-index:3}
 .olowek{
   position:absolute; width:36px; height:36px; margin:-18px 0 0 -18px;
-  display:none; place-items:center; pointer-events:auto;
+  display:grid; place-items:center; pointer-events:auto;
   background:var(--biel); border:1px solid var(--obwodka); border-radius:50%;
   color:var(--atrament); cursor:ew-resize; padding:0; touch-action:none;
 }
@@ -94,17 +94,27 @@ body{
 .pole-siatki:focus{outline:2px solid var(--akcent); border-color:transparent}
 .nota-siatki{margin:8px 0 0; font-size:11.5px; line-height:1.5; color:var(--szary)}
 .nota-siatki.uwaga{color:#e9a23b}
+/* Pasek stanu sceny: mówi, czemu nie da się teraz edytować, i daje przycisk, który to
+   naprawia. Musi być klikalny, więc wyłamuje się z `pointer-events:none` warstw nad sceną. */
 .podpowiedz{
-  position:absolute; left:50%; bottom:88px; transform:translateX(-50%); margin:0; z-index:3;
+  position:absolute; left:50%; bottom:88px; transform:translateX(-50%); margin:0; z-index:6;
+  display:flex; align-items:center; gap:10px; pointer-events:auto;
   background:var(--biel); border:1px solid var(--obwodka); border-radius:999px;
-  padding:9px 18px; font-size:12px; color:var(--szary);
+  padding:7px 8px 7px 18px; font-size:12px; color:var(--szary); box-shadow:var(--cien);
 }
+.podpowiedz button{
+  border:0; border-radius:999px; padding:6px 13px; background:var(--atrament); color:#fff;
+  font:inherit; font-size:12px; cursor:pointer;
+}
+.podpowiedz button:hover{background:var(--akcent)}
 
 /* komórki i karta */
 .siatka{position:absolute; inset:0; z-index:2; pointer-events:none}
 /* Komórki nie łapią wskaźnika — przeciąganie po meblu ma obracać scenę.
    Klik jest rozpoznawany geometrycznie, a chwytne są tylko uchwyty w rogach. */
-.komorka{position:absolute; border:1px solid transparent; border-radius:3px; pointer-events:none}
+/* Siatka jest mapą tego, co da się kliknąć — musi być widoczna od razu, a nie dopiero
+   pod kursorem. Cienka, półprzezroczysta kreska nie zabija podglądu mebla. */
+.komorka{position:absolute; border:1px solid rgba(13,153,255,.24); border-radius:3px; pointer-events:none}
 .komorka.podswietlona,.komorka.wybrana{border-color:var(--akcent); background:rgba(13,153,255,.12)}
 .komorka{display:flex; align-items:flex-start; justify-content:center; touch-action:none}
 .komorka.zaznaczona{border-color:var(--akcent); background:rgba(13,153,255,.26)}
@@ -344,7 +354,10 @@ body{
 .modul:hover{background:var(--najazd)}
 .modul.zaznaczony{background:var(--akcent); color:#fff}
 .modul.aktywny-modul:not(.zaznaczony){box-shadow:inset 3px 0 0 var(--akcent); background:rgba(13,153,255,.07)}
+/* Wejście w moduł oznacza obwódka, a tło zostaje przy zaznaczeniu — inaczej blada
+   poświata `wejsciowy` nadpisywała niebieskie tło i zostawał biały tekst na jasnym. */
 .modul.wejsciowy{background:rgba(13,153,255,.14); box-shadow:inset 0 0 0 1px var(--akcent)}
+.modul.wejsciowy.zaznaczony{background:var(--akcent); color:#fff}
 .modul svg{width:12px; height:12px; flex:0 0 12px; color:#a78bfa}
 .modul.zaznaczony svg{color:#fff}
 .modul .kropka{width:8px; height:8px; flex:0 0 8px; border-radius:50%; box-shadow:inset 0 0 0 1px rgba(28,30,35,.18)}
@@ -357,9 +370,16 @@ body{
 .okruchy svg{width:9px; height:9px}
 .sekcja.zablokowana{opacity:.4; pointer-events:none}
 .podpowiedz-modulu{
-  margin:0; padding:var(--blok) var(--marg); font-size:10.5px; line-height:1.5; color:var(--szary);
-  border-bottom:1px solid var(--obwodka);
+  display:flex; align-items:center; gap:10px; margin:0; padding:var(--blok) var(--marg);
+  font-size:11px; line-height:1.4; color:var(--szary); border-bottom:1px solid var(--obwodka);
 }
+.podpowiedz-modulu span{flex:1 1 auto; min-width:0}
+.podpowiedz-modulu button{
+  flex:0 0 auto; border:0; border-radius:999px; padding:6px 12px; background:var(--atrament);
+  color:#fff; font:inherit; font-size:11px; cursor:pointer; max-width:130px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.podpowiedz-modulu button:hover{background:var(--akcent)}
 .lista-wyboru{
   width:100%; height:24px; padding:0 6px; border:1px solid var(--obwodka); border-radius:5px;
   background:var(--tor); color:var(--atrament); font:inherit; font-size:11.5px; cursor:pointer;

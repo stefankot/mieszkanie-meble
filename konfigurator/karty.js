@@ -95,9 +95,10 @@ export function trescKarty(klucz){
     <div class="pole"><div class="mini">Merge with neighbours</div>
       <div class="grupa" data-rola="scal">${[['l', '←'], ['p', '→'], ['g', '↑'], ['d', '↓']].map(([id, znak]) =>
         `<button data-id="${id}" title="Extend the niche this way">${znak}</button>`).join('')}</div></div>
-    <div class="pole"><div class="mini">Row height</div>
+    ${wysokosciDoWyboru(r).length ? `<div class="pole"><div class="mini">Row height</div>
       <div class="grupa" data-rola="wysokosc">${wysokosciDoWyboru(r).map(v =>
-        `<button data-id="${v}" class="${Math.abs(v - h) < 16 ? 'aktywny' : ''}">${cm(v)}</button>`).join('')}</div></div>
+        `<button data-id="${v}" class="${Math.abs(v - h) < 16 ? 'aktywny' : ''}">${cm(v)}</button>`).join('')}</div></div>`
+      : ''}
     <div class="pole"><div class="mini">Doors in this row</div>
       <div class="grupa" data-rola="rzad">${['none', 'some', 'max'].map(v =>
         `<button data-id="${v}" class="${trybRzedu(r) === v ? 'aktywny' : ''}">${v[0].toUpperCase() + v.slice(1)}</button>`).join('')}</div></div>

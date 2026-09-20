@@ -24,7 +24,10 @@ export async function selftest(zakresWprost){
   const zakres = parsujZakres(zakresWprost ?? new URLSearchParams(location.search).get('selftest'));
   document.querySelector('.selftest')?.remove();
   const wyniki = [];
+  /* Ostatnia zameldowana kontrola — gdy zestaw się zatnie, `window.__postep` mówi gdzie,
+     zamiast zostawiać nas z samym „jeszcze liczy". */
   const dodaj = (nr, opis, ok, det) => {
+    window.__postep = {nr, opis};
     if(zakres && (nr < zakres.od || nr > zakres.do)) return;
     wyniki.push({nr, opis, ok: !!ok, det: det || ''});
   };

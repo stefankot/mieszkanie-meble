@@ -464,7 +464,10 @@ export function przebuduj(zapisujHistorie = true){
   const obrocono = stan.ostatniObrot !== stan.obrot || stan.ostatniAktywny !== stan.aktywny;
   stan.ostatniObrot = stan.obrot;
   stan.ostatniAktywny = stan.aktywny;
-  dopasujKamere(obrocono ? frontMebla() : undefined, obrocono);
+  /* Kamerę ruszam TYLKO wtedy, gdy zmienił się mebel albo jego obrót. Wcześniej robiła to
+     każda przebudowa, więc każde drgnięcie suwaka wyrywało widok z powrotem na aktywny
+     moduł i nie dało się pracować patrząc na całość. */
+  if(obrocono) dopasujKamere(frontMebla(), true);
   /* Jeden wadliwy odświeżacz panelu nie może zabijać całej przebudowy sceny. */
   for(const f of odswiezacze){
     try{ f(); }catch(e){ console.error('odświeżanie panelu:', e); }
@@ -637,7 +640,12 @@ export function usunMebel(){
   }
   przebuduj();
   dopasujRozmiar();
+  /* Pierwsze ujęcie pokazuje cały mebel, nie moduł numer jeden — inaczej po wejściu na
+     stronę w kadrze stoi sam cokół i nie widać, co się właściwie otworzyło. Zaznaczenie
+     zostaje przy jednym module, więc suwaki nadal dotyczą jego, a nie całego zestawu. */
+  stan.kadrCaly = true;
   ustawUjecie(frontMebla());
+  stan.kadrCaly = false;
   petla();
   /* Modele przedmiotów ważą kilka megabajtów — scena ma stanąć przed nimi, a nie po nich.
      Gdy dojdą, jedna przebudowa wymienia zastępcze bryłki na prawdziwe doniczki. */
@@ -674,7 +682,12 @@ export function usunMebel(){
   document.querySelector('.szyna').addEventListener('click', e => {
     const akcja = e.target.closest('button')?.dataset.akcja;
     if(akcja === 'widok-3d'){ zamknijKarte(); ustawUjecie(frontMebla().applyAxisAngle(new THREE.Vector3(0, 1, 0), .42).setY(.17)); }
-    if(akcja === 'dopasuj') ustawUjecie(frontMebla());                 // natychmiastowy powrót na oś
+    /* Lupa to przycisk ratunkowy: wraca na oś, a gdy nic nie jest otwarte, wchodzi też
+       w aktywny moduł. Sama oś nic nie dawała, bo warstwa edycyjna wymaga obu rzeczy naraz. */
+    if(akcja === 'dopasuj'){
+      if(!stan.wejscie.length && stan.meble[stan.aktywny]) wejdzWModul(stan.meble[stan.aktywny].id);
+      ustawUjecie(frontMebla());
+    }
     if(akcja === 'sciezki') return przelaczTrybSciezek(e.target.closest('button'));
     if(akcja === 'wymiary'){
       stan.wymiary = !stan.wymiary;

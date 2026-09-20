@@ -283,7 +283,10 @@ function zastosujLimity(l){
                              maxPolarAngle: l.maxP, minAzimuthAngle: l.minA, maxAzimuthAngle: l.maxA});
 }
 
-export const NA_OSI = .08;
+/* Rzuty komórek liczy `rzutuj()` z macierzy kamery, więc są poprawne pod każdym kątem —
+   prostokąt `div`-a rozjeżdża się dopiero przy sporym skosie. Stare .08 rad (4,6°) kasowało
+   całą warstwę edycyjną przy najmniejszym ruchu myszą. */
+export const NA_OSI = .30;
 export function naOsiCzolowej(){
   if(przelot) return false;
   const kier = kamera.position.clone().sub(sterowanie.target).normalize();

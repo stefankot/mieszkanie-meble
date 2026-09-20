@@ -413,6 +413,10 @@ export async function kontroleMebli(dodaj){
   przelaczMebel(stan.meble.findIndex(m => m.id === 'biurko-lewe'));
   stan.zaznaczone = [];
   przebuduj(false);
+  /* Przełączenie modułu kadruje łagodnym przelotem, więc odległość trzeba zmierzyć PO nim.
+     Wcześniej każda przebudowa dociągała kamerę natychmiast i pomiar wychodził od ręki —
+     teraz kamera stoi w miejscu, dopóki nie zmieni się mebel, więc trzeba poczekać. */
+  await new Promise(r => setTimeout(r, 800));
   const kadrModulu = kamera.position.distanceTo(sterowanie.target);
   dodaj(33, 'the list root selects every module, leaves the one you were in and frames the whole set',
     wSrodkuSciezka === 2 && wszystkie === stan.meble.length && puste === 0 && kadrCalosci > kadrModulu,

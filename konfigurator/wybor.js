@@ -4,7 +4,7 @@ import {stan, MIN_KOMORKA, el, zacisk} from './dane.js';
 
 import {wWnece} from './wneki.js';
 import {zapisTorow} from './siatka.js';
-import {kamera, renderer, mebel, grupyMebli} from './scena.js';
+import {kamera, renderer, mebel, grupyMebli, ustawUjecie} from './scena.js';
 import {przebuduj, przelaczMebel, wejdzWModul} from './szafa.js';
 import {sciezkaZawierania} from './moduly.js';
 import {rzutuj, zamknijKarte, odswiezNakladke, komorkiEkranu, wnekiEkranu} from './nakladka.js';
@@ -56,6 +56,9 @@ export function dodajKolumne(strona){
   stan.siatkaKol = zapisTorow(stan.kolumnyWlasne);
   stan.styl = 'custom';
   przebuduj();
+  /* Mebel właśnie urósł o 40 cm — bez przekadrowania wychodzi poza widok i użytkownik
+     nie widzi kolumny, którą dołożył. */
+  ustawUjecie(null, true);
 }
 
 export function wlaczPrzeciaganie(){

@@ -8,7 +8,9 @@ import {granicaWneki, wWnece} from './wneki.js';
 import {rysujZaznaczenie} from './wybor.js';
 import {nazwaModulu} from './moduly.js';
 
-import {kamera, renderer, mebel, naOsiCzolowej, grupyMebli, sciezkiAktywne} from './scena.js';
+import {kamera, renderer, mebel, naOsiCzolowej, grupyMebli, sciezkiAktywne,
+        ustawUjecie, frontMebla} from './scena.js';
+import {wejdzWModul} from './szafa.js';
 
 let rectyKomorek = [];                                 // prostokąty komórek w pikselach sceny
 let rectyWnek = [];                                    // to samo dla wnęk — wnęka zasłania komórki pod sobą
@@ -32,13 +34,37 @@ export function etykieta(x, y, tekst, klasa, zgodny){
   return `<div class="wymiar-et ${klasa}${zgodny === false ? ' niezgodny' : ''}" style="left:${x}px;top:${y}px">${tekst}${uwaga}</div>`;
 }
 
+/* Pasek pod sceną: jedyne miejsce, w którym aplikacja tłumaczy, czemu nie da się teraz
+   edytować. Przycisk robi dokładnie to, czego brakuje. */
+function pasekStanu(wModule, naOsi, sciezki){
+  const pasek = el('podpowiedz');
+  if(!pasek) return;
+  if(sciezki || (wModule && naOsi)){ pasek.hidden = true; return; }
+  pasek.hidden = false;
+  pasek.innerHTML = !wModule
+    ? `Nothing is open for editing <button data-akcja="wejdz">Edit this piece</button>`
+    : `The grid shows head-on <button data-akcja="na-os">Turn to face</button>`;
+}
+
+el('podpowiedz')?.addEventListener('click', e => {
+  const akcja = e.target.closest('button')?.dataset.akcja;
+  if(akcja === 'wejdz' && stan.meble[stan.aktywny]) wejdzWModul(stan.meble[stan.aktywny].id);
+  if(akcja === 'na-os') ustawUjecie(frontMebla(), true);
+});
+
 export function odswiezNakladke(){
   odswiezZnaczniki();
   /* Siatka komórek i uchwyty przegród pokazują się dopiero w środku modułu — jak zawartość
      grupy w Figmie, do której trzeba wejść dwuklikiem. Poza modułem scena jest czysta. */
   const siatka = el('siatka'), olowki = el('olowki');
-  const front = naOsiCzolowej() && !sciezkiAktywne() && stan.wejscie.length > 0;
+  /* Trzy osobne warunki, nie jeden. Gdy któregoś brakuje, narzędzia znikały bez słowa —
+     teraz pasek mówi, czego brakuje, i daje to naprawić jednym kliknięciem. */
+  const wModule = stan.wejscie.length > 0;
+  const naOsi = naOsiCzolowej();
+  const sciezki = sciezkiAktywne();
+  const front = wModule && naOsi && !sciezki;
   siatka.hidden = olowki.hidden = !front;
+  pasekStanu(wModule, naOsi, sciezki);
   if(!front) zamknijKarte();
   if(!front || !stan.komorki.length) return;
   kamera.updateMatrixWorld();
