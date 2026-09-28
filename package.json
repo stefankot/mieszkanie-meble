@@ -10,14 +10,14 @@
     "test:edytor": "vitest run"
   },
   "dependencies": {
-    "@lucide/vue": "1.47.0",
+    "@lucide/vue": "1.48.0",
     "@nanostores/vue": "1.1.0",
-    "@vueuse/core": "14.4.0",
+    "@vueuse/core": "15.0.0",
     "fuse.js": "7.5.0",
     "idb-keyval": "6.3.0",
     "nanostores": "1.5.3",
     "openai": "7.17.0",
-    "reka-ui": "2.10.4",
+    "reka-ui": "2.10.5",
     "tinykeys": "4.0.0",
     "vue": "3.5.43",
     "zod": "4.6.5"
